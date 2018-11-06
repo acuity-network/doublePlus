@@ -1,0 +1,40 @@
+{
+  "name": "Mix-Hub",
+  "version": "1.0.1",
+  "description": "Mix-Hub",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Brian Heishman",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "https://github.com/mixblockchain/mix-hub",
+  "dependencies": {
+    "@babel/runtime": "7.0.0-beta.55",
+    "base-58": "0.0.1",
+    "brotli": "^1.3.2",
+    "classnames": "^2.2.5",
+    "core-js": "^2.5.7",
+    "ethereumjs-tx": "^1.3.7",
+    "ethereumjs-wallet": "^0.6.2",
+    "google-protobuf": "^3.5.0",
+    "history": "^3.0.0",
+    "ipfs-api": "^25.0.0",
+    "jquery": "^3.3.1",
+    "meteor-node-stubs": "^0.4.1",
+    "multihashes": "^0.4.12",
+    "react": "^16.3.0",
+    "react-dom": "^16.3.0",
+    "react-file-input": "^0.2.5",
+    "react-router-dom": "^4.0.0-beta.6",
+    "request": "^2.88.0",
+    "web3": "1.0.0-beta.34"
+  }
+}

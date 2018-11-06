@@ -1,0 +1,27 @@
+@font-face {
+    font-family: 'Gidole-Regular';
+    src: 
+     url('fonts/Gidole-Regular.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+  }  
+
+h1
+    {
+        padding-top:30px
+    }
+h2 
+    {
+        padding-top:20px
+    }
+h3
+    {
+        padding-top:20px
+    }
+body {
+        font-family: 'Gidole-Regular';
+    }
+    h6
+    {
+        padding-top:20px;
+        font-style:bolder;
+        padding-bottom:20px
+    }

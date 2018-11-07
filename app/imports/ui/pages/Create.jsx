@@ -63,7 +63,7 @@ class Create extends React.Component{
         let Render;
 
         Render = 
-        <div>
+        <div style ={{margin:'auto', maxWidth:'1200px'}}>
         <div className="w3-col m12">
             <div className="w3-card w3-round w3-white">
                 <div className="w3-container w3-padding">

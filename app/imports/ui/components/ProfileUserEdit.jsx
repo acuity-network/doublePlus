@@ -1,6 +1,12 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import base64img from '../../startup/client/lib/base64img.js'
+import profileProto from '../../startup/client/lib/protobuf/account-profile_pb.js'
+import languageProto from '../../startup/client/lib/protobuf/language_pb.js'
+import titleProto from '../../startup/client/lib/protobuf/titleProto_pb.js'
+import bodyTextProto from '../../startup/client/lib/protobuf/bodyText_pb.js'
+import languageProto from '../../startup/client/lib/protobuf/language_pb.js'
+import MixContent from '../../startup/client/classes/MixContent.js'
 
 
 class ProfileUserEdit extends React.Component{
@@ -28,11 +34,17 @@ class ProfileUserEdit extends React.Component{
         this.props.history.push(link)
     };
 
-    handleBioChange () {
+    handleBioChange (e) {
+        this.setState({
+            bio: e.target.value
+        })
 
     }
 
-    handleLocationChange () {
+    handleLocationChange (e) {
+        this.setState({
+            location: e.target.value
+        })
 
     }
 
@@ -41,6 +53,48 @@ class ProfileUserEdit extends React.Component{
 
     }
     save (e) {
+
+        let content = new MixContent();
+        // Account profile
+        let profileMessage = new profileProto.AccountProfile();
+        profileMessage.setType(this.state.type);
+        profileMessage.setLocation(this.state.location);
+        content.addMixin(0x4bf3ce07, profileMessage.serializeBinary());
+        // Language
+        let languageMessage = new languageProto.LanguageMixin();
+        languageMessage.setLanguageTag('en-US');
+        content.addMixin(0x4e4e06c4, languageMessage.serializeBinary());
+        // Title
+        let titleMessage = new titleProto.TitleMixin();
+        titleMessage.setTitle(this.state.name);
+        content.addMixin(0x24da6114, titleMessage.serializeBinary());
+        // BodyText
+        let bodyTextMessage = new bodyTextProto.BodyTextMixin();
+        bodyTextMessage.setBodyText(this.state.bio);
+        content.addMixin(0x34a9a6ec, bodyTextMessage.serializeBinary());
+        // Image
+        // if (window.fileNames) {
+        //   let image = new Image(this.$root, window.fileNames[0])
+        //   content.addMixin(0x12745469, await image.createMixin())
+        // }
+
+
+
+        
+
+
+    }
+
+    handleTypeChange (e) {
+        this.setState({
+            type: e.target.value
+        })
+    }
+
+    handleNameChange (e) {
+        this.setState({
+            name: e.target.value
+        })
 
     }
 
@@ -55,12 +109,28 @@ class ProfileUserEdit extends React.Component{
                <h6 className="w3-center">{this.state.profileAddr}</h6>
                <div className="w3-center">
                 <p className="w3-center"><img src={this.state.profileImg} className="w3-circle" style={{height:"200px",width:"200px"}} alt="Avatar"/></p>
-                <input id="save" type="file" accept=".jpeg, .jpg, .jpe, .png" onChange={this.onFileChange.bind(this)} />
+                <label className = "w3-button w3-theme" htmlFor="avatar">Edit Picture</label>
+                <input id="avatar" type="file" multiple={false} accept=".jpeg, .jpg, .jpe, .png" onChange={this.onFileChange.bind(this)} />
     
                </div>
                <hr/>
-               <p><i className="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> <input onChange={this.handleBioChange.bind(this)} className="form-control" id="bio" placeholder="My bio..." type="text"/></p>
-               <p><i className="fa fa-home fa-fw w3-margin-right w3-text-theme"></i> <input onChange={this.handleLocationChange.bind(this)} className="form-control" id="Location" placeholder="Location..." type="text"/> </p>
+               <label htmlFor="name">Name:</label> <br/><input onChange={this.handleNameChange.bind(this)} className="form-control" id="name" placeholder="Name..." type="text"/> 
+               <label htmlFor="bio">Bio:</label> <br/><input onChange={this.handleBioChange.bind(this)} className="form-control" id="bio" placeholder="My bio..." type="text"/>
+               <label htmlFor="location">Location:</label> <br/><input onChange={this.handleLocationChange.bind(this)} className="form-control" id="location" placeholder="Location..." type="text"/> 
+               
+               <label htmlFor="typeChange">Profile Type: </label> <br/>
+                <select defaultValue = '' style={{width:'40%'}} onChange = {this.handleTypeChange.bind(this)} className="form-control" id="typeChange">
+                    <option value="0">Anon</option>
+                    <option value="1">Person</option>
+                    <option value="2">Project</option>
+                    <option value="3">Organization</option>
+                    <option value="4">Proxy</option>
+                    <option value="5">Parody</option>
+                    <option value="6">Bot</option>
+                    <option value="7">Shill</option>
+                    
+                </select>
+                <br/>
                {/* <p><i className="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> <input onChange={this.handleToAddrChange.bind(this)} className="form-control" id="toAddr" placeholder="0x4e221b..." type="text"/> </p> */}
                <button onClick={this.save.bind(this)} id="save" type="button" className="w3-button w3-theme"><i ></i> &nbsp;Save</button> &nbsp;
               </div>

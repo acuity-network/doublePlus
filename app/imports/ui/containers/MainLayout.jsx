@@ -23,7 +23,7 @@ export default class MainLayout extends React.Component {
   }
   console.log(LocalStore.get('nodeURL'));
   if(!LocalStore.get('ipfsApiURL')) {
-      LocalStore.set('ipfsApiURL', "localhost");
+      LocalStore.set('ipfsApiURL', "ipfs.infura.io");
   }
   if(!LocalStore.get('ipfsGatewayURL')) {
       LocalStore.set('ipfsGatewayURL', "https://ipfs.infura.io/");

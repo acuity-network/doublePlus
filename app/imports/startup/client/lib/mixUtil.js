@@ -329,13 +329,23 @@ module.exports = {
 
     },
 
-    createNewItem: async(myAddr, ipfsHash, flagsNonce) => {
+    //accepts optional parent array of itemIds and calls the corresponding contract method depending on parentss count.
+    createNewItem: async(myAddr, ipfsHash, flagsNonce, parents = []) => {
       
       try {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
         
         const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
-        const createItem = await itemStoreIpfsSha256.methods.create(flagsNonce,ipfsHash);
+        let createItem;
+        if(parents.length == 0) {
+          createItem = await itemStoreIpfsSha256.methods.create(flagsNonce,ipfsHash);
+        } else  if(parents.length == 1) {
+          createItem = await itemStoreIpfsSha256.methods.createWithParent(flagsNonce,ipfsHash,parents[0]);
+        } else if (parents.length > 1){
+          createItem = await itemStoreIpfsSha256.methods.createWithParents(flagsNonce,ipfsHash,parents);
+        } else {
+          throw 'error';
+        }
         const encodedABI = createItem.encodeABI();
 
         let gasEst = await createItem.estimateGas();
@@ -367,7 +377,7 @@ module.exports = {
           chainId:76,
           from: myAddr,
           to: itemStoreIpfsSha256Addr,
-          gas: 2000000,
+          gas: 2500000,
           data: encodedABI,
           gasPrice:GasPrice
         }; 

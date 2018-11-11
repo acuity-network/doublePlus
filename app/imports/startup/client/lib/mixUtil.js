@@ -12,16 +12,20 @@ const itemStoreShortId = new web3.eth.Contract(itemStoreShortIdAbi, '0xd02ee7687
 const itemStoreAbi = require('../lib/jsonAbis/itemStoreInterface.abi.json');
 //const itemStoreFactory = new web3.eth.Contract(itemStoreAbi, '0xdf37447c7c3b241be8dc5dfc70103d3fa7fee1a6');
 
+
+const itemStoreIpfsSha256Addr = '0xe059665fe0d226f00c72e3982d54bddf4be19c6c';
 const itemStoreIpfsSha256Abi = require('../lib/jsonAbis/itemStoreIPFSSha256.abi.json');
 //const itemStoreIpfsSha256Factory = new web3.eth.Contract(itemStoreIpfsSha256Abi);
 
 const accountProfileAbi = require('../lib/jsonAbis/AccountProfile.abi.json');
+const accountProfileAddr = '0x72f52ab6b1d15630ee9b2d8763b23478c0327df8';
+//const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr)
 
 const multihashes = require('multihashes');
 const itemPb = require("./protobuf/item_pb.js");
 const mixinmixin = require("./protobuf/mixin-mixin_pb.js");
 const jpegmixin = require("./protobuf/mix_jpeg_mipmap_pb.js");
-const brotli = require("../lib/brotli.js");
+const brotli = require("../lib/brotli/brotli.js");
 var bro = new brotli.Brotli();
 const Base58 = require("base-58");
 
@@ -61,7 +65,7 @@ module.exports = {
             console.log("Unknown item store.");
             return;
           }
-      
+          console.log('d'+itemStoreAddress);
           const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreAddress);
       
           const item = await itemStoreIpfsSha256.methods.getItem(itemId).call();
@@ -94,19 +98,6 @@ module.exports = {
       } catch(e) {
         console.log(e);
       }
-    
-        
-    
-        // console.log("Flags: " + flags);
-        // console.log("Owner: " + owner);
-        // console.log("Revision count: " + revisionCount);
-        // console.log("Revision IPFS hashes: " + revisionIpfsHashes);
-        // console.log("Revision timestamps: " + revisionTimestamps);
-        // console.log("Parent ids: " + parentIds);
-        // console.log("Child ids: " + childIds);
-
-        
-
 
     },
 
@@ -120,7 +111,7 @@ module.exports = {
 
     },
 
-    addTrustedAccount:async (myAddr, trustedAddr, privKey)=> {
+    addTrustedAccount:async (myAddr, trustedAddr)=> {
 
       const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
 
@@ -129,6 +120,7 @@ module.exports = {
       const encodedABI = addTrusted.encodeABI();
 
       let gasEst = await addTrusted.estimateGas();
+      console.log(gasEst)
 
       const notify = $.notify({
         icon: 'glyphicon glyphicon-warning-sign',
@@ -162,7 +154,7 @@ module.exports = {
         gasPrice:GasPrice
       }; 
 
-      let res = await Web3Util.signAndSendRawTx(rawTx,privKey,notify);
+      let res = await Web3Util.signAndSendRawTx(rawTx,notify);
 
 
     },
@@ -202,12 +194,193 @@ module.exports = {
     accountHasProfile: async(addr) => {
 
       const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
-      let accountProfile = new web3.eth.Contract(accountProfileAbi,)
+      const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
+      try {
+        return await accountProfile.methods.hasProfile(addr).call();
+      } catch (e) {
+        console.log(e.message)
+        return false;
+      }
+    },
 
+    associateProfileToAccount: async(myAddr, mixAccountItemId) => {
+      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      
+      const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
+      
+        try {
+          console.log(mixAccountItemId);
+          const setProfile = accountProfile.methods.setProfile(mixAccountItemId);
+          const encodedABI = setProfile.encodeABI();
+          console.log('here')
+          //let gasEst = await setProfile.estimateGas();
+          //gasEst = gasEst +gasEst;
+          //console.log(gasEst);
+
+          const notify = $.notify({
+            icon: 'glyphicon glyphicon-warning-sign',
+            title: '',
+            message: 'Creating Transaction..',
+            target: '_blank',
+            allow_dismiss: false,
+          },{
+            animate: {
+                enter: 'animated fadeInDown',
+                exit: 'animated fadeOutUp'
+            },
+            type:'info',
+            showProgressbar: true,
+            placement: {
+                from: "bottom",
+                align: "center"
+            }
+          });
+
+          let GasPrice = await Web3Util.getGasPrice();
+          let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
+
+          let rawTx = {
+            nonce:Nonce,
+            chainId:76,
+            to: accountProfileAddr,
+            from:myAddr,
+            gas: 2000000,
+            data: encodedABI,
+            gasPrice:GasPrice
+          }; 
+
+          let res = await Web3Util.signAndSendRawTx(rawTx,notify);
+          console.log('profiletx', res);
+          return res;
+        } catch (e) {
+          console.log(e.message);
+        }
+      
+    },
+
+    getProfile: async(addr) => {
+      try {
+
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
+        let profileId = await accountProfile.methods.getProfileByAccount(addr).call();
+        return profileId;
+
+      } catch (e) {
+        console.log(e.message);
+        return null;
+      }
+    },
+
+
+    createOrReviseMyProfile: async(ipfsHash, myAddr) => {
+      try {
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
+        accountProfile.getPastEvents("allEvents",(e,events)=>{console.log(events)})
+        let myProfile = await module.exports.getProfile(myAddr);
+        console.log('my profile',myProfile)
+        if(myProfile == null || myProfile == '0x') {
+          
+          await module.exports.createProfile(ipfsHash, myAddr);
+
+        } else {
+          
+          await module.exports.reviseProfile(myProfile, ipfsHash, myAddr);
+
+        }
+
+      } catch (e) {
+        console.log(e.message)
+
+      }
+    },
+
+    createProfile: async(ipfsHash, myAddr) => {
+
+      try {
+        
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        let flagsNonce = '0x01' + web3.utils.randomHex(30).substr(2);
+        let itemId = await module.exports.getItemId(flagsNonce, myAddr);
+
+        await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce);
+        await module.exports.associateProfileToAccount(myAddr, itemId);  
+
+      } catch(e) {
+       console.log(e.message)
+      }
+
+    },
+
+    reviseProfile: async(profileId, ipfsHash, myAddr) => {
+
+      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const accountProfile = new web3.eth.Contract(accountProfileAbi, );
+
+    },
+
+    getItemId: async(flagsNonce,myAddr) => {
+      
+      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
+      let itemId = await itemStoreIpfsSha256.methods.getNewItemId(flagsNonce).call({from:myAddr});
+      return itemId;
+
+    },
+
+    createNewItem: async(myAddr, ipfsHash, flagsNonce) => {
+      
+      try {
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        
+        const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
+        const createItem = await itemStoreIpfsSha256.methods.create(flagsNonce,ipfsHash);
+        const encodedABI = createItem.encodeABI();
+
+        let gasEst = await createItem.estimateGas();
+
+        const notify = $.notify({
+          icon: 'glyphicon glyphicon-warning-sign',
+          title: '',
+          message: 'Creating Transaction..',
+          target: '_blank',
+          allow_dismiss: false,
+        },{
+          animate: {
+              enter: 'animated fadeInDown',
+              exit: 'animated fadeOutUp'
+          },
+          type:'info',
+          showProgressbar: true,
+          placement: {
+              from: "bottom",
+              align: "center"
+          }
+        });
+
+        let GasPrice = await Web3Util.getGasPrice();
+        let Nonce = await web3.eth.getTransactionCount(myAddr);
+      
+        let rawTx = {
+          nonce:Nonce,
+          chainId:76,
+          from: myAddr,
+          to: itemStoreIpfsSha256Addr,
+          gas: 2000000,
+          data: encodedABI,
+          gasPrice:GasPrice
+        }; 
+
+        let res = await Web3Util.signAndSendRawTx(rawTx,notify);
+
+        return res;
+
+      } catch (e) {
+        throw e
+      }
 
     }
-
-
 
 
 }

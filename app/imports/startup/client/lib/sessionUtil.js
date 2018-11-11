@@ -5,11 +5,12 @@ module.exports = {
         Session.set('loggedIn', null);
         Session.set('wallet', null);
         Session.set('priv', null);
-        Session.set('addr', null)
+        Session.set('addr', null);
+        Session.set('profile', null);
 
     },
     
-    logIn: async (privKey) => { return new Promise((resolve,reject) => {
+    logIn: async (privKey) => {
         try{
             let buff = new Buffer(privKey, 'hex');
             let wallet = EthWallet.fromPrivateKey(buff);
@@ -23,14 +24,17 @@ module.exports = {
                 Session.set('balance',res);
             });
 
-            resolve();
+            let profile = await MixUtil.getProfile(Session.get('addr'));
+            Session.get('profile', profile);
+            console.log('my', profile);
+
+            return true;
         } catch(e) {
-            reject(e);
+            console.log(e.message);
+            throw e;
         }
-
-    });
-
-},
+    
+    },
 
 
 }

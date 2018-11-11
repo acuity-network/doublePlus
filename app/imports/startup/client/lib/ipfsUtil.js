@@ -50,6 +50,7 @@ module.exports = {
 
     addFile: async(data) => {
         const ipfs = ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
+        console.log(data);
         let result = await ipfs.files.add(data);
         let hash = result[0].hash;
         return hash;

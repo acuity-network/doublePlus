@@ -3,9 +3,8 @@ import { withRouter } from 'react-router-dom';
 import base64img from '../../startup/client/lib/base64img.js'
 import profileProto from '../../startup/client/lib/protobuf/account-profile_pb.js'
 import languageProto from '../../startup/client/lib/protobuf/language_pb.js'
-import titleProto from '../../startup/client/lib/protobuf/titleProto_pb.js'
-import bodyTextProto from '../../startup/client/lib/protobuf/bodyText_pb.js'
-import languageProto from '../../startup/client/lib/protobuf/language_pb.js'
+import titleProto from '../../startup/client/lib/protobuf/title_pb.js'
+import bodyTextProto from '../../startup/client/lib/protobuf/body_pb.js'
 import MixContent from '../../startup/client/classes/MixContent.js'
 
 
@@ -52,7 +51,11 @@ class ProfileUserEdit extends React.Component{
         console.log(e.target.files[0]);
 
     }
-    save (e) {
+
+    save () {
+
+
+        
 
         let content = new MixContent();
         // Account profile
@@ -77,11 +80,14 @@ class ProfileUserEdit extends React.Component{
         //   let image = new Image(this.$root, window.fileNames[0])
         //   content.addMixin(0x12745469, await image.createMixin())
         // }
-
-
-
-        
-
+        console.log(content);
+        content.save()
+        .then((res)=>{
+            console.log(res);
+            console.log(Session.get('addr'));
+            MixUtil.createOrReviseMyProfile(res, Session.get('addr'));
+            
+        });
 
     }
 

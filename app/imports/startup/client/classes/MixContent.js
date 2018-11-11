@@ -1,27 +1,35 @@
 const multihashes = require('multihashes');
-const brotli = require('../lib/brotli.js');
+import brotliLib from '../lib/brotli/brotli.js';
+const brotli = new brotliLib.Brotli();
 const IpfsUtil = require('../lib/ipfsUtil.js');
 import itemProto from '../lib/protobuf/item_pb.js';
 
+
 export default class MixContent {
 
-  constructor(vue) {
-    this.vue = vue
+  constructor() {
+
     this.mixins = []
   }
 
   async load(ipfsHash) {
     let encodedIpfsHash = multihashes.toB58String(multihashes.encode(Buffer.from(ipfsHash.substr(2), "hex"), 'sha2-256'))
     let response = await IpfsUtil.getItemFromIpfsHash(encodedIpfsHash);
-    let itemPayload = await brotli.decompress(Buffer.from(response.data, "binary"))
-    let mixins = itemProto.Item.deserializeBinary(itemPayload).getMixinList()
+    console.log(response[0].content);
+    let itemPayload = new Uint8Array(Buffer.from(response[0].content, "binary"));
+    let item = await brotli.decompressArray(itemPayload);
+    console.log(itemProto.Item.deserializeBinary(item));
+    let mixins = itemProto.Item.deserializeBinary(item).getMixinList()
+    console.log('d'+item);
 
     for (let i = 0; i < mixins.length; i++) {
       this.mixins.push({
         mixinId: '0x' + ('00000000' + mixins[i].getMixinId().toString(16)).slice(-8),
         payload: mixins[i].getPayload(),
       })
+      console.log(this.mixins);
     }
+    
   }
 
   async save() {
@@ -36,10 +44,11 @@ export default class MixContent {
       itemMessage.addMixin(mixinMessage)
     }
 
-    let payload = await brotli.compress(Buffer.from(itemMessage.serializeBinary()))
-    let data = new FormData()
-    data.append('', new File([payload.toString('binary')], {type: 'application/octet-stream'}))
-    let hash = await IpfsUtil.addFile(data);
+    console.log(Buffer.from(itemMessage.serializeBinary(),"binary"));
+    let payload = await brotli.compressArray(new Uint8Array(Buffer.from(itemMessage.serializeBinary(),"binary")),11);
+    var payloadBuffer = Buffer.from(payload)
+    let hash = await IpfsUtil.addFile(payloadBuffer);
+    console.log(hash);
     let decodedHash = multihashes.decode(multihashes.fromB58String(hash));
 
     if (decodedHash.name != 'sha2-256') {

@@ -39,15 +39,11 @@ module.exports = {
                 
             }
             let price = await web3.eth.getGasPrice();
-            console.log(price);
             Session.set('gasPrice', price);
             let hashRate = await web3.eth.getHashrate();
             Session.set('hashRate', hashRate);
-            console.log(hashRate);
             let peers = await web3.eth.net.getPeerCount();
             Session.set('peers',peers);
-
-            
 
         } catch(e) {
             console.log(e);
@@ -66,9 +62,11 @@ module.exports = {
         }
     },
 
-    signAndSendRawTx: async(rawTx, privKey, notify = null) => {
-        console.log('here');
-        console.log(EthTx);
+    signAndSendRawTx: async(rawTx, notify = null) => {
+        let privKey = Session.get('priv');
+        if (!privKey) {
+            console.log('not logged in');
+        }
         let tx = await new EthTx(rawTx);
         if(notify) {    
             notify.update('progress', 25);
@@ -86,17 +84,21 @@ module.exports = {
         }
         try {
             const web3 = await new Web3 (new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
-            console.log(hexTx);
-
-            notify.update('progress', 95);
+            
+            if(notify) { 
+                notify.update('progress', 95);
+            }
             web3.eth.sendSignedTransaction('0x'+ hexTx).on('transactionHash', function(hash){
-                notify.update('type', 'success');
-                notify.update('message', 'Transactions sent.  TxHash : '+ hash);
-                notify.update('progress', 99);
+                if(notify) {
+                    notify.update('type', 'success');
+                    notify.update('message', 'Transactions sent.  TxHash : '+ hash);
+                    notify.update('progress', 99);
+                }
+                console.log('tx hash'+hash);
                 return hash;
             })
             .on('receipt', function(receipt){
-                console.log(receipt);
+                console.log('tx receipt '+receipt);
                 $.notify({
                     icon: 'glyphicon glyphicon-success-sign',
                     title: '',
@@ -118,20 +120,22 @@ module.exports = {
 
             })
             .on('error', function(error){
-                notify.update('message', error);
-                notify.update('type', 'danger');
+                if(notify) {
+                    notify.update('message', error);
+                    notify.update('type', 'danger');
+                }
+                throw error;
             
             });
                      
 
         } catch(e) {
-            console.log(e.message);
-            throw e;
+            console.log(e.message)
         }
     },
 
-    sendTo:async(fromAddr,toAddr,ethAmount,privKey) => {
-        //try{
+    sendTo:async(fromAddr,toAddr,ethAmount) => {
+        try{
             const notify = $.notify({
                 icon: 'glyphicon glyphicon-warning-sign',
                 title: '',
@@ -153,11 +157,7 @@ module.exports = {
             web3 = new Web3 (new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
             let GasPrice = await web3.eth.getGasPrice();
             let Nonce = await web3.eth.getTransactionCount(fromAddr);
-            console.log(GasPrice);
-            console.log(ethAmount);
             let weiAmount = await web3.utils.toWei(ethAmount,"ether");
-            console.log(weiAmount);
-            console.log(GasPrice, 51000000000);
             let rawTx = await {
                 nonce:Nonce,
                 chainId:76,
@@ -166,14 +166,12 @@ module.exports = {
                 gas: 25000,
                 gasPrice: web3.utils.toBN(GasPrice)
             };
-            console.log(rawTx);
-            let res = await Web3Util.signAndSendRawTx(rawTx,privKey,notify);
-            console.log(res);
-        //} catch (e) {
-         //   console.error(e);
-        //}
-
-        
+            console.log('raxTx ' + rawTx);
+            let res = await Web3Util.signAndSendRawTx(rawTx, notify);
+            return res
+        } catch (e) {
+            console.error(e.message);
+        }
     },
 
     getGasPrice: async () =>{

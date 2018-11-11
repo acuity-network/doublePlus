@@ -25,7 +25,7 @@ export default class MixItem {
             
         let inUse = await this.itemStore.methods.getInUse(this.itemId).call();
         
-        console.log(inUse);
+        console.log(this.itemStoreAddress);
         
         if (!inUse) {
             throw 'Item not found.'

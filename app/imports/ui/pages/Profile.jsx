@@ -43,22 +43,26 @@ class Profile extends React.Component{
 
     render() {
         let Render;
-        if(! this.state.loaded){
-            Render =
-                <Loading/>
-    
-        } else if(this.state.isMine && !Session.get('profile')) {
+        //if is users page and user doesnt have a profile, show user edit
+        if(this.state.isMine && !Session.get('profile')) {
         Render = 
             <div style ={{margin:'auto', maxWidth:'1200px'}}>
                 <ProfileUserEdit/>
             </div>
             
+        } else if(!this.state.loaded){
+            Render =
+                <Loading/>
+        } else if(!this.state.profileId) {
+            Render = 
+                <h1>Profile doesnt exist</h1>
+        
         } else {
-        Render = 
-            <div className="w3-row">       
-                <ProfileUserInfo isMine = {this.state.isMine} profileId = {this.state.profileId} profileAddr={this.state.profileAddr}/>
-                <ProfileFeed isMine = {this.state.isMine} profileId={this.state.profileId} profileAddr={this.state.profileAddr}/>
-            </div>  
+            Render = 
+                <div className="w3-row">       
+                    <ProfileUserInfo isMine = {this.state.isMine} profileId = {this.state.profileId} profileAddr={this.state.profileAddr}/>
+                    <ProfileFeed isMine = {this.state.isMine} profileId={this.state.profileId} profileAddr={this.state.profileAddr}/>
+                </div>  
         }
       
         return(Render);

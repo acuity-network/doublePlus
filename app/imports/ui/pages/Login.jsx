@@ -35,7 +35,7 @@ class Login extends React.Component{
 
     handleSubmit(e) {
             SessionUtil.logIn(this.state.privateKey)
-            .then(()=> {
+            .then((success)=> {
                     Web3Util.getBalance(Session.get('addr'))
                     .then((balance) =>{
                         Session.set('balance',balance);

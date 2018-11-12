@@ -7,8 +7,9 @@ class ProfileUserInfo extends React.Component{
     constructor(props){
         super(props);
         this.state = { 
-                    profileAddr:this.props.profileAddr,
-                    isMine: Session.get('addr')==this.props.profileAddr
+                profileAddr:this.props.profileAddr,
+                profileId: this.props.profileId,
+                isMine: this.props.isMine
         };
     }
 

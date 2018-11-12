@@ -337,6 +337,7 @@ module.exports = {
         
         const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
         let createItem;
+
         if(parents.length == 0) {
           createItem = await itemStoreIpfsSha256.methods.create(flagsNonce,ipfsHash);
         } else  if(parents.length == 1) {
@@ -344,8 +345,9 @@ module.exports = {
         } else if (parents.length > 1){
           createItem = await itemStoreIpfsSha256.methods.createWithParents(flagsNonce,ipfsHash,parents);
         } else {
-          throw 'error';
+          throw 'parent error';
         }
+        
         const encodedABI = createItem.encodeABI();
 
         let gasEst = await createItem.estimateGas();

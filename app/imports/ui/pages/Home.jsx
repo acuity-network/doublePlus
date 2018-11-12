@@ -10,7 +10,7 @@ class Home extends React.Component {
   
   constructor(props){
     super(props);
-    console.log(base64img.base64Gif);
+
     this.state = { gif:
         "data:image/gif;base64, "+ base64img.base64Gif
     };

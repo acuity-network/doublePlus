@@ -112,49 +112,54 @@ module.exports = {
     },
 
     addTrustedAccount:async (myAddr, trustedAddr)=> {
+      try{
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
 
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);
+        const addTrusted = trustedAccounts.methods.trustAccount(trustedAddr);
+        const encodedABI = addTrusted.encodeABI();
 
-      const trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);
-      const addTrusted = trustedAccounts.methods.trustAccount(trustedAddr);
-      const encodedABI = addTrusted.encodeABI();
+        let gasEst = await addTrusted.estimateGas();
+        console.log(gasEst)
 
-      let gasEst = await addTrusted.estimateGas();
-      console.log(gasEst)
+        const notify = $.notify({
+          icon: 'glyphicon glyphicon-warning-sign',
+          title: '',
+          message: 'Creating Transaction..',
+          target: '_blank',
+          allow_dismiss: false,
+        },{
+          animate: {
+              enter: 'animated fadeInDown',
+              exit: 'animated fadeOutUp'
+          },
+          type:'info',
+          showProgressbar: true,
+          placement: {
+              from: "bottom",
+              align: "center"
+          }
+        });
 
-      const notify = $.notify({
-        icon: 'glyphicon glyphicon-warning-sign',
-        title: '',
-        message: 'Creating Transaction..',
-        target: '_blank',
-        allow_dismiss: false,
-      },{
-        animate: {
-            enter: 'animated fadeInDown',
-            exit: 'animated fadeOutUp'
-        },
-        type:'info',
-        showProgressbar: true,
-        placement: {
-            from: "bottom",
-            align: "center"
-        }
-      });
+        let GasPrice = await Web3Util.getGasPrice();
+        let Nonce = await web3.eth.getTransactionCount(myAddr);
+      
+        let rawTx = {
+          nonce:Nonce,
+          chainId:76,
+          from: myAddr,
+          to: trustedAccountAddr,
+          gas: gasEst,
+          data: encodedABI,
+          gasPrice:GasPrice
+        }; 
 
-      let GasPrice = await Web3Util.getGasPrice();
-      let Nonce = await web3.eth.getTransactionCount(myAddr);
-    
-      let rawTx = {
-        nonce:Nonce,
-        chainId:76,
-        from: myAddr,
-        to: trustedAccountAddr,
-        gas: gasEst,
-        data: encodedABI,
-        gasPrice:GasPrice
-      }; 
+        Web3Util.signAndSendRawTx(rawTx,notify);
 
-      let res = await Web3Util.signAndSendRawTx(rawTx,notify);
+      } catch(e) {
+
+        throw (e);
+      }
 
 
     },
@@ -249,11 +254,11 @@ module.exports = {
             gasPrice:GasPrice
           }; 
 
-          let res = await Web3Util.signAndSendRawTx(rawTx,notify);
-          console.log('profiletx', res);
-          return res;
+          Web3Util.signAndSendRawTx(rawTx,notify);
+    
         } catch (e) {
           console.log(e.message);
+          throw(e);
         }
       
     },
@@ -330,7 +335,7 @@ module.exports = {
     },
 
     //accepts optional parent array of itemIds and calls the corresponding contract method depending on parentss count.
-    createNewItem: async(myAddr, ipfsHash, flagsNonce, parents = []) => {
+    createNewItem: async(myAddr, ipfsHash, flagsNonce, parents = [], notify = null) => {
       
       try {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
@@ -347,32 +352,16 @@ module.exports = {
         } else {
           throw 'parent error';
         }
-        
+
         const encodedABI = createItem.encodeABI();
 
         let gasEst = await createItem.estimateGas();
 
-        const notify = $.notify({
-          icon: 'glyphicon glyphicon-warning-sign',
-          title: '',
-          message: 'Creating Transaction..',
-          target: '_blank',
-          allow_dismiss: false,
-        },{
-          animate: {
-              enter: 'animated fadeInDown',
-              exit: 'animated fadeOutUp'
-          },
-          type:'info',
-          showProgressbar: true,
-          placement: {
-              from: "bottom",
-              align: "center"
-          }
-        });
+        notify.update('message', 'Creating new Mix Item!');
+        notify.update('progress', 60);
 
         let GasPrice = await Web3Util.getGasPrice();
-        let Nonce = await web3.eth.getTransactionCount(myAddr);
+        let Nonce = await web3.eth.getTransactionCount(myAddr, "pending");
       
         let rawTx = {
           nonce:Nonce,
@@ -384,14 +373,27 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        let res = await Web3Util.signAndSendRawTx(rawTx,notify);
-
-        return res;
+        Web3Util.signAndSendRawTx(rawTx,notify);
 
       } catch (e) {
         throw e
       }
 
+    },
+
+    postNewBlurb: async(myAddr, ipfsHash, parentProfileId, notify = null) => {
+
+        try {
+
+          let flagsNonce = '0x01' + Web3.utils.randomHex(30).substr(2);
+          let itemId = await module.exports.getItemId(flagsNonce, myAddr);
+          console.log([parentProfileId]);
+          module.exports.createNewItem(myAddr,ipfsHash,flagsNonce,[parentProfileId], notify)
+
+          } catch (e) {
+              throw e
+          }
+        
     }
 
 

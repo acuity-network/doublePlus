@@ -49,6 +49,7 @@ export default class MixRevision {
   }
 
   getBodyText() {
+    //console
     return bodyTextProto.BodyTextMixin.deserializeBinary(this.content.getPayloads('0x34a9a6ec')[0]).getBodyText()
   }
 

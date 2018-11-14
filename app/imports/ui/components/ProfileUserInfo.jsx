@@ -6,18 +6,46 @@ class ProfileUserInfo extends React.Component{
 
     constructor(props){
         super(props);
-        this.state = { 
-                profileAddr:this.props.profileAddr,
-                profileId: this.props.profileId,
-                isMine: this.props.isMine
-        };
+        
+
+        this.state = {
+            profileAddr:this.props.profileAddr,
+            profileId: this.props.profileId,
+            isMine: this.props.isMine,
+            profileItem: this.props.profileItem,
+            latestProfileRevision: null,
+            location: null,
+            type: null,
+            bio: null,
+            name: null,
+            timestamp: null
+        
+        }
+
     }
 
     componentWillMount(){
         this.setState({
             profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg
-  
         });
+
+        this.state.profileItem.latestRevision().load()
+        .then(profileRevision => {
+            
+            this.setState( {
+                latestProfileRevision: profileRevision,
+                location: profileRevision.getProfile().location,
+                type: profileRevision.getProfile().type,
+                bio: profileRevision.getBodyText(),
+                name: profileRevision.getTitle(),
+                timestamp: profileRevision.getTimestamp()
+            })
+
+        }).catch(e=>{
+
+
+        });
+
     };
 
     shouldComponentUpdate(lastState, nextState) {
@@ -34,12 +62,12 @@ class ProfileUserInfo extends React.Component{
         <div className="w3-col m3">
             <div className="w3-card w3-round w3-white">
               <div className="w3-container">
-               <h6 className="w3-center">{this.state.profileAddr}</h6>
+               <h6 className="w3-center">{this.state.name}</h6>
                <p className="w3-center"><img src={this.state.profileImg} className="w3-circle" style={{height:"106px",width:"106px"}} alt="Avatar"/></p>
                <hr/>
-               <p><i className="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> Software Dev</p>
-               <p><i className="fa fa-home fa-fw w3-margin-right w3-text-theme"></i> US </p>
-               <p><i className="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> June 9, 1990 </p>
+               <p><i className="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> {this.state.bio}</p>
+               <p><i className="fa fa-home fa-fw w3-margin-right w3-text-theme"></i> {this.state.location}</p>
+               {/* <p><i className="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> June 9, 1990 </p> */}
               </div>
             </div>
             <br/>
@@ -48,6 +76,7 @@ class ProfileUserInfo extends React.Component{
     };
 
     componentWillUnmount() {
+
     };
 
 }

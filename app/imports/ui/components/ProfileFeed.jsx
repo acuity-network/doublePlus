@@ -32,7 +32,7 @@ class ProfileFeed extends React.Component{
         <div className="w3-col m7">
             <div className="w3-row-padding">
                 <div className="w3-col m12">
-                    <ProfilePost profileAddr = {this.state.profileAddr} isMine = {this.state.isMine}/>
+                    {this.state.isMine ? <ProfilePost profileAddr = {this.state.profileAddr} isMine = {this.state.isMine}/>:''}
 
                 
                 </div>

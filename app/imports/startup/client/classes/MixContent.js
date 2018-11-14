@@ -23,11 +23,11 @@ export default class MixContent {
     console.log('d'+item);
 
     for (let i = 0; i < mixins.length; i++) {
-      this.mixins.push({
+      await this.mixins.push({
         mixinId: '0x' + ('00000000' + mixins[i].getMixinId().toString(16)).slice(-8),
         payload: mixins[i].getPayload(),
       })
-      console.log(this.mixins);
+    
     }
     
   }

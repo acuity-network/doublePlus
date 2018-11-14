@@ -88,14 +88,15 @@ module.exports = {
             if(notify) { 
                 notify.update('progress', 95);
             }
-            web3.eth.sendSignedTransaction('0x'+ hexTx).on('transactionHash', function(hash){
+            web3.eth.sendSignedTransaction('0x'+ hexTx)
+            .on('transactionHash', (hash) => {
+                
                 if(notify) {
                     notify.update('type', 'success');
                     notify.update('message', 'Transactions sent.  TxHash : '+ hash);
                     notify.update('progress', 99);
                 }
                 console.log('tx hash'+hash);
-                return hash;
             })
             .on('receipt', function(receipt){
                 console.log('tx receipt '+receipt);
@@ -117,6 +118,8 @@ module.exports = {
                         align: "center"
                     }
                 });
+
+                ////HANDLE UPDATES BASED ON TO CONTRACT ID
 
             })
             .on('error', function(error){
@@ -167,8 +170,7 @@ module.exports = {
                 gasPrice: web3.utils.toBN(GasPrice)
             };
             console.log('raxTx ' + rawTx);
-            let res = await Web3Util.signAndSendRawTx(rawTx, notify);
-            return res
+            Web3Util.signAndSendRawTx(rawTx, notify);
         } catch (e) {
             console.error(e.message);
         }

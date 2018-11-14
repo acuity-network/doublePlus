@@ -54,9 +54,6 @@ class ProfileUserEdit extends React.Component{
 
     save () {
 
-
-        
-
         let content = new MixContent();
         // Account profile
         let profileMessage = new profileProto.AccountProfile();

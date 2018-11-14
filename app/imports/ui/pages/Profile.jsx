@@ -4,6 +4,7 @@ import ProfileUserInfo from '../components/ProfileUserInfo.jsx';
 import ProfileFeed from '../components/ProfileFeed.jsx';
 import ProfileUserEdit from '../components/ProfileUserEdit.jsx';
 import Loading from '../components/Loading.jsx';
+import MixItem from '../../startup/client/classes/MixItem.js'
 
 
 
@@ -23,14 +24,27 @@ class Profile extends React.Component{
     componentWillMount(){
 
         MixUtil.getProfile(this.state.profileAddr)
-        .then((_profileId) => {
-            this.setState({
-                profileId:_profileId,
-                loaded: true
-            });
+        .then(_profileId => {
+            
+            if(_profileId) {
+                let _profileItem = new MixItem(_profileId);
+                _profileItem.init()
+                .then(item =>{
+                    this.setState({
+                        profileItem:_profileItem,
+                        profileId:_profileId,
+                        loaded: true
+                        
+                    })
+                })
+            } else {
+                this.setState({
+                    profileId:_profileId,
+                    loaded: true
+                });
+            }
 
         });
-        
     };
 
     shouldComponentUpdate(lastState, nextState) {
@@ -60,8 +74,8 @@ class Profile extends React.Component{
         } else {
             Render = 
                 <div className="w3-row">       
-                    <ProfileUserInfo isMine = {this.state.isMine} profileId = {this.state.profileId} profileAddr={this.state.profileAddr}/>
-                    <ProfileFeed isMine = {this.state.isMine} profileId={this.state.profileId} profileAddr={this.state.profileAddr}/>
+                    <ProfileUserInfo profileItem = {this.state.profileItem} isMine = {this.state.isMine} profileId = {this.state.profileId} profileAddr={this.state.profileAddr}/>
+                    <ProfileFeed profileItem = {this.state.profileItem} isMine = {this.state.isMine} profileId={this.state.profileId} profileAddr={this.state.profileAddr}/>
                 </div>  
         }
       

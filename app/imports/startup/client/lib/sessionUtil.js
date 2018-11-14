@@ -28,7 +28,8 @@ module.exports = {
             console.log(profile);
             Session.set('profile', profile);
             console.log('my', profile);
-
+            await module.exports.syncFollowingToLocalDB();
+            console.log(followingDb.find())
             return true;
         } catch(e) {
             console.log(e.message);
@@ -36,6 +37,35 @@ module.exports = {
         }
     
     },
+
+    syncFollowingToLocalDB: async() => {
+        try{
+            let addr = Session.get('addr');
+            let following = await MixUtil.getTrustedAccounts(addr);
+            for( const item of following) {
+                Session.set('followingDbSyncing',true);
+                
+                console.log(Session.get('followingDbSyncing'));
+                MixUtil.getProfile(item)
+                .then(_profileId => {
+                    followingDb.insert({address: item, profileId: _profileId})
+                })
+                .catch(e => {
+                    followingDb.insert({address: item, profileId:null})
+                });
+                Session.set('followingDbSyncing', following[following.length-1]==item ? false: true);
+                
+            }
+
+        } catch (e) {
+
+            console.log(e);
+
+
+        }
+
+
+    }
 
 
 }

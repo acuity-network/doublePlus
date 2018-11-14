@@ -74,7 +74,7 @@ class Send extends React.Component{
                 }
             });
         } else {
-            let res = Web3Util.sendTo(Session.get('addr'),this.state.toAddr,this.state.amount);
+            Web3Util.sendTo(Session.get('addr'),this.state.toAddr,this.state.amount);
 
         }
     };

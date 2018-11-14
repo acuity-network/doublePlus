@@ -36,8 +36,11 @@ export default class MainLayout extends React.Component {
 
   IpfsUtil.initIPFS();
 
-  
-  
+  persistentTransactionDb = new Mongo.Collection('transaction-Db', null);
+  followingDb = new Mongo.Collection('following-Db',null);
+
+  transactionDb = new PersistentMinimongo(persistentTransactionDb);
+  transactionDb.refresh();
 
     return (
       

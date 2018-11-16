@@ -4,8 +4,26 @@ let multihashes = require('multihashes')
 
 module.exports = {
 
-    initIPFS: async()=>{
+    initIPFS: async ()=>{
         try{
+            
+            $.getScript("https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js", function(){
+                const repoPath = 'ipfs-mix'
+                global.ipfs = new Ipfs({ repo: repoPath });
+                global.ipfs.on('ready', () => { 
+                    
+                    global.ipfs.files.get('Qmaisz6NMhDB51cCvNWa1GMS7LU1pAxdF4Ld6Ft9kZEP2a')
+                    .then(res=>{
+                        console.log(res);
+                    })
+                })               
+            
+             });
+
+                // node.on('ready', () => {
+                // // Ready to use!
+                // // See https://github.com/ipfs/js-ipfs#core-api
+                // })
             const ipfs = ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
             //let res = await ipfs.bootstrap.list();
             Session.set('ipfsConnected',false);
@@ -36,20 +54,14 @@ module.exports = {
     },
 
     getItemFromIpfsHash: async(hash) => {
-        const ipfs = ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
+        //const ipfs = ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
+        const ipfs = global.ipfs;
         console.log(hash);
         let files = await ipfs.files.get(hash);
-        // ipfs.files.get(hash)
-        // .then((files)=>{
-        //     console.log(files);
-        //     return files;
-
-        // });
         return files;
     },
 
     addFile: async(data, isInfuraPost = false) => {
-       
         const ipfs = isInfuraPost ? ipfsAPI('ipfs.infura.io', '5001', {protocol: 'https'}) : ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
         let result = await ipfs.files.add(data);
         let hash = result[0].hash;

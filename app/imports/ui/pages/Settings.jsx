@@ -78,7 +78,7 @@ class Settings extends React.Component{
 
     restore () {
         LocalStore.set('nodeURL', 'http://145.249.107.233:8645/');
-        LocalStore.set('ipfsApiURL', 'ipfs.infura.io');
+        LocalStore.set('ipfsApiURL', 'localhost');
         LocalStore.set('protocol', 'https')
         LocalStore.set('ipfsGatewayURL', 'https://ipfs.infura.io/');
         Web3Util.initWeb3();
@@ -123,10 +123,14 @@ class Settings extends React.Component{
                                         <label htmlFor="ipfsApiURL">IPFS API URL:</label>
                                     <input onChange= {this.handleApiChange.bind(this)} style={{width:"100%"}} className="form-control" id="ipfsApiURL" value={this.state.ipfsApiURL} type="text"/>
                                 </div> */}
-                            
+
                                 <div className="form-group">
+                                    
+                                    <input  type="checkbox" id = "ipfsCheckBox" checked="true"></input>
+                                    <label htmlFor = "ipfsCheckBox">Use Browser IPFS?</label>
+                                    <br/>
                                     <label htmlFor="ipfsApiURL">IPFS API Host: </label> <br/>
-                                    <select defaultValue = {this.state.ipfsApiURL} style={{width:'40%'}} onChange = {this.handleApiChange.bind(this)} className="form-control" id="ipfsApiURL">
+                                    <select disabled="true" defaultValue = {this.state.ipfsApiURL} style={{width:'40%'}} onChange = {this.handleApiChange.bind(this)} className="form-control" id="ipfsApiURL">
                                         {/* <option  value='ipfs.infura.io'>ipfs.infura.io</option> */}
                                         <option  value='localhost'>localhost</option>
                                         

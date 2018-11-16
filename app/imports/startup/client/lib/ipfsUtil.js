@@ -48,9 +48,9 @@ module.exports = {
         return files;
     },
 
-    addFile: async(data) => {
-        const ipfs = ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
-        console.log(data);
+    addFile: async(data, isInfuraPost = false) => {
+       
+        const ipfs = isInfuraPost ? ipfsAPI('ipfs.infura.io', '5001', {protocol: 'https'}) : ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
         let result = await ipfs.files.add(data);
         let hash = result[0].hash;
         return hash;

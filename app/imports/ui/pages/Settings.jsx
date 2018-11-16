@@ -127,7 +127,7 @@ class Settings extends React.Component{
                                 <div className="form-group">
                                     <label htmlFor="ipfsApiURL">IPFS API Host: </label> <br/>
                                     <select defaultValue = {this.state.ipfsApiURL} style={{width:'40%'}} onChange = {this.handleApiChange.bind(this)} className="form-control" id="ipfsApiURL">
-                                        <option  value='ipfs.infura.io'>ipfs.infura.io</option>
+                                        {/* <option  value='ipfs.infura.io'>ipfs.infura.io</option> */}
                                         <option  value='localhost'>localhost</option>
                                         
                                     </select>

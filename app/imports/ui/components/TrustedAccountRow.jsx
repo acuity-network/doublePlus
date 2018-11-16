@@ -26,7 +26,8 @@ class TrustedAccountRow extends React.Component{
         let Render;
         Render =
         <tr className="table-default">
-            <th scope="row">{this.props.addr}</th>
+            {/* <th scope="row">{this.props.addr}</th> */}
+            <td><a onClick = { this.route.bind(this,'/profile/' + this.props.addr) } >{this.props.addr}</a></td>
             <td>{this.props.numTrusting}</td>
             {/* <td>Column content</td> */}
         </tr>

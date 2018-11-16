@@ -88,7 +88,7 @@ module.exports = {
             if(notify) { 
                 notify.update('progress', 95);
             }
-            web3.eth.sendSignedTransaction('0x'+ hexTx)
+            await web3.eth.sendSignedTransaction('0x'+ hexTx)
             .on('transactionHash', (hash) => {
                 
                 if(notify) {
@@ -98,12 +98,13 @@ module.exports = {
                 }
                 console.log('tx hash'+hash);
             })
-            .on('receipt', function(receipt){
-                console.log('tx receipt '+receipt);
+            .on('receipt', function() { //////not returing a receipt currently
+                console.log('here')
+                console.log('tx receipt ');
                 $.notify({
                     icon: 'glyphicon glyphicon-success-sign',
                     title: '',
-                    message: 'Transaction successfully included in block: ' + receipt.blockNumber,
+                    message: 'Transaction successfully included in block: ',
                     target: '_blank',
                     allow_dismiss: false,
                 },{
@@ -122,7 +123,7 @@ module.exports = {
                 ////HANDLE UPDATES BASED ON TO CONTRACT ID
 
             })
-            .on('error', function(error){
+            .on('error', (error) => {
                 if(notify) {
                     notify.update('message', error);
                     notify.update('type', 'danger');
@@ -130,7 +131,7 @@ module.exports = {
                 throw error;
             
             });
-                     
+                  
 
         } catch(e) {
             console.log(e.message)
@@ -170,7 +171,7 @@ module.exports = {
                 gasPrice: web3.utils.toBN(GasPrice)
             };
             console.log('raxTx ' + rawTx);
-            Web3Util.signAndSendRawTx(rawTx, notify);
+            let ret = Web3Util.signAndSendRawTx(rawTx, notify);
         } catch (e) {
             console.error(e.message);
         }

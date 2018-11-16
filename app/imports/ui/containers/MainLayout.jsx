@@ -23,13 +23,13 @@ export default class MainLayout extends React.Component {
   }
   console.log(LocalStore.get('nodeURL'));
   if(!LocalStore.get('ipfsApiURL')) {
-      LocalStore.set('ipfsApiURL', "ipfs.infura.io");
+      LocalStore.set('ipfsApiURL', "localhost");
   }
   if(!LocalStore.get('ipfsGatewayURL')) {
       LocalStore.set('ipfsGatewayURL', "https://ipfs.infura.io/");
   }
   if(!LocalStore.get('protocol')) {
-    LocalStore.set('protocol', 'https');
+    LocalStore.set('protocol', 'http');
   }
 
   Web3Util.initWeb3();

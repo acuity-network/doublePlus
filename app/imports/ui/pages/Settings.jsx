@@ -9,7 +9,8 @@ class Settings extends React.Component{
         this.state = { 
             nodeURL : LocalStore.get('nodeURL'),
             ipfsApiURL : LocalStore.get('ipfsApiURL'),
-            ipfsGatewayURL : LocalStore.get('ipfsGatewayURL')
+            ipfsGatewayURL : LocalStore.get('ipfsGatewayURL'),
+            browserIpfs : LocalStore.get('browserIpfs')
             //protocol : LocalStore.get('protocol')
             // ipfsSelect : LocalStore.get('ipfsApiURL') == 'localhost'?'selected':''
         };
@@ -55,6 +56,7 @@ class Settings extends React.Component{
         LocalStore.set('ipfsGatewayURL', this.state.ipfsGatewayURL);
         let protocol = LocalStore.get('ipfsApiURL') == 'localhost'?'http':'https';
         LocalStore.set('protocol', protocol);
+        LocalStore.set('browserIpfs', this.state.browserIpfs);
         Web3Util.initWeb3();
         IpfsUtil.initIPFS();
         this.route('/');
@@ -81,6 +83,7 @@ class Settings extends React.Component{
         LocalStore.set('ipfsApiURL', 'localhost');
         LocalStore.set('protocol', 'https')
         LocalStore.set('ipfsGatewayURL', 'https://ipfs.infura.io/');
+        LocalStore.set('browserIpfs', true);
         Web3Util.initWeb3();
         IpfsUtil.initIPFS();
         this.route('/');
@@ -102,6 +105,18 @@ class Settings extends React.Component{
         });
     }
 
+    handleCheck (e) {
+        console.log(e.target.checked);
+        if(e.target.checked) {
+            this.setState({
+                browserIpfs: true
+            })
+        } else {
+            this.setState({
+                browserIpfs: false
+            })
+        }
+    }
     render() {
         let Render;
 
@@ -125,12 +140,12 @@ class Settings extends React.Component{
                                 </div> */}
 
                                 <div className="form-group">
-                                    
-                                    <input  type="checkbox" id = "ipfsCheckBox" checked="true"></input>
+                                    {console.log(this.state.browserIpfs)}
+                                    <input  onChange={this.handleCheck.bind(this)} type="checkbox" id = "ipfsCheckBox" checked={this.state.browserIpfs}></input>
                                     <label htmlFor = "ipfsCheckBox">Use Browser IPFS?</label>
                                     <br/>
                                     <label htmlFor="ipfsApiURL">IPFS API Host: </label> <br/>
-                                    <select disabled="true" defaultValue = {this.state.ipfsApiURL} style={{width:'40%'}} onChange = {this.handleApiChange.bind(this)} className="form-control" id="ipfsApiURL">
+                                    <select disabled={this.state.browserIpfs} defaultValue = {this.state.ipfsApiURL} style={{width:'40%'}} onChange = {this.handleApiChange.bind(this)} className="form-control" id="ipfsApiURL">
                                         {/* <option  value='ipfs.infura.io'>ipfs.infura.io</option> */}
                                         <option  value='localhost'>localhost</option>
                                         

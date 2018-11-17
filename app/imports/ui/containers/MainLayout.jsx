@@ -31,6 +31,9 @@ export default class MainLayout extends React.Component {
   if(!LocalStore.get('protocol')) {
     LocalStore.set('protocol', 'http');
   }
+  if(LocalStore.get('browserIpfs') == null) {
+    LocalStore.set('browserIpfs', true)
+  }
 
   Web3Util.initWeb3();
 
@@ -45,7 +48,9 @@ export default class MainLayout extends React.Component {
     return (
       
       <Router>
+
         <div>
+        
           <header>
             <Header />
           </header>

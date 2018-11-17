@@ -17,6 +17,7 @@ class Home extends React.Component {
   }
 
   componentWillMount(){
+    
     this.autoRun = Tracker.autorun(()=>{
         this.setState({
             loggedIn: Session.get('loggedIn')
@@ -63,7 +64,29 @@ class Home extends React.Component {
         </div>
         <MixStats/>
         <IpfsStats/>
+
+        {/* <div className="modal" id="ipfsModal" style = {{paddingTop:'50px'}}>
+            <div className="modal-dialog modal-lg" role="document">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title">IPFS Daemon Starting...</h5>
+
+                    </div>
+                    <div className="modal-body">
+                        <div style={{margin:"auto"}}>
+                            {this.state.gif}
+
+                        </div>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" onClick={this.hideModal.bind(this)} className="w3-button w3-theme" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div> */}
     </div>
+
+        $('#ipfsModal').show();
       return(Render);
   };
 }

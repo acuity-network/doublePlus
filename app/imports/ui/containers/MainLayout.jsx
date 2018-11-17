@@ -50,7 +50,6 @@ export default class MainLayout extends React.Component {
       <Router>
 
         <div>
-        
           <header>
             <Header />
           </header>

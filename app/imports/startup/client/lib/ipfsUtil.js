@@ -5,6 +5,7 @@ let multihashes = require('multihashes')
 module.exports = {
 
     initIPFS: async ()=>{
+        Session.set('ipfsConnected',false);
         if (LocalStore.get('browserIpfs') == null) {LocalStore.set('browserIpfs', true)}
         
         console.log(LocalStore.get('browserIpfs'));
@@ -13,9 +14,9 @@ module.exports = {
                 $.getScript("https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js", async ()=>{
                     const repoPath = 'ipfs-mix'
                     global.ipfs = new Ipfs({ repo: repoPath });
+                      
                     global.ipfs.on('ready', async () => { 
                         
-                
                         Session.set('ipfsConnected',false);
                         Session.set('ipfsId',null);
                         let files = await module.exports.getItemFromIpfsHash('Qmaisz6NMhDB51cCvNWa1GMS7LU1pAxdF4Ld6Ft9kZEP2a');
@@ -27,7 +28,7 @@ module.exports = {
                         Session.set('ipfsId', id.id);
                         console.log(files);
                         
-                    }) 
+                    })
                     
                     
                 

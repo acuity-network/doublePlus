@@ -1,6 +1,9 @@
 global.Buffer = global.Buffer || require("buffer").Buffer;
 const ipfsAPI = require('ipfs-api')
 let multihashes = require('multihashes')
+//import Ipfs from '../../../../public/01.ipfs.js'
+
+
 
 module.exports = {
 
@@ -21,6 +24,25 @@ module.exports = {
                         Session.set('ipfsId',null);
                         let files = await module.exports.getItemFromIpfsHash('Qmaisz6NMhDB51cCvNWa1GMS7LU1pAxdF4Ld6Ft9kZEP2a');
                         if(files && files.length > 0) {
+                            $.notify({
+                                icon: 'glyphicon glyphicon-success-sign',
+                                title: '',
+                                message: 'IPFS daemon successfully started in browser! ',
+                                target: '_blank',
+                                allow_dismiss: false,
+                            },{
+                                animate: {
+                                    enter: 'animated fadeInDown',
+                                    exit: 'animated fadeOutUp'
+                                },
+                                type:'success',
+                                showProgressbar: false,
+                                placement: {
+                                    from: "bottom",
+                                    align: "center"
+                                }
+                            });
+
                             Session.set('ipfsConnected',true);
                         }
                         let id = await ipfs.id();

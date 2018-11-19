@@ -20,14 +20,27 @@ class Home extends React.Component {
     
     this.autoRun = Tracker.autorun(()=>{
         this.setState({
-            loggedIn: Session.get('loggedIn')
+            loggedIn: Session.get('loggedIn'),
+            isBrowserIpfs: LocalStore.get('browserIpfs'),
+            ipfsConnected: Session.get('ipfsConnected')
         });
     })
+    
   };
 
   componentWillUnmount() {
       this.autoRun.stop();
   };
+
+  componentDidMount() {
+    if(!this.state.ipfsConnected){
+        $('#ipfsModal').show();
+    }
+  }
+
+  handleClick() {
+    $('#ipfsModal').hide();
+  }
 
   route (link) {
       this.props.history.push(link)
@@ -65,7 +78,7 @@ class Home extends React.Component {
         <MixStats/>
         <IpfsStats/>
 
-        {/* <div className="modal" id="ipfsModal" style = {{paddingTop:'50px'}}>
+        <div className="modal" id="ipfsModal" style = {{paddingTop:'50px'}}>
             <div className="modal-dialog modal-lg" role="document">
                 <div className="modal-content">
                     <div className="modal-header">
@@ -73,20 +86,23 @@ class Home extends React.Component {
 
                     </div>
                     <div className="modal-body">
-                        <div style={{margin:"auto"}}>
-                            {this.state.gif}
+                        <div className = "w3-center w3-container w3-padding">
+                            <img src = {this.state.gif}/>
 
                         </div>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" onClick={this.hideModal.bind(this)} className="w3-button w3-theme" data-dismiss="modal">Close</button>
+                        <button type="button" onClick={this.handleClick.bind(this)} className="w3-button w3-theme" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
-        </div> */}
+        </div> 
     </div>
 
-        $('#ipfsModal').show();
+      if(this.state.ipfsConnected) {
+        $('#ipfsModal').hide();
+      }
+        
       return(Render);
   };
 }

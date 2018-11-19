@@ -1,6 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import base64img from '../../startup/client/lib/base64img.js'
+import { log } from 'util';
 
 class ProfileUserInfo extends React.Component{
 
@@ -42,7 +43,7 @@ class ProfileUserInfo extends React.Component{
             })
 
         }).catch(e=>{
-
+            console.log(e);
 
         });
 

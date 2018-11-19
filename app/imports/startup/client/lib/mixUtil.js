@@ -21,6 +21,10 @@ const accountProfileAbi = require('../lib/jsonAbis/AccountProfile.abi.json');
 const accountProfileAddr = '0x72f52ab6b1d15630ee9b2d8763b23478c0327df8';
 //const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr)
 
+const MixItem = require('../classes/MixItem.js')
+const MixContent = require('../classes/MixContent.js')
+const MixRevision = require('../classes/MixRevision.js')
+
 const multihashes = require('multihashes');
 const itemPb = require("./protobuf/item_pb.js");
 const mixinmixin = require("./protobuf/mixin-mixin_pb.js");
@@ -54,7 +58,7 @@ module.exports = {
           let inUse = await itemStore.methods.getInUse(itemId).call();
 
           if(!inUse) {
-            console.log(inUse);
+            
             return;
           }
 
@@ -321,7 +325,7 @@ module.exports = {
     reviseProfile: async(profileId, ipfsHash, myAddr) => {
 
       const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
-      const accountProfile = new web3.eth.Contract(accountProfileAbi, );
+      let item = new MixItem(profileId);
 
     },
 
@@ -378,6 +382,11 @@ module.exports = {
       } catch (e) {
         throw e
       }
+
+    },
+
+    reviseItem: async(myAddr, mixItemId, revisionIpfsHash) => {
+
 
     },
 

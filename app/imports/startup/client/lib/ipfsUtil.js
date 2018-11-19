@@ -1,25 +1,75 @@
 global.Buffer = global.Buffer || require("buffer").Buffer;
 const ipfsAPI = require('ipfs-api')
 let multihashes = require('multihashes')
+//import Ipfs from '../../../../public/01.ipfs.js'
+
+
 
 module.exports = {
 
-    initIPFS: async()=>{
+    initIPFS: async ()=>{
+        Session.set('ipfsConnected',false);
+        if (LocalStore.get('browserIpfs') == null) {LocalStore.set('browserIpfs', true)}
+        
+        console.log(LocalStore.get('browserIpfs'));
         try{
-            const ipfs = ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
-            //let res = await ipfs.bootstrap.list();
-            Session.set('ipfsConnected',false);
-            Session.set('ipfsId',null);
-            //console.log(res);
-            //test ipfs connection
-            let files = await module.exports.getItemFromIpfsHash('Qmaisz6NMhDB51cCvNWa1GMS7LU1pAxdF4Ld6Ft9kZEP2a');
-            if(files && files.length > 0) {
-                Session.set('ipfsConnected',true);
-            }
-            let id = await ipfs.id();
-            console.log(id);
-            Session.set('ipfsId', id.id);
-            console.log(files);
+            if(LocalStore.get('browserIpfs')) {
+                $.getScript("https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js", async ()=>{
+                    const repoPath = 'ipfs-mix'
+                    global.ipfs = new Ipfs({ repo: repoPath });
+                      
+                    global.ipfs.on('ready', async () => { 
+                        
+                        Session.set('ipfsConnected',false);
+                        Session.set('ipfsId',null);
+                        let files = await module.exports.getItemFromIpfsHash('Qmaisz6NMhDB51cCvNWa1GMS7LU1pAxdF4Ld6Ft9kZEP2a');
+                        if(files && files.length > 0) {
+                            $.notify({
+                                icon: 'glyphicon glyphicon-success-sign',
+                                title: '',
+                                message: 'IPFS daemon successfully started in browser! ',
+                                target: '_blank',
+                                allow_dismiss: false,
+                            },{
+                                animate: {
+                                    enter: 'animated fadeInDown',
+                                    exit: 'animated fadeOutUp'
+                                },
+                                type:'success',
+                                showProgressbar: false,
+                                placement: {
+                                    from: "bottom",
+                                    align: "center"
+                                }
+                            });
+
+                            Session.set('ipfsConnected',true);
+                        }
+                        let id = await ipfs.id();
+                        console.log(id);
+                        Session.set('ipfsId', id.id);
+                        console.log(files);
+                        
+                    })
+                    
+                    
+                
+                });
+                
+            } else {
+                global.ipfs = ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
+                Session.set('ipfsConnected',false);
+                Session.set('ipfsId',null);
+
+                let files = await module.exports.getItemFromIpfsHash('Qmaisz6NMhDB51cCvNWa1GMS7LU1pAxdF4Ld6Ft9kZEP2a');
+                if(files && files.length > 0) {
+                    Session.set('ipfsConnected',true);
+                }
+                let id = await ipfs.id();
+                console.log(id);
+                Session.set('ipfsId', id.id);
+                console.log(files);
+        }
         } catch(e) {
             
             console.log(e);
@@ -36,21 +86,15 @@ module.exports = {
     },
 
     getItemFromIpfsHash: async(hash) => {
-        const ipfs = ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
+        //const ipfs = ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
+        const ipfs = global.ipfs;
         console.log(hash);
         let files = await ipfs.files.get(hash);
-        // ipfs.files.get(hash)
-        // .then((files)=>{
-        //     console.log(files);
-        //     return files;
-
-        // });
         return files;
     },
 
     addFile: async(data, isInfuraPost = false) => {
-       
-        const ipfs = isInfuraPost ? ipfsAPI('ipfs.infura.io', '5001', {protocol: 'https'}) : ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
+        const ipfs = isInfuraPost ? ipfsAPI('ipfs.infura.io', '5001', {protocol: 'https'}) : global.ipfs;
         let result = await ipfs.files.add(data);
         let hash = result[0].hash;
         return hash;

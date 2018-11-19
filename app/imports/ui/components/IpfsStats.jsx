@@ -12,7 +12,7 @@ class IpfsStats extends React.Component{
     componentWillMount(){
         this.autoRun = Tracker.autorun(()=>{
             this.setState({
-                nodeURL:LocalStore.get('ipfsApiURL'),
+                nodeURL:LocalStore.get('browserIpfs') ? 'Browser IPFS' : LocalStore.get('ipfsApiURL'),
                 connected:Session.get('ipfsConnected'),
                 ipfsId:Session.get('ipfsId'),
                 redImg: "data:image/png;base64, " + base64img.redImg,

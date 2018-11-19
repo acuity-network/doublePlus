@@ -6,6 +6,7 @@ const BN = Web3.utils.BN;
 module.exports = {
     
     initWeb3: async () => {
+        Session.set('blockNum', 0);
         if(!LocalStore.get('nodeURL')) {
             LocalStore.set('nodeURL', "http://145.249.107.233:8645");
         }

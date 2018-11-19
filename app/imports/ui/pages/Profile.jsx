@@ -69,7 +69,7 @@ class Profile extends React.Component{
                 <Loading/>
         } else if(!this.state.profileId) {
             Render = 
-                <h1>Profile doesnt exist</h1>
+                <h1>Profile doesn't exist</h1>
         
         } else {
             Render = 

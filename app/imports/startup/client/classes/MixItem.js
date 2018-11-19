@@ -53,6 +53,10 @@ export default class MixItem {
  
   }
 
+  owner() {
+    return this.item.owner
+  }
+
   itemId() {
     return this.itemId
   }

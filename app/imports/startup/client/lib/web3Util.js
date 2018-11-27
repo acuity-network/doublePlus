@@ -99,13 +99,13 @@ module.exports = {
                 }
                 console.log('tx hash'+hash);
             })
-            .on('receipt', function() { //////not returing a receipt currently
+            .on('receipt', function(receipt) { //////not returing a receipt currently
                 console.log('here')
-                console.log('tx receipt ');
+                console.log(receipt);
                 $.notify({
                     icon: 'glyphicon glyphicon-success-sign',
                     title: '',
-                    message: 'Transaction successfully included in block: ',
+                    message: 'Transaction successfully included in block: ' + receipt.blockNumber,
                     target: '_blank',
                     allow_dismiss: false,
                 },{

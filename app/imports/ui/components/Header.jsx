@@ -61,7 +61,7 @@ class Header extends React.Component {
         <div className="w3-top">
         <div className="w3-bar w3-theme-d2 w3-left-align w3-large">
         <a className="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" ><i className="fa fa-bars"></i></a>
-        <a onClick = { this.route.bind(this,'/') } className="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i className="fa fa-home w3-margin-right"></i>Mix Hub</a>
+        <a onClick = { this.route.bind(this,'/') } className="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i className="fa fa-home w3-margin-right"></i>Mix-Hub</a>
         <a onClick = { this.route.bind(this,'/wallet/') } className="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Wallet">Wallet</a>
         {/* <a onClick = { this.route.bind(this,'/explore/') } className="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Wallet">Explore Mix</a> */}
         <a onClick = { this.route.bind(this,'/trusted/') } className="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Wallet">Trusted Accounts</a>
@@ -85,7 +85,7 @@ class Header extends React.Component {
       <div className="w3-top">
       <div className="w3-bar w3-theme-d2 w3-left-align w3-large">
       <a className="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" ><i className="fa fa-bars"></i></a>
-      <a onClick = { this.route.bind(this,'/') } className="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i className="fa fa-home w3-margin-right"></i>Mix Hub</a>
+      <a onClick = { this.route.bind(this,'/') } className="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i className="fa fa-home w3-margin-right"></i>Mix-Hub</a>
       {/* <a onClick = { this.route.bind(this,'/explore/') } className="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Explore">Explore Mix</a> */}
       <a onClick = { this.route.bind(this,'/settings/') }className="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white w3-right" title="Settings"> Settings <i className="fa fa-gear w3-margin-right"></i></a>
       <div className="w3-dropdown-hover w3-right w3-hide-small">

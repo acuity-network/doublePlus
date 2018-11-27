@@ -55,12 +55,13 @@ export default class MainLayout extends React.Component {
     Web3Util.initWeb3();
   
     IpfsUtil.initIPFS();
+    if(Meteor.isClient) {
+      persistentTransactionDb = new Mongo.Collection('transaction-Db', null);
+      profileDb = new Mongo.Collection(null);
   
-    persistentTransactionDb = new Mongo.Collection('transaction-Db', null);
-    followingDb = new Mongo.Collection('following-Db',null);
-  
-    transactionDb = new PersistentMinimongo(persistentTransactionDb);
-    transactionDb.refresh();
+      transactionDb = new PersistentMinimongo(persistentTransactionDb);
+      transactionDb.refresh();
+    }
     
   };
 

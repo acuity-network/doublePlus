@@ -21,7 +21,7 @@ const accountProfileAbi = require('../lib/jsonAbis/AccountProfile.abi.json');
 const accountProfileAddr = '0x72f52ab6b1d15630ee9b2d8763b23478c0327df8';
 //const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr)
 
-const MixItem = require('../classes/MixItem.js')
+import MixItem from '../classes/MixItem.js'
 const MixContent = require('../classes/MixContent.js')
 const MixRevision = require('../classes/MixRevision.js')
 
@@ -360,9 +360,10 @@ module.exports = {
         const encodedABI = createItem.encodeABI();
 
         let gasEst = await createItem.estimateGas();
-
-        notify.update('message', 'Creating new Mix Item!');
-        notify.update('progress', 60);
+        if(notify) {
+          notify.update('message', 'Creating new Mix Item!');
+          notify.update('progress', 60);
+        }
 
         let GasPrice = await Web3Util.getGasPrice();
         let Nonce = await web3.eth.getTransactionCount(myAddr, "pending");
@@ -385,7 +386,40 @@ module.exports = {
 
     },
 
-    reviseItem: async(myAddr, mixItemId, revisionIpfsHash) => {
+    createNewRevision: async(myAddr, mixItemId, revisionIpfsHash, notify=null) => {
+
+      try{
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
+
+        let reviseItem = await itemStoreIpfsSha256.methods.createNewRevision(mixItemId, revisionIpfsHash);
+        const encodedABI = reviseItem.encodeABI();
+
+
+        if(notify) {
+          notify.update('message', 'Revising Mix Item!');
+          notify.update('progress', 60);
+        }
+
+        let GasPrice = await Web3Util.getGasPrice();
+        let Nonce = await web3.eth.getTransactionCount(myAddr, "pending");
+      
+        let rawTx = {
+          nonce:Nonce,
+          chainId:76,
+          from: myAddr,
+          to: itemStoreIpfsSha256Addr,
+          gas: 2500000,
+          data: encodedABI,
+          gasPrice:GasPrice
+        }; 
+
+        Web3Util.signAndSendRawTx(rawTx,notify);
+
+      } catch (e) {
+        throw e
+      }
+   
 
 
     },
@@ -403,6 +437,58 @@ module.exports = {
               throw e
           }
         
+    },
+
+    getProfileLocalDb: async(addr, forceUpdate=false) => {
+      console.log(profileDb);
+      let profile = await profileDb.find({ _id: addr }).fetch();
+      //console.log('db',profile)
+      if(profile.length>0 && !forceUpdate) {
+        console.log('from DB')
+        return profile[0];
+      } else {
+        try {
+          let profileId = await module.exports.getProfile(addr);
+          if(profileId) {
+            let mixItem = new MixItem(profileId);
+            let _item = await mixItem.init();
+            await _item.latestRevision().load();
+            
+            let profile = await _item.latestRevision().getProfile();
+            profile.children = await _item.childIds();
+            profile.bio = await _item.latestRevision().getBodyText();
+            profile.name = await _item.latestRevision().getTitle();
+            profile._id = addr;
+            profile.profileItemId = profileId;
+            try{
+              profile.image = await _item.latestRevision().getImage(1000,1000);
+            } catch (e) {
+              profile.image = null;
+              console.log(e)
+            }
+            console.log(profile);
+            if(Meteor.isClient) {
+              try{
+                profileDb.insert({_id:profile._id, profileItemId: profile.profileItemId, name:profile.name, bio:profile.bio, location:profile.location, type:profile.type, image:profile.image, children:profile.children});
+              } catch(e) {
+                
+              }
+            }  
+            return profile;
+          } else {
+            return null;
+          }
+        } catch(e) {
+          throw e
+
+        }
+
+
+
+      }
+
+
+
     }
 
 

@@ -28,8 +28,8 @@ module.exports = {
             console.log(profile);
             Session.set('profile', profile);
             console.log('my', profile);
-            await module.exports.syncFollowingToLocalDB();
-            console.log(followingDb.find())
+            //await module.exports.syncFollowingToLocalDB();
+            //console.log(followingDb.find())
             return true;
         } catch(e) {
             console.log(e.message);

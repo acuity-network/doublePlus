@@ -13,13 +13,12 @@ class ProfileUserInfo extends React.Component{
             profileAddr:this.props.profileAddr,
             profileId: this.props.profileId,
             isMine: this.props.isMine,
-            profileItem: this.props.profileItem,
+            profileObject: this.props.profileObject,
             latestProfileRevision: null,
             location: null,
             type: null,
             bio: null,
-            name: null,
-            timestamp: null
+            name: null
         
         }
 
@@ -29,24 +28,13 @@ class ProfileUserInfo extends React.Component{
         this.setState({
             profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg
         });
-
-        this.state.profileItem.latestRevision().load()
-        .then(profileRevision => {
             
             this.setState( {
-                latestProfileRevision: profileRevision,
-                location: profileRevision.getProfile().location,
-                type: profileRevision.getProfile().type,
-                bio: profileRevision.getBodyText(),
-                name: profileRevision.getTitle(),
-                timestamp: profileRevision.getTimestamp()
-            })
-
-        }).catch(e=>{
-            console.log(e);
-
-        });
-
+                location: this.state.profileObject.location,
+                type: this.state.profileObject.type,
+                bio: this.state.profileObject.bio,
+                name: this.state.profileObject.name
+            });
     };
 
     shouldComponentUpdate(lastState, nextState) {
@@ -63,7 +51,7 @@ class ProfileUserInfo extends React.Component{
         <div className="w3-col m3">
             <div className="w3-card w3-round w3-white">
               <div className="w3-container">
-               <h6 className="w3-center">{this.state.name}</h6>
+               <h3 className="w3-center">{this.state.name}</h3>
                <p className="w3-center"><img src={this.state.profileImg} className="w3-circle" style={{height:"106px",width:"106px"}} alt="Avatar"/></p>
                <hr/>
                <p><i className="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> {this.state.bio}</p>

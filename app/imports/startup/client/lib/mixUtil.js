@@ -1,25 +1,27 @@
-const trustedAccountsAbi = require('./jsonAbis/trustedAccounts.abi.json');
-const trustedAccountAddr = '0xaae497797e3f9a5ff341225bd9696d9759991418';
+
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
 
 const itemStoreRegistryAbi = require('../lib/jsonAbis/itemStoreRegistry.abi.json');
-const itemStoreRegistry = new web3.eth.Contract(itemStoreRegistryAbi, '0xa46adddd3105715fa0ea0d4a883d4be99452c3f6');
+const itemStoreRegistryAddr = '0x8928f846012b98aac5cd2f4ef4029097cd4110fc';
 
 const itemStoreShortIdAbi = require('../lib/jsonAbis/itemStoreShortId.abi.json');
-const itemStoreShortId = new web3.eth.Contract(itemStoreShortIdAbi, '0xd02ee768718b41a8cea9350d7c4c443727da5c7b')
+const itemStoreShortIdAddr = '0xd02ee768718b41a8cea9350d7c4c443727da5c7b';
 
 const itemStoreAbi = require('../lib/jsonAbis/itemStoreInterface.abi.json');
-//const itemStoreFactory = new web3.eth.Contract(itemStoreAbi, '0xdf37447c7c3b241be8dc5dfc70103d3fa7fee1a6');
 
-
-const itemStoreIpfsSha256Addr = '0xe059665fe0d226f00c72e3982d54bddf4be19c6c';
 const itemStoreIpfsSha256Abi = require('../lib/jsonAbis/itemStoreIPFSSha256.abi.json');
-//const itemStoreIpfsSha256Factory = new web3.eth.Contract(itemStoreIpfsSha256Abi);
+const itemStoreIpfsSha256Addr = '0x1c12e8667bd48f87263e0745d7b28ea18f74ac0e';
 
 const accountProfileAbi = require('../lib/jsonAbis/AccountProfile.abi.json');
-const accountProfileAddr = '0x72f52ab6b1d15630ee9b2d8763b23478c0327df8';
-//const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr)
+const accountProfileAddr = '0x7855a6b883c39c8e87d51002b064180ddbf16026';
+
+const trustedAccountsAbi = require('../lib/jsonAbis/trustedAccounts.abi.json');
+const trustedAccountAddr = '0x11dc5cf838ae3850458f92474dc28d1e47f8e045';
+
+const itemDagAbi = require('../lib/jsonAbis/ItemDag.abi.json');
+const itemDagAddr = '0xbd3af0bdcf4c8a6dfd8f6ff2129409632decfc7e';
+
 
 import MixItem from '../classes/MixItem.js'
 const MixContent = require('../classes/MixContent.js')
@@ -41,7 +43,7 @@ module.exports = {
 
         try{
           const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
-          const itemStoreRegistry = new web3.eth.Contract(itemStoreRegistryAbi, '0xa46adddd3105715fa0ea0d4a883d4be99452c3f6');
+          const itemStoreRegistry = new web3.eth.Contract(itemStoreRegistryAbi, itemStoreRegistryAddr);
 
           let itemStoreAddress = await itemStoreRegistry.methods.getItemStore(itemId).call();
           console.log(itemStoreAddress);
@@ -295,7 +297,7 @@ module.exports = {
 
         } else {
           
-          await module.exports.reviseProfile(myProfile, ipfsHash, myAddr);
+          await module.exports.createNewRevision(myAddr, myProfile, ipfsHash);
 
         }
 
@@ -347,16 +349,8 @@ module.exports = {
         const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
         let createItem;
 
-        if(parents.length == 0) {
-          createItem = await itemStoreIpfsSha256.methods.create(flagsNonce,ipfsHash);
-        } else  if(parents.length == 1) {
-          createItem = await itemStoreIpfsSha256.methods.createWithParent(flagsNonce,ipfsHash,parents[0]);
-        } else if (parents.length > 1){
-          createItem = await itemStoreIpfsSha256.methods.createWithParents(flagsNonce,ipfsHash,parents);
-        } else {
-          throw 'parent error';
-        }
-
+        createItem = await itemStoreIpfsSha256.methods.create(flagsNonce,ipfsHash);
+        
         const encodedABI = createItem.encodeABI();
 
         let gasEst = await createItem.estimateGas();
@@ -394,7 +388,6 @@ module.exports = {
 
         let reviseItem = await itemStoreIpfsSha256.methods.createNewRevision(mixItemId, revisionIpfsHash);
         const encodedABI = reviseItem.encodeABI();
-
 
         if(notify) {
           notify.update('message', 'Revising Mix Item!');
@@ -455,7 +448,7 @@ module.exports = {
             await _item.latestRevision().load();
             
             let profile = await _item.latestRevision().getProfile();
-            profile.children = await _item.childIds();
+            profile.children = await getChildren(profileId);
             profile.bio = await _item.latestRevision().getBodyText();
             profile.name = await _item.latestRevision().getTitle();
             profile._id = addr;
@@ -486,8 +479,18 @@ module.exports = {
 
 
       }
+    },
 
-
+    getChildren: async(itemId) => {
+      try {
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagAddr);
+        let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
+        return childrenArray;
+      } catch (e) {
+        console.log(e)
+        return [];
+      }
 
     }
 

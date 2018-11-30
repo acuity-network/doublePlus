@@ -6,6 +6,7 @@ import languageProto from '../../startup/client/lib/protobuf/language_pb.js'
 import titleProto from '../../startup/client/lib/protobuf/title_pb.js'
 import bodyTextProto from '../../startup/client/lib/protobuf/body_pb.js'
 import MixContent from '../../startup/client/classes/MixContent.js'
+import Image from '../../startup/client/classes/image.js'
 
 
 class ProfileUserEdit extends React.Component{
@@ -48,9 +49,21 @@ class ProfileUserEdit extends React.Component{
     }
 
     onFileChange (e) {
-        console.log(e.target.files[0]);
+        try {
+            var file = e.target.files[0];
+            var reader = new FileReader();
+            reader.onload = event => {
+                console.log(event.target.result)
+            };
+            this.setState({
+                image:reader.readAsArrayBuffer(file)
+            })
+            console.log(reader.readAsArrayBuffer(file));
+        } catch(e) {
+            console.log(e, "image upload error");
+        }
 
-    }
+    };
 
     save () {
 
@@ -73,10 +86,19 @@ class ProfileUserEdit extends React.Component{
         bodyTextMessage.setBodyText(this.state.bio);
         content.addMixin(0x34a9a6ec, bodyTextMessage.serializeBinary());
         // Image
-        // if (window.fileNames) {
-        //   let image = new Image(this.$root, window.fileNames[0])
-        //   content.addMixin(0x12745469, await image.createMixin())
-        // }
+        if (this.state.image) {
+            let image = new Image(this.state.image)
+            //   image.createMixin()
+            //   .then(img => {
+            //     content.addMixin(0x12745469, img);
+            //     console.log(content);
+            //   })
+            image.scaleImage(400,400)
+            .then(scaled=>{
+                console.log(scaled)
+            })
+          
+        }
         console.log(content);
         content.save()
         .then((res)=>{

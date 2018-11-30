@@ -1,7 +1,23 @@
 const itemStoreRegistryAbi = require('../lib/jsonAbis/itemStoreRegistry.abi.json');
+const itemStoreRegistryAddr = '0x8928f846012b98aac5cd2f4ef4029097cd4110fc';
+
 const itemStoreShortIdAbi = require('../lib/jsonAbis/itemStoreShortId.abi.json');
+const itemStoreShortIdAddr = '0xd02ee768718b41a8cea9350d7c4c443727da5c7b';
+
 const itemStoreAbi = require('../lib/jsonAbis/itemStoreInterface.abi.json');
+
 const itemStoreIpfsSha256Abi = require('../lib/jsonAbis/itemStoreIPFSSha256.abi.json');
+const itemStoreIpfsSha256Addr = '0x1c12e8667bd48f87263e0745d7b28ea18f74ac0e';
+
+const accountProfileAbi = require('../lib/jsonAbis/AccountProfile.abi.json');
+const accountProfileAddr = '0x7855a6b883c39c8e87d51002b064180ddbf16026';
+
+const trustedAccountsAbi = require('../lib/jsonAbis/trustedAccounts.abi.json');
+const trustedAccountAddr = '0xaae497797e3f9a5ff341225bd9696d9759991418';
+
+const itemDagAbi = require('../lib/jsonAbis/ItemDag.abi.json');
+const itemDagAddr = '0xbd3af0bdcf4c8a6dfd8f6ff2129409632decfc7e';
+
 const Web3 = require('web3');
 import itemProto from '../lib/protobuf/item_pb.js';
 import MixRevision from './MixRevision.js';
@@ -16,8 +32,8 @@ export default class MixItem {
     try {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
         
-        this.itemStoreRegistry = new web3.eth.Contract(itemStoreRegistryAbi, '0xa46adddd3105715fa0ea0d4a883d4be99452c3f6');
-        this.itemStoreShortId = new web3.eth.Contract(itemStoreShortIdAbi, '0xd02ee768718b41a8cea9350d7c4c443727da5c7b');
+        this.itemStoreRegistry = new web3.eth.Contract(itemStoreRegistryAbi, itemStoreRegistryAddr);
+        this.itemStoreShortId = new web3.eth.Contract(itemStoreShortIdAbi, itemStoreShortIdAddr);
         this.itemStoreAddress = await this.itemStoreRegistry.methods.getItemStore(this.itemId).call();
 
         this.itemStore = new web3.eth.Contract(itemStoreAbi, this.itemStoreAddress);
@@ -32,7 +48,7 @@ export default class MixItem {
         } 
         let contractId = await this.itemStore.methods.getContractId().call();
         console.log(contractId);
-        if (contractId != "0x2d54bddf4be19c6c") {
+        if (contractId != "0x1f1e136d1003177d") {
             throw 'Unknown item store.'
         }  
         this.itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, this.itemStoreAddress);
@@ -63,14 +79,6 @@ export default class MixItem {
 
   isUpdatable() {
     return this.item.flags & 1
-  }
-
-  parentIds() {
-    return this.item.parentIds
-  }
-
-  childIds() {
-    return this.item.childIds
   }
 
   revisions() {

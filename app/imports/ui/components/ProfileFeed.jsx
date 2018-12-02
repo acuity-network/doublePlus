@@ -87,7 +87,7 @@ class ProfileFeed extends React.Component{
                             dataLength={this.state.itemCount}
                             next={this.loadMore.bind(this)}
                             hasMore={!this.state.done}
-                            loader={<h4>Loading...</h4>}
+                            loader={null}
                         >
                             {this.profileItems()}
                         </InfiniteScroll> 

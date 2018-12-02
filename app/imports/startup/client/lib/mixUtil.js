@@ -285,6 +285,7 @@ module.exports = {
 
 
     createOrReviseMyProfile: async(ipfsHash, myAddr) => {
+      
       try {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
         const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
@@ -335,20 +336,19 @@ module.exports = {
       
       const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
       const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
-      let itemId = await itemStoreIpfsSha256.methods.getNewItemId(flagsNonce).call({from:myAddr});
+      let itemId = await itemStoreIpfsSha256.methods.getNewItemId(myAddr, flagsNonce).call({from:myAddr});
       return itemId;
 
     },
 
-    //accepts optional parent array of itemIds and calls the corresponding contract method depending on parentss count.
-    createNewItem: async(myAddr, ipfsHash, flagsNonce, parents = [], notify = null) => {
+    
+    createNewItem: async(myAddr, ipfsHash, flagsNonce, notify = null) => {
       
       try {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
         
         const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
         let createItem;
-
         createItem = await itemStoreIpfsSha256.methods.create(flagsNonce,ipfsHash);
         
         const encodedABI = createItem.encodeABI();
@@ -360,8 +360,8 @@ module.exports = {
         }
 
         let GasPrice = await Web3Util.getGasPrice();
-        let Nonce = await web3.eth.getTransactionCount(myAddr, "pending");
-      
+        let Nonce = await web3.eth.getTransactionCount(myAddr,'pending');
+        console.log('n1',Nonce)
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -413,10 +413,38 @@ module.exports = {
         throw e
       }
    
-
-
     },
 
+    addChildToParent: async(myAddr, parent, flagsNonce) => {
+
+      try{
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const itemDag = new web3.eth.Contract(itemDagAbi, itemDagAddr);
+
+        let reviseItem = await itemDag.methods.addChild(parent, itemStoreIpfsSha256Addr, flagsNonce);
+        const encodedABI = reviseItem.encodeABI();
+
+        let GasPrice = await Web3Util.getGasPrice();
+        let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
+        console.log('n2',Nonce)
+        let rawTx = {
+          nonce:Nonce,
+          chainId:76,
+          from: myAddr,
+          to: itemDagAddr,
+          gas: 2500000,
+          data: encodedABI,
+          gasPrice:GasPrice
+        }; 
+
+        Web3Util.signAndSendRawTx(rawTx);
+
+      } catch (e) {
+        throw e
+      }
+   
+    },
+    
     postNewBlurb: async(myAddr, ipfsHash, parentProfileId, notify = null) => {
 
         try {
@@ -424,7 +452,10 @@ module.exports = {
           let flagsNonce = '0x01' + Web3.utils.randomHex(30).substr(2);
           let itemId = await module.exports.getItemId(flagsNonce, myAddr);
           console.log([parentProfileId]);
-          module.exports.createNewItem(myAddr,ipfsHash,flagsNonce,[parentProfileId], notify)
+          
+          
+          await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce);
+          await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
 
           } catch (e) {
               throw e
@@ -448,7 +479,7 @@ module.exports = {
             await _item.latestRevision().load();
             
             let profile = await _item.latestRevision().getProfile();
-            profile.children = await getChildren(profileId);
+            profile.children = await module.exports.getChildren(profileId);
             profile.bio = await _item.latestRevision().getBodyText();
             profile.name = await _item.latestRevision().getTitle();
             profile._id = addr;

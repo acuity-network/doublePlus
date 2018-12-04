@@ -22,6 +22,8 @@ const trustedAccountAddr = '0x11dc5cf838ae3850458f92474dc28d1e47f8e045';
 const itemDagAbi = require('../lib/jsonAbis/ItemDag.abi.json');
 const itemDagAddr = '0xbd3af0bdcf4c8a6dfd8f6ff2129409632decfc7e';
 
+const itemDagOnlyOwnerAddr = '0xd6cc1712b46a599f87f023fad83bc06473bb2b8d';
+
 
 import MixItem from '../classes/MixItem.js'
 const MixContent = require('../classes/MixContent.js')
@@ -419,7 +421,7 @@ module.exports = {
 
       try{
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
-        const itemDag = new web3.eth.Contract(itemDagAbi, itemDagAddr);
+        const itemDag = new web3.eth.Contract(itemDagAbi, itemDagOnlyOwnerAddr);
 
         let reviseItem = await itemDag.methods.addChild(parent, itemStoreIpfsSha256Addr, flagsNonce);
         const encodedABI = reviseItem.encodeABI();
@@ -431,7 +433,7 @@ module.exports = {
           nonce:Nonce,
           chainId:76,
           from: myAddr,
-          to: itemDagAddr,
+          to: itemDagOnlyOwnerAddr,
           gas: 2500000,
           data: encodedABI,
           gasPrice:GasPrice
@@ -493,7 +495,7 @@ module.exports = {
             console.log(profile);
             if(Meteor.isClient) {
               try{
-                profileDb.insert({_id:profile._id, profileItemId: profile.profileItemId, name:profile.name, bio:profile.bio, location:profile.location, type:profile.type, image:profile.image, children:profile.children});
+              profileDb.insert({_id:profile._id, profileItemId: profile.profileItemId, name:profile.name, bio:profile.bio, location:profile.location, type:profile.type, image:profile.image, children:profile.children});
               } catch(e) {
                 
               }
@@ -513,10 +515,12 @@ module.exports = {
     },
 
     getChildren: async(itemId) => {
+
       try {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
-        const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagAddr);
+        const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagOnlyOwnerAddr);
         let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
+        console.log(childrenArray)
         return childrenArray;
       } catch (e) {
         console.log(e)

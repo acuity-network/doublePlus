@@ -36,7 +36,7 @@ export default class MainLayout extends React.Component {
 
 
     if(!LocalStore.get('nodeURL')) {
-      LocalStore.set('nodeURL', "http://145.249.107.233:8645/");
+      LocalStore.set('nodeURL', "https://rpc.doubleplus.io/");
     }
     console.log(LocalStore.get('nodeURL'));
     if(!LocalStore.get('ipfsApiURL')) {
@@ -55,12 +55,13 @@ export default class MainLayout extends React.Component {
     Web3Util.initWeb3();
   
     IpfsUtil.initIPFS();
+    if(Meteor.isClient) {
+      persistentTransactionDb = new Mongo.Collection('transaction-Db', null);
+      profileDb = new Mongo.Collection(null);
   
-    persistentTransactionDb = new Mongo.Collection('transaction-Db', null);
-    followingDb = new Mongo.Collection('following-Db',null);
-  
-    transactionDb = new PersistentMinimongo(persistentTransactionDb);
-    transactionDb.refresh();
+      transactionDb = new PersistentMinimongo(persistentTransactionDb);
+      transactionDb.refresh();
+    }
     
   };
 

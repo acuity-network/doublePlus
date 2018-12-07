@@ -1,6 +1,6 @@
 const multihashes = require('multihashes')
 import titleProto from '../lib/protobuf/title_pb.js'
-import jpegImageProto from '../lib/protobuf/jpeg-image_pb.js'
+import jpegImageProto from '../lib/protobuf/mix_jpeg_mipmap_pb.js'
 import bodyTextProto from '../lib/protobuf/body_pb.js'
 import profileProto from '../lib/protobuf/account-profile_pb.js'
 import MixContent from './MixContent.js'

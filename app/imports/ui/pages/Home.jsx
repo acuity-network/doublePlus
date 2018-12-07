@@ -2,6 +2,7 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import MixStats from '../components/MixStats.jsx'
 import IpfsStats from '../components/IpfsStats.jsx'
+import AccountRouter from '../components/AccountRouter.jsx'
 import base64img from '../../startup/client/lib/base64img.js'
 
 //console.log(base64Gif);
@@ -50,11 +51,14 @@ class Home extends React.Component {
   render() {
       let Render;
       Render = 
-      <div>
-        <div className="w3-col m9">
+      <div className="w3-row">
+       
+        <div className="w3-col m9 w3-row-padding" style={{paddingBottom:"20px"}}>
+        <AccountRouter/>
+        
                 <div className="w3-card w3-round w3-white">
                     <div className="w3-center w3-container w3-padding">
-
+                    
                     {/* <h1  >
                         Welcome to the Decentralized Web!
                     </h1> */}
@@ -74,7 +78,8 @@ class Home extends React.Component {
                     </div>:''}
                     </div>
                 </div>
-        </div>
+            </div>
+
         <MixStats/>
         <IpfsStats/>
 
@@ -98,6 +103,7 @@ class Home extends React.Component {
             </div>
         </div> 
     </div>
+  
 
       if(this.state.ipfsConnected) {
         $('#ipfsModal').hide();

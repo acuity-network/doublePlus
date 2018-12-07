@@ -23,23 +23,22 @@ class Profile extends React.Component{
 
     componentWillMount(){
 
-        MixUtil.getProfile(this.state.profileAddr)
-        .then(_profileId => {
+        MixUtil.getProfileLocalDb(this.state.profileAddr, true)
+        .then(_profileObject => {
             
-            if(_profileId) {
-                let _profileItem = new MixItem(_profileId);
-                _profileItem.init()
-                .then(item =>{
-                    this.setState({
-                        profileItem:_profileItem,
-                        profileId:_profileId,
-                        loaded: true
-                        
-                    })
+            if(_profileObject) {
+                
+    
+                this.setState({
+                    profileObject:_profileObject,
+                    profileId:_profileObject.profileItemId,
+                    loaded: true
+                    
                 })
+           
             } else {
                 this.setState({
-                    profileId:_profileId,
+                    profileId:null,
                     loaded: true
                 });
             }
@@ -74,8 +73,8 @@ class Profile extends React.Component{
         } else {
             Render = 
                 <div className="w3-row">       
-                    <ProfileUserInfo profileItem = {this.state.profileItem} isMine = {this.state.isMine} profileId = {this.state.profileId} profileAddr={this.state.profileAddr}/>
-                    <ProfileFeed profileItem = {this.state.profileItem} isMine = {this.state.isMine} profileId={this.state.profileId} profileAddr={this.state.profileAddr}/>
+                    <ProfileUserInfo profileObject = {this.state.profileObject} isMine = {this.state.isMine} profileId = {this.state.profileId} profileAddr={this.state.profileAddr}/>
+                    <ProfileFeed profileObject = {this.state.profileObject} isMine = {this.state.isMine} profileId={this.state.profileId} profileAddr={this.state.profileAddr}/>
                 </div>  
         }
       

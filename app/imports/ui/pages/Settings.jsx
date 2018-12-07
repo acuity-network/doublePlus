@@ -79,9 +79,9 @@ class Settings extends React.Component{
     }
 
     restore () {
-        LocalStore.set('nodeURL', 'http://145.249.107.233:8645/');
+        LocalStore.set('nodeURL', "https://rpc.doubleplus.io/");
         LocalStore.set('ipfsApiURL', 'localhost');
-        LocalStore.set('protocol', 'https')
+        LocalStore.set('protocol', 'http')
         LocalStore.set('ipfsGatewayURL', 'https://ipfs.infura.io/');
         LocalStore.set('browserIpfs', true);
         Web3Util.initWeb3();

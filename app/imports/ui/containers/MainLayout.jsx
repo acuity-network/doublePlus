@@ -36,7 +36,7 @@ export default class MainLayout extends React.Component {
 
 
     if(!LocalStore.get('nodeURL')) {
-      LocalStore.set('nodeURL', "http://145.249.107.233:8645/");
+      LocalStore.set('nodeURL', "https://rpc.doubleplus.io/");
     }
     console.log(LocalStore.get('nodeURL'));
     if(!LocalStore.get('ipfsApiURL')) {

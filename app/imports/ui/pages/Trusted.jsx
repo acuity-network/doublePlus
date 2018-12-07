@@ -67,8 +67,8 @@ class Trusted extends React.Component{
 
         if(this.state.loaded){
         Render = 
-
-            <div className="w3-col m12">
+            <div style ={{margin:'auto', maxWidth:'1200px'}}>
+            <div className="w3-col m12" >
                     <div className="w3-card w3-round w3-white">
                         <div className="w3-container w3-padding">
                             <div style={{paddingBottom: "60px"}}>
@@ -98,6 +98,7 @@ class Trusted extends React.Component{
                         </div>
                     </div>
                     
+                </div>
                 </div>
             } else {
                 Render =

@@ -117,14 +117,14 @@ class AccountRouter extends React.Component{
 
 
                     <div style={{paddingBottom: "20px"}}>
-                    <h3 style={{paddingBottom: "20px"}} >Enter the Mix address of account you'd like to view</h3>
+                    <h3 style={{paddingBottom: "20px"}} >View a profile by their Mix Address</h3>
             
                     <div  style={{paddingBottom: "20px"}}>
                         
                         <div className="form-group loginText">
                             <input style={{ width: '100%'}} onChange={this.addrChange.bind(this)} className="form-control" id="routeAddr" placeholder="0x32b3a..." type="text"/>
                         </div>
-                        <button onClick= {this.routeHandle.bind(this)} id="create" type="button" className="w3-button w3-theme"><i className=""></i> &nbsp;Route</button>&nbsp;&nbsp;
+                        <button onClick= {this.routeHandle.bind(this)} style={{width:"20%"}}  id="create" type="button" className="w3-button w3-theme btn-lg">Route</button>
                         
                     </div>
                     </div>

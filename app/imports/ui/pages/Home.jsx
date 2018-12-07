@@ -53,7 +53,7 @@ class Home extends React.Component {
       Render = 
       <div className="w3-row">
        
-        <div className="w3-col m9">
+        <div className="w3-col m9 w3-row-padding" style={{paddingBottom:"20px"}}>
         <AccountRouter/>
         
                 <div className="w3-card w3-round w3-white">

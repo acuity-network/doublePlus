@@ -121,10 +121,10 @@ class AccountRouter extends React.Component{
             
                     <div  style={{paddingBottom: "20px"}}>
                         
-                        <div className="form-group loginText">
-                            <input style={{ width: '100%'}} onChange={this.addrChange.bind(this)} className="form-control" id="routeAddr" placeholder="0x32b3a..." type="text"/>
+                        <div style={{paddingBottom: "20px"}} className="form-group loginText">
+                            <input style={{  width: '100%'}} onChange={this.addrChange.bind(this)} className="form-control" id="routeAddr" placeholder="0x32b3a..." type="text"/>
                         </div>
-                        <button onClick= {this.routeHandle.bind(this)} style={{width:"20%"}}  id="create" type="button" className="w3-button w3-theme btn-lg">Route</button>
+                        <button onClick= {this.routeHandle.bind(this)} style={{width:"35%"}}  id="create" type="button" className="w3-button btn-lg btn-info">Route</button>
                         
                     </div>
                     </div>

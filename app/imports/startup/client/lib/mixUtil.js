@@ -527,6 +527,20 @@ module.exports = {
         return [];
       }
 
+    },
+
+    getComments: async(itemId) => {
+      try {
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagAdd);
+        let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
+        console.log(childrenArray)
+        return childrenArray;
+      } catch (e) {
+        console.log(e)
+        return [];
+      }
+
     }
 
 

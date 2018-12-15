@@ -1,6 +1,8 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import base64img from '../../startup/client/lib/base64img.js'
+import base64img from '../../startup/client/lib/base64img.js';
+import ReplyBox from './ReplyBox.jsx';
+const web3 = require('web3');
 
 class ProfileFeedItem extends React.Component{
 
@@ -8,7 +10,7 @@ class ProfileFeedItem extends React.Component{
         super(props);
         this.state = { 
             item: this.props.item,
-            ownerProfile: this.props.profile
+            reply:false
         };
     }
 
@@ -18,8 +20,16 @@ class ProfileFeedItem extends React.Component{
         });
         this.state.item.init()
         .then(_item => {
+            console.log(_item);
             this.setState({
-                owner:_item.owner()
+                owner:_item.owner(),
+                itemId:_item.itemId,
+                isMine: (web3.utils.toChecksumAddress(_item.owner()) == web3.utils.toChecksumAddress(Session.get('addr')))
+            })
+
+            MixUtil.getBlurbInfo(_item.itemId)
+            .then(blurbInfo =>{
+                console.log('info', blurbInfo);
             })
 
             MixUtil.getProfileLocalDb(_item.owner())
@@ -56,6 +66,40 @@ class ProfileFeedItem extends React.Component{
         return true;
     };
 
+    handleReplyChange(e) {
+        this.setState({
+            reply:!this.state.reply,
+        });
+
+    };
+
+    handleDonate(e) {
+
+        let notify = 
+        $.notify({
+            icon: 'glyphicon glyphicon-warning-sign',
+            title: '',
+            message: 'Donating to Item Owner!',
+            target: '_blank',
+            allow_dismiss: false,
+          },{
+            animate: {
+                enter: 'animated fadeInDown',
+                exit: 'animated fadeOutUp'
+            },
+            type:'info',
+            showProgressbar: true,
+            placement: {
+                from: "bottom",
+                align: "center"
+            }
+          });
+
+          MixUtil.donateToItem(Session.get('addr'),this.state.itemId, notify);
+
+
+    };
+
     route (link) {
         this.props.history.push(link)
     };
@@ -71,9 +115,18 @@ class ProfileFeedItem extends React.Component{
             <h3>{this.state.name}</h3> <a href="#" onClick={this.route.bind(this,'/profile/'+this.state.owner)} > {this.state.owner}</a>
             
             <hr className="w3-clear"/>
-            <p style={{fontSize:"24px"}}>{this.state.bodyText}</p>
-            <button type="button" className="w3-button w3-theme-d1 w3-margin-bottom"><i className="fa fa-thumbs-up"></i> &nbsp;Donate</button> &nbsp; 
-            <button type="button" className="w3-button w3-theme-d2 w3-margin-bottom"><i className="fa fa-comment"></i> &nbsp;Reply</button> 
+            <p style={{paddingBottom:"10px",fontSize:"20px"}}> &nbsp; {this.state.bodyText}</p>
+            {!this.state.isMine &&
+            <button type="button" onClick={this.handleDonate.bind(this)} className="btn btn-success w3-margin-bottom"><i className="fa fa-money"></i> &nbsp;Send a Mix</button>
+            }
+            <button type="button" onClick={this.handleReplyChange.bind(this)} className="btn w3-theme-d2 w3-margin-bottom"><i className="fa fa-comment"></i> &nbsp; {this.state.reply ? 'Cancel': 'Reply'}</button> 
+            <span className="w3-right w3-opacity"> <a href="" onClick={this.route.bind(this, "comments/"+ this.state.itemId) }> Replies: 23</a> </span>
+            <span className="w3-right w3-opacity">  Mix Received: 1232 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            {this.state.reply &&
+                <div style={{paddingBottom:"20px"}}>
+                    <ReplyBox parentItemId = {this.state.itemId}/>
+                </div>
+            }
         </div>  
         
         return(Render);

@@ -126,7 +126,8 @@ class ProfileUserEdit extends React.Component{
     render() {
         let Render;
         Render = 
-        <div id = "edit" className="w3-col m15 w3-row-padding">
+        <div style ={{margin:'auto', maxWidth:'800'}}>
+        <div id = "edit"  className="w3-col m12 w3-row-padding">
             
             <div className="w3-card w3-round w3-white">
               <div  style = {{paddingBottom:'10px'}} className="w3-container">
@@ -161,6 +162,7 @@ class ProfileUserEdit extends React.Component{
               </div>
             </div>
             <br/>
+        </div>
         </div>
         return(Render);
     };

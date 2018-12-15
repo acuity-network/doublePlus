@@ -24,6 +24,8 @@ const itemDagAddr = '0xbd3af0bdcf4c8a6dfd8f6ff2129409632decfc7e';
 
 const itemDagOnlyOwnerAddr = '0xd6cc1712b46a599f87f023fad83bc06473bb2b8d';
 
+const blurbsAbi = require('../lib/jsonAbis/Blurbs.abi.json');
+const blurbsAddr = '0x0c4803fc03a8ff541ead099561dd668c80eee0b5';
 
 import MixItem from '../classes/MixItem.js'
 const MixContent = require('../classes/MixContent.js')
@@ -458,6 +460,7 @@ module.exports = {
           
           await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce);
           await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
+          await module.exports.initializeBlurb(myAddr, itemId, 0);
 
           } catch (e) {
               throw e
@@ -541,7 +544,107 @@ module.exports = {
         return [];
       }
 
+    },
+
+    donateToItem: async(myAddr, itemId, notify = null, amount = 1) => {
+      try{
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
+
+        let donateBlurb = await blurbsFactory.methods.donate(itemId);
+        const encodedABI = donateBlurb.encodeABI();
+
+        if(notify) {
+          notify.update('message', 'Sending 1 Mix!');
+          notify.update('progress', 60);
+        }
+
+        let GasPrice = await Web3Util.getGasPrice();
+        let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
+        //currently just 1 mix, will update in future.
+        let weiAmount = await web3.utils.toWei(web3.utils.toBN(amount),"ether");
+        let rawTx = {
+          nonce:Nonce,
+          chainId:76,
+          value: web3.utils.toBN(weiAmount),
+          from: myAddr,
+          to: blurbsAddr,
+          gas: 2500000,
+          data: encodedABI,
+          gasPrice:GasPrice
+        }; 
+
+        Web3Util.signAndSendRawTx(rawTx, notify);
+
+      } catch (e) {
+        throw e
+      }
+
+
+    },
+
+    initializeBlurb: async(myAddr, itemId, blurbType) => {
+
+      try{
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
+
+        let addBlurb = await blurbsFactory.methods.addBlurb(itemId, blurbType);
+        const encodedABI = addBlurb.encodeABI();
+
+        let GasPrice = await Web3Util.getGasPrice();
+        let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
+        console.log('n2',Nonce)
+        let rawTx = {
+          nonce:Nonce,
+          chainId:76,
+          from: myAddr,
+          to: blurbsAddr,
+          gas: 2500000,
+          data: encodedABI,
+          gasPrice:GasPrice
+        }; 
+
+        Web3Util.signAndSendRawTx(rawTx);
+
+      } catch (e) {
+        throw e
+      }
+
+    },
+
+    getTotalDonationsForItem: async(itemId) => {
+      try{
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
+
+        let donations = await blurbsFactory.methods.getBlurbTotalDonations(itemId).call();
+        return (web3.utils.fromWei(web3.utils.toBN(donations),"ether"));
+      } catch(e) {
+        console.log(e);
+        return 0;
+      }
+
+
+    },
+
+    getBlurbInfo: async(itemId) => {
+      try{
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
+
+        let blurbInfo = await blurbsFactory.methods.getBlurbInfo(itemId).call();
+        console.log(blurbInfo);
+        return blurbInfo;
+      } catch(e) {
+        console.log(e);
+        return [];
+      }
+
+
     }
+
+    
 
 
 }

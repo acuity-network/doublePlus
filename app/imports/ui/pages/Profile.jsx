@@ -59,7 +59,7 @@ class Profile extends React.Component{
         //if is users page and user doesnt have a profile, show user edit
         if(this.state.isMine && !Session.get('profile')) {
         Render = 
-            <div style ={{margin:'auto', maxWidth:'1200px'}}>
+            <div style ={{margin:'auto', maxWidth:'800px'}}>
                 <ProfileUserEdit/>
             </div>
             

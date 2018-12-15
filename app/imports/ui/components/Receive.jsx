@@ -45,11 +45,13 @@ class Receive extends React.Component{
                 <div className="w3-card w3-round w3-white">
                     <div className="w3-container w3-padding">
                         <h2>Receive</h2>
-                        <div>
+                        <div style={{paddingLeft:"50px"}}>
                                 
-                                <h5 style = {{paddingTop:"30px", paddingLeft:"50px"}}>
-                                    Mix Balance: {this.state.balance} 
+                                <h5 style = {{paddingTop:"30px"}}>
+                                    Mix Balance: {this.state.balance} <br/>
+                                    Donation Balance: <a href="#">0   WITHDRAW</a>
                                 </h5>
+                          
                             <div id="qrcode" style={{paddingTop:"40px", textAlign: "center"}}> </div>
                             <div style={{textAlign: "center"}}> <p>{this.state.addr}</p></div>
                                   

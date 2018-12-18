@@ -13,12 +13,6 @@ class Header extends React.Component {
   
   };
 
-  login () { 
-    console.log('here');
-    SessionUtil.logIn();
-    //await web3Util.initWeb3();
-  };
-
   route (link) {
     this.props.history.push(link);
   };

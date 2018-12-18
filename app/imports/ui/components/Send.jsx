@@ -98,8 +98,8 @@ class Send extends React.Component{
                                         <input onChange={this.handleAmountChange.bind(this)} className="form-control" id="amount" placeholder="" type="text"/>
                         
                                     </div>
-                                    <div style = {{paddingTop:"30px", display: "flex", justifyContent: "center", paddingBottom: "83px"}}>
-                                        <button onClick={this.send.bind(this)} style={{width:"50%"}} type="button" id="sendBtn" className="w3-button w3-theme btn-lg">Send</button>
+                                    <div style = {{paddingTop:"50px", display: "flex", justifyContent: "center", paddingBottom: "83px"}}>
+                                        <button onClick={this.send.bind(this)} style={{width:"50%"}} type="button" id="sendBtn" className="w3-button btn-info btn-lg">Send</button>
                                     </div>
         
                             </div>

@@ -27,7 +27,9 @@ class Profile extends React.Component{
         .then(_profileObject => {
             
             if(_profileObject) {
-                
+                if(this.state.isMine) {
+                    Session.set('profileId', _profileObject.profileItemId)
+                }
     
                 this.setState({
                     profileObject:_profileObject,
@@ -57,9 +59,9 @@ class Profile extends React.Component{
     render() {
         let Render;
         //if is users page and user doesnt have a profile, show user edit
-        if(this.state.isMine && !Session.get('profile')) {
+        if(this.state.isMine && !this.state.profileId && this.state.loaded) {
         Render = 
-            <div style ={{margin:'auto', maxWidth:'1200px'}}>
+            <div style ={{margin:'auto', maxWidth:'800px'}}>
                 <ProfileUserEdit/>
             </div>
             

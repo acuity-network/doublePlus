@@ -126,7 +126,8 @@ class ProfileUserEdit extends React.Component{
     render() {
         let Render;
         Render = 
-        <div id = "edit" className="w3-col m15 w3-row-padding">
+        <div style ={{margin:'auto', maxWidth:'800'}}>
+        <div id = "edit"  className="w3-col m12 w3-row-padding">
             
             <div className="w3-card w3-round w3-white">
               <div  style = {{paddingBottom:'10px'}} className="w3-container">
@@ -134,7 +135,7 @@ class ProfileUserEdit extends React.Component{
                <h6 className="w3-center">{this.state.profileAddr}</h6>
                <div className="w3-center">
                 <p className="w3-center"><img src={this.state.profileImg} className="w3-circle" style={{height:"200px",width:"200px"}} alt="Avatar"/></p>
-                <label className = "w3-button w3-theme" htmlFor="avatar">Edit Picture</label>
+                <label className = "btn btn-lg btn-light" htmlFor="avatar">Edit Picture</label>
                 <input id="avatar" type="file" multiple={false} accept=".jpeg, .jpg, .jpe, .png" onChange={this.onFileChange.bind(this)} />
     
                </div>
@@ -157,10 +158,11 @@ class ProfileUserEdit extends React.Component{
                 </select>
                 <br/>
                {/* <p><i className="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> <input onChange={this.handleToAddrChange.bind(this)} className="form-control" id="toAddr" placeholder="0x4e221b..." type="text"/> </p> */}
-               <button onClick={this.save.bind(this)} id="save" type="button" className="w3-button w3-theme"><i ></i> &nbsp;Save</button> &nbsp;
+               <button onClick={this.save.bind(this)} id="save" type="button" className="btn btn-success"><i ></i> &nbsp;Save</button> &nbsp;
               </div>
             </div>
             <br/>
+        </div>
         </div>
         return(Render);
     };

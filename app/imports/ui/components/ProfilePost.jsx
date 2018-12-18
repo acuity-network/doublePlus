@@ -162,9 +162,9 @@ class ProfilePost extends React.Component{
                 <div className="form-group loginText">
                     <textarea style={{ width: '100%'}}  onChange={this.handlePostChange.bind(this)} className="form-control" id="post" placeholder="Feeling Uncensorable!" type="text"/>
                 </div>
-                <button  onClick = {this.handlePostSubmit.bind(this)} style={{float: 'right'}} type="button" className="w3-button w3-theme"><i className="fa fa-pencil"></i> &nbsp;Post</button> 
+                <button  onClick = {this.handlePostSubmit.bind(this)} style={{float: 'right'}} type="button" className="btn btn-info"><i className="fa fa-pencil"></i> &nbsp;Post</button> 
                 <span className="w3-right w3-opacity" style={{float: 'right'}}> {140 - this.state.charCount} &nbsp;&nbsp; </span>
-                <button  type="button" className="w3-button w3-theme"><i className="fa fa-image"></i> &nbsp;Attach Img</button> 
+                <button  type="button" className="btn w3-theme"><i className="fa fa-image"></i> &nbsp;Attach Img</button> 
             </div>
         </div>
         return(Render);

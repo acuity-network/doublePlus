@@ -37,8 +37,8 @@ class Login extends React.Component{
             SessionUtil.logIn(this.state.privateKey)
             .then((success)=> {
                     Web3Util.getBalance(Session.get('addr'))
-                    .then((balance) =>{
-                        Session.set('balance',balance);
+                    .then((res) =>{
+                        Session.set('balance',parseFloat(res).toFixed(4));
                     })
                     this.route('/');
 
@@ -98,7 +98,7 @@ class Login extends React.Component{
                                 </div>
                         </div>
                         <div style={{paddingBottom:'20px' }}>
-                            <button onClick={this.handleSubmit.bind(this)} type="button" className="w3-button w3-theme"><i className=""></i> &nbsp;Login</button> &nbsp; &nbsp;
+                            <button onClick={this.handleSubmit.bind(this)} type="button" className="btn btn-light"><i className=""></i> &nbsp;Login</button> &nbsp; &nbsp;
                             <a href ="#" onClick = {this.create.bind(this)} className="">Create Account</a>
                         </div>
                         

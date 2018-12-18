@@ -129,7 +129,7 @@ class Settings extends React.Component{
                 <div className="w3-card w3-round w3-white">
                     <div className="w3-container w3-padding">
                         <div style={{paddingBottom: "20px"}}>
-                                <h2 style={{paddingBottom: "20px"}} >Mix Hub Settings</h2>
+                                <h2 style={{paddingBottom: "20px"}} >Double Plus Settings</h2>
                                 <div className="form-group">
                                         <label htmlFor="nodeURL">Node URL:</label>
                                     <input onChange= {this.handleNodeChange.bind(this)} style={{width:"100%"}} className="form-control" id="nodeURL" value={this.state.nodeURL} type="text"/>
@@ -158,9 +158,9 @@ class Settings extends React.Component{
                                 <input onChange={this.handleGatewayChange.bind(this)} style={{width:"100%"}} className="form-control" id="ipfsGatewayURL" value={this.state.ipfsGatewayURL} type="text"/>
                             </div> */}
                         </div>
-                        <div style={{paddingNottom: "50px"}}>
-                            <button onClick={this.save.bind(this)} id="save" type="button" className="w3-button w3-theme"><i ></i> &nbsp;Save</button> &nbsp;
-                            <button onClick={this.restore.bind(this)} id="restore" type="button" className="w3-button w3-theme"><i></i> &nbsp;Restore Defaults</button> &nbsp;
+                        <div style={{paddingBottom: "20px"}}>
+                            <button onClick={this.save.bind(this)} id="save" type="button" className="btn btn-success"><i ></i> &nbsp;Save</button> &nbsp;
+                            <button onClick={this.restore.bind(this)} id="restore" type="button" className="btn w3-theme"><i></i> &nbsp;Restore Defaults</button> &nbsp;
                         </div>
                         
                     </div>

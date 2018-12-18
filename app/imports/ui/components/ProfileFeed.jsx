@@ -78,8 +78,8 @@ class ProfileFeed extends React.Component{
 
         let Render;
         Render = 
-        
-            <div className="w3-col m7">
+        <div style ={{margin:'auto', maxWidth:'1200px'}}>
+            <div  className="w3-col m8">
                 <div className="w3-row-padding">
                     <div className="w3-col m12">
                         {this.state.isMine ? <ProfilePost profileAddr = {this.state.profileAddr} isMine = {this.state.isMine}/>:''}
@@ -94,6 +94,7 @@ class ProfileFeed extends React.Component{
                     </div>
                 </div>
             </div>     
+        </div>
         
       
 

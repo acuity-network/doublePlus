@@ -34,6 +34,7 @@
   --danger: #E74C3C;
   --light: #ecf0f1;
   --dark: #7b8a8b;
+  --costumePurple: #6d7fcc;
   --breakpoint-xs: 0;
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;
@@ -171,7 +172,7 @@ sup {
 }
 
 a {
-  color: #18BC9C;
+  color:#053e5a;
   text-decoration: none;
   background-color: transparent;
   -webkit-text-decoration-skip: objects;
@@ -186,7 +187,7 @@ a {
   }
 
 a:hover {
-  color: #0f7864;
+  color: #0b473c;
   text-decoration: underline;
 }
 
@@ -2745,9 +2746,9 @@ fieldset:disabled a.btn {
 }
 
 .btn-light {
-  color: #212529;
-  background-color: #ecf0f1;
-  border-color: #ecf0f1;
+  color: #ffffff;
+  background-color: #6d7fcc;
+  border-color: #6d7fcc;
 }
 
 .btn-light:hover {

@@ -13,6 +13,8 @@ import Explore from '../pages/Explore.jsx';
 import Create from '../pages/Create.jsx';
 import Profile from '../pages/Profile.jsx';
 import Loading from '../components/Loading.jsx';
+import SidePanel from '../components/SidePanel.jsx';
+import NavBar from '../components/NavBar.jsx';
 
 
 
@@ -51,6 +53,8 @@ export default class MainLayout extends React.Component {
     if(LocalStore.get('browserIpfs') == null) {
       LocalStore.set('browserIpfs', true)
     }
+
+    Session.set('isMobile', (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1));
   
     Web3Util.initWeb3();
   
@@ -77,11 +81,12 @@ export default class MainLayout extends React.Component {
       
       <Router>
 
-        <div>
-          <header>
-            <Header />
-          </header>
-          <div className="w3-container w3-content" style={{maxWidth:'1700px',marginTop:'100px'}}>  
+        <div className="wrapper">
+        < SidePanel />
+          <div id="content">
+            <NavBar /> 
+       
+          <div className="w3-container w3-content" style={{maxWidth:'1700px',marginTop:'20px'}}>  
           
       
               
@@ -98,6 +103,7 @@ export default class MainLayout extends React.Component {
                 <Route component={Home} />
               </Switch>
         
+          </div>
           </div>
 
         </div>

@@ -13,11 +13,18 @@ class Receive extends React.Component{
 
     componentWillMount(){
         Web3Util.getBalance(Session.get('addr'))
-        .then((bal)=>{
-            Session.set('balance',bal);
+        .then((res)=>{
+            Session.set('balance',parseFloat(res).toFixed(4));
             this.setState({
-                balance: bal
+                balance: parseFloat(res).toFixed(4)
             });
+        })
+
+        MixUtil.donationBalance(Session.get('addr'))
+        .then(_donations => {
+            this.setState({
+                donations:  parseFloat(_donations).toFixed(2)
+            })
         })
         
     };
@@ -36,6 +43,52 @@ class Receive extends React.Component{
         this.props.history.push(link)
     };
 
+    withdraw() {
+        if(this.state.donations <=0 ){
+
+            $.notify({
+                icon: 'glyphicon glyphicon-warning-sign',
+                title: '',
+                message: 'You currently have no donations to withdraw.',
+                target: '_blank'
+            },{
+                animate: {
+                    enter: 'animated fadeInDown',
+                    exit: 'animated fadeOutUp'
+                },
+                type:'danger',
+                placement: {
+                    from: "bottom",
+                    align: "center"
+                }
+            });
+
+        } else {
+
+            let notify = $.notify({
+                icon: 'glyphicon glyphicon-warning-sign',
+                title: '',
+                message: 'Withdrawing your balance.',
+                target: '_blank'
+            },{
+                animate: {
+                    enter: 'animated fadeInDown',
+                    exit: 'animated fadeOutUp'
+                },
+                type:'info',
+                placement: {
+                    from: "bottom",
+                    align: "center"
+                }
+            });
+
+            MixUtil.withdrawDonationBalance(Session.get('addr'), notify);
+            
+        }
+
+
+    };
+
     render() {
         let Render;
 
@@ -48,8 +101,8 @@ class Receive extends React.Component{
                         <div style={{paddingLeft:"50px"}}>
                                 
                                 <h5 style = {{paddingTop:"30px"}}>
-                                    Mix Balance: {this.state.balance} <br/>
-                                    Donation Balance: <a href="#">0   WITHDRAW</a>
+                                    MIX Balance: {this.state.balance} <br/>
+                                    Donation Balance: <a onClick = {this.withdraw.bind(this)} >{this.state.donations}   WITHDRAW</a>
                                 </h5>
                           
                             <div id="qrcode" style={{paddingTop:"40px", textAlign: "center"}}> </div>

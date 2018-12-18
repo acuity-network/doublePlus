@@ -16,7 +16,12 @@ module.exports = {
             if(LocalStore.get('browserIpfs')) {
                 $.getScript("https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js", async ()=>{
                     const repoPath = 'ipfs-mix'
+                    
+                    
                     global.ipfs = new Ipfs({ repo: repoPath });
+
+                    await global.ipfs.bootstrap.add('/ip4/162.154.36.79/tcp/4001/ipfs/QmWLiP6qKSii1kfRuxXTev7C7Ck7XYbz8Rq92HZerui1cu');
+                    console.log(await global.ipfs.bootstrap.list());
                       
                     global.ipfs.on('ready', async () => { 
                         

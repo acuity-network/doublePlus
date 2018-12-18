@@ -69,10 +69,10 @@ class Home extends React.Component {
                     <br/>
                     {!this.state.loggedIn ? <div>
                     
-                    <button onClick={this.route.bind(this,'/login')} style={{width:"60%"}} type="button" className="w3-button w3-theme btn-lg">Login</button>
+                    <button onClick={this.route.bind(this,'/login')} style={{width:"60%"}} type="button" className="w3-button  btn-success btn-lg">Login</button>
                     <br/>
                     <br/>
-                    <button onClick={this.route.bind(this, '/create')} style={{width:"60%"}} type="button" className="w3-button btn-lg btn-success">Create Account</button>
+                    <button onClick={this.route.bind(this, '/create')} style={{width:"60%"}} type="button" className="w3-button btn-lg btn-light">Create Account</button>
                     <br/>
                     <br/>
                     </div>:''}

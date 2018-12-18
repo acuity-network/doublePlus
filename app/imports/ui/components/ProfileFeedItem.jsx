@@ -10,7 +10,11 @@ class ProfileFeedItem extends React.Component{
         super(props);
         this.state = { 
             item: this.props.item,
-            reply:false
+            reply:false,
+            replyCount:0,
+            donations:0,
+            replies:[]
+
         };
     }
 
@@ -24,12 +28,26 @@ class ProfileFeedItem extends React.Component{
             this.setState({
                 owner:_item.owner(),
                 itemId:_item.itemId,
-                isMine: (web3.utils.toChecksumAddress(_item.owner()) == web3.utils.toChecksumAddress(Session.get('addr')))
+                isMine: (web3.utils.toChecksumAddress(_item.owner()) == web3.utils.toChecksumAddress(Session.get('addr'))),
+                loggedIn:Session.get('loggedIn')
+            })
+
+            MixUtil.getComments(_item.itemId)
+            .then(_comments => {
+                this.setState({
+                    replies:_comments,
+                    replyCount:_comments.length
+
+                })
             })
 
             MixUtil.getBlurbInfo(_item.itemId)
             .then(blurbInfo =>{
-                console.log('info', blurbInfo);
+                this.setState({
+                    donations: web3.utils.fromWei(web3.utils.toBN(blurbInfo.donationsReceived),"ether"),
+                    blurbType: blurbInfo.blurbType
+                })
+                
             })
 
             MixUtil.getProfileLocalDb(_item.owner())
@@ -44,8 +62,6 @@ class ProfileFeedItem extends React.Component{
                 })
             });
             
-
-
             _item.latestRevision().load()
             .then(_revision => {
                 this.setState({
@@ -59,7 +75,6 @@ class ProfileFeedItem extends React.Component{
 
         })
         
-        
     };
 
     shouldComponentUpdate(lastState, nextState) {
@@ -67,9 +82,13 @@ class ProfileFeedItem extends React.Component{
     };
 
     handleReplyChange(e) {
-        this.setState({
-            reply:!this.state.reply,
-        });
+        if(!this.state.loggedIn) {
+            this.route('/login');
+        } else {
+            this.setState({
+                reply:!this.state.reply,
+            });
+        }
 
     };
 
@@ -106,7 +125,6 @@ class ProfileFeedItem extends React.Component{
 
     render() {
         let Render;
-        
 
         Render = 
         <div className="w3-container w3-card w3-white w3-round w3-margin"><br/>
@@ -116,14 +134,16 @@ class ProfileFeedItem extends React.Component{
             
             <hr className="w3-clear"/>
             <p style={{paddingBottom:"10px",fontSize:"20px"}}> &nbsp; {this.state.bodyText}</p>
-            {!this.state.isMine &&
-            <button type="button" onClick={this.handleDonate.bind(this)} className="btn btn-success w3-margin-bottom"><i className="fa fa-money"></i> &nbsp;Send a Mix</button>
+            {(!this.state.isMine && this.state.loggedIn) &&
+                <span style={{paddingRight:'10px'}}>
+                    <button type="button" onClick={this.handleDonate.bind(this)} className="btn btn-success w3-margin-bottom"><i className="fa fa-money"></i> &nbsp;Send a Mix</button>
+                </span>
             }
             <button type="button" onClick={this.handleReplyChange.bind(this)} className="btn w3-theme-d2 w3-margin-bottom"><i className="fa fa-comment"></i> &nbsp; {this.state.reply ? 'Cancel': 'Reply'}</button> 
-            <span className="w3-right w3-opacity"> <a href="" onClick={this.route.bind(this, "comments/"+ this.state.itemId) }> Replies: 23</a> </span>
-            <span className="w3-right w3-opacity">  Mix Received: 1232 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span className="w3-right w3-opacity"> <a href="" onClick={this.route.bind(this, "/comments/"+ this.state.itemId) }> Replies: {this.state.replyCount}</a> </span>
+            <span className="w3-right w3-opacity">  Mix Received: {this.state.donations} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             {this.state.reply &&
-                <div style={{paddingBottom:"20px"}}>
+                <div style={{ paddingBottom:"20px"}}>
                     <ReplyBox parentItemId = {this.state.itemId}/>
                 </div>
             }

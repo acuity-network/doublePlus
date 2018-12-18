@@ -608,7 +608,7 @@ module.exports = {
         Web3Util.signAndSendRawTx(rawTx);
 
       } catch (e) {
-        throw e
+        console.log(e);
       }
 
     },
@@ -642,9 +642,61 @@ module.exports = {
       }
 
 
+    },
+
+    withdrawDonationBalance: async(myAddr, notify = null) => {
+
+      try{
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
+
+        let withdraw = await blurbsFactory.methods.withdraw();
+        const encodedABI = withdraw.encodeABI();
+
+        let GasPrice = await Web3Util.getGasPrice();
+        let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
+
+        if(notify) {
+          notify.update('message', 'Withdrawing Balance!');
+          notify.update('progress', 60);
+        }
+
+        let rawTx = {
+          nonce:Nonce,
+          chainId:76,
+          from: myAddr,
+          to: blurbsAddr,
+          gas: 2000000,
+          data: encodedABI,
+          gasPrice:GasPrice
+        }; 
+
+        Web3Util.signAndSendRawTx(rawTx, notify);
+
+      } catch (e) {
+        console.log(e);
+      }
+
+    },
+
+    donationBalance: async(myAddr) => {
+
+      try{
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
+
+        let donationBalance = await blurbsFactory.methods.currentBalance(myAddr).call();
+        return (web3.utils.fromWei(web3.utils.toBN(donationBalance),"ether"));
+      } catch(e) {
+        console.log(e);
+        return 0;
+      }
+
+
+
+
     }
 
-    
 
 
 }

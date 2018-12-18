@@ -72,7 +72,7 @@ class Create extends React.Component{
             
                     <div  style={{paddingBottom: "20px"}}>
                         
-                        <button onClick= {this.createHandle.bind(this)} id="create" type="button" className="w3-button w3-theme"><i className=""></i> &nbsp;Create</button>&nbsp;&nbsp;
+                        <button onClick= {this.createHandle.bind(this)} id="create" type="button" className="btn btn-light"><i className=""></i> &nbsp;Create</button>&nbsp;&nbsp;
                         <a href="#" onClick = {this.loginHandle.bind(this)} >Login with existing account</a>
                     </div>
                 </div>
@@ -93,7 +93,7 @@ class Create extends React.Component{
                 <p><strong>Private Key:  </strong> {this.state.priv} <br/>  </p>
             </div>
             <div className="modal-footer">
-                <button type="button" onClick={this.hideModal.bind(this)} className="w3-button w3-theme" data-dismiss="modal">Close</button>
+                <button type="button" onClick={this.hideModal.bind(this)} className="btn btn-light" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

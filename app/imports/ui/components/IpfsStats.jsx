@@ -57,10 +57,10 @@ class IpfsStats extends React.Component{
                         Peers:
                         <span >{this.state.peers}</span>
                     </li> */}
-                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                    {/* <li className="list-group-item d-flex justify-content-between align-items-center">
                         Node ID:
                             <span style={{fontSize:'10px'}} >{this.state.ipfsId}</span>
-                    </li>
+                    </li> */}
                 </ul>
                 </div>
             </div>

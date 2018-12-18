@@ -7,6 +7,7 @@ module.exports = {
         Session.set('priv', null);
         Session.set('addr', null);
         Session.set('profile', null);
+        Session.set('balance', null)
 
     },
     
@@ -21,7 +22,7 @@ module.exports = {
 
             Web3Util.getBalance(wallet.getAddressString()).then((res,e)=>{
                 console.log(res);
-                Session.set('balance',res);
+                Session.set('balance',parseFloat(res).toFixed(4));
             });
 
             let profile = await MixUtil.getProfile(Session.get('addr'));

@@ -34,7 +34,7 @@ class Receive extends React.Component{
     };
     componentDidMount() {
         $("#qrcode").qrcode({
-            size: 200,
+            size: (Session.get('isMobile') ? 100: 200),
             text: "mix:" + Session.get("addr")
         });
     };

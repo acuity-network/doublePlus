@@ -73,6 +73,10 @@ export default class MixItem {
     return this.item.owner
   }
 
+  latestTimeStamp() {
+    return this.item.timestamps[this.item.timestamps.length - 1]
+  }
+
   itemId() {
     return this.itemId
   }

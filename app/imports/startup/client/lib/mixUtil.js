@@ -25,7 +25,7 @@ const itemDagAddr = '0xbd3af0bdcf4c8a6dfd8f6ff2129409632decfc7e';
 const itemDagOnlyOwnerAddr = '0xd6cc1712b46a599f87f023fad83bc06473bb2b8d';
 
 const blurbsAbi = require('../lib/jsonAbis/Blurbs.abi.json');
-const blurbsAddr = '0x0c4803fc03a8ff541ead099561dd668c80eee0b5';
+const blurbsAddr = '0xe9dfe7da1310e73d515447695fe2a425ece9abde';
 
 import MixItem from '../classes/MixItem.js'
 const MixContent = require('../classes/MixContent.js')
@@ -472,7 +472,7 @@ module.exports = {
       console.log(profileDb);
       let profile = await profileDb.find({ _id: addr }).fetch();
       //console.log('db',profile)
-      if(profile.length>0 && !forceUpdate) {
+      if(profile.length > 0 && !forceUpdate) {
         console.log('from DB')
         return profile[0];
       } else {
@@ -508,7 +508,7 @@ module.exports = {
             return null;
           }
         } catch(e) {
-          throw e
+          return null;
 
         }
 
@@ -535,7 +535,7 @@ module.exports = {
     getComments: async(itemId) => {
       try {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
-        const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagAdd);
+        const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagAddr);
         let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
         console.log(childrenArray)
         return childrenArray;
@@ -692,8 +692,45 @@ module.exports = {
         return 0;
       }
 
+    },
 
+    cultivateMyFeed: async(myAddr) => {
 
+      try {
+        let returnFeedArray = [];
+        let accountsTrusting = await module.exports.getTrustedAccounts(myAddr);
+          for (let i = 0; i < accountsTrusting.length; i++) {
+            let _profile = await module.exports.getProfileLocalDb(accountsTrusting[i], true);
+            if(_profile) {
+              let reversedChildren = await _profile.children.reverse(); //reverse array to get newest first
+              let initItemArray = await reversedChildren.slice(0,5); //get the last 5 post per each account following
+              await initItemArray.forEach( async _item =>{
+                await returnFeedArray.push(new MixItem(_item));
+              })
+            }
+
+        }
+
+        let initalizedItems = await module.exports.initAllItems(returnFeedArray);
+        await initalizedItems.sort((itemA, itemB) => {
+          return (itemB.latestTimeStamp() - itemA.latestTimeStamp())
+          }
+        
+        )
+        
+        return initalizedItems;
+
+      } catch(e) {
+
+        console.log(e);
+        return [];
+      }
+
+    },
+
+    initAllItems: async(arrayOfItems) => {
+
+      return Promise.all( arrayOfItems.map(async _item => await _item.init()));
 
     }
 

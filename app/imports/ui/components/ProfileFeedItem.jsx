@@ -13,25 +13,45 @@ class ProfileFeedItem extends React.Component{
             reply:false,
             replyCount:0,
             donations:0,
-            replies:[]
+            replies:[],
+            isMine:false
 
         };
+
     }
 
     componentWillMount(){
         this.setState({
             profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg
         });
-        this.state.item.init()
-        .then(_item => {
-            console.log(_item);
+
+        //if not initalized then initalize
+
+        if(!this.state.item.item) {
+            this.state.item.init()
+            .then(_item => {
+                this.intitalizeStateItems(_item);
+            })
+        } else {
+            console.log('worign')
+            this.intitalizeStateItems(this.state.item);
+        }
+    };
+
+    intitalizeStateItems(_item) {
+
+
             this.setState({
                 owner:_item.owner(),
                 itemId:_item.itemId,
-                isMine: (web3.utils.toChecksumAddress(_item.owner()) == web3.utils.toChecksumAddress(Session.get('addr'))),
                 loggedIn:Session.get('loggedIn')
             })
-
+            if(Session.get('loggedIn')) {
+                this.setState({
+                    isMine: (web3.utils.toChecksumAddress(_item.owner()) == web3.utils.toChecksumAddress(Session.get('addr'))),
+                })
+            }
+        
             MixUtil.getComments(_item.itemId)
             .then(_comments => {
                 this.setState({
@@ -43,8 +63,9 @@ class ProfileFeedItem extends React.Component{
 
             MixUtil.getBlurbInfo(_item.itemId)
             .then(blurbInfo =>{
+                console.log('donations',blurbInfo.donationsReceived);
                 this.setState({
-                    donations: web3.utils.fromWei(web3.utils.toBN(blurbInfo.donationsReceived),"ether"),
+                    donations: web3.utils.fromWei(blurbInfo.donationsReceived,"ether"),
                     blurbType: blurbInfo.blurbType
                 })
                 
@@ -66,16 +87,16 @@ class ProfileFeedItem extends React.Component{
             .then(_revision => {
                 this.setState({
                     bodyText: _revision.getBodyText(),
-                    timeStamp: moment.unix(_revision.getTimestamp()).format('YYYY MM DD'),
+                    timeStamp: moment.unix(_revision.getTimestamp()).format('YYYY MM DD, h:mm a'),
 
                 });
 
 
             })
 
-        })
-        
+
     };
+        
 
     shouldComponentUpdate(lastState, nextState) {
         return true;

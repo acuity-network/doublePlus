@@ -15,11 +15,7 @@ import Profile from '../pages/Profile.jsx';
 import Loading from '../components/Loading.jsx';
 import SidePanel from '../components/SidePanel.jsx';
 import NavBar from '../components/NavBar.jsx';
-
-
-
-
-
+import Feed from '../pages/Feed.jsx';
 
 
 
@@ -98,6 +94,7 @@ export default class MainLayout extends React.Component {
                 <Route path = '/settings' component={Settings} />
                 <Route path = '/explore' component={Explore} />
                 <Route path = '/create' component={Create} />
+                <Route path = '/feed/:address' component={Feed} />
                 <Route path = '/profile/:address' component={Profile} />
                 
                 <Route component={Home} />

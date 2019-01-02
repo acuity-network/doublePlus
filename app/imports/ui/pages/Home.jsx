@@ -96,8 +96,9 @@ class Home extends React.Component {
 
                         </div>
                     </div>
+                    <p className = "w3-center">This may take up to 15 seconds the first time.  Currently browser IPFS isn't compatible with FireFox.</p>
                     <div className="modal-footer">
-                        <button type="button" onClick={this.handleClick.bind(this)} className="w3-button w3-theme" data-dismiss="modal">Close</button>
+                        <button type="button" onClick={this.handleClick.bind(this)} className="btn btn-danger" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>

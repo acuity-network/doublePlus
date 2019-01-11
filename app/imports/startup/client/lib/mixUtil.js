@@ -34,7 +34,7 @@ const MixRevision = require('../classes/MixRevision.js')
 const multihashes = require('multihashes');
 const itemPb = require("./protobuf/item_pb.js");
 const mixinmixin = require("./protobuf/mixin-mixin_pb.js");
-const jpegmixin = require("./protobuf/mix_jpeg_mipmap_pb.js");
+const jpegmixin = require("./protobuf/jpeg-image_pb.js");
 const brotli = require("../lib/brotli/brotli.js");
 var bro = new brotli.Brotli();
 const Base58 = require("base-58");
@@ -288,21 +288,21 @@ module.exports = {
     },
 
 
-    createOrReviseMyProfile: async(ipfsHash, myAddr) => {
+    createOrReviseMyProfile: async(ipfsHash, myAddr, notify = null) => {
       
       try {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
         const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
         accountProfile.getPastEvents("allEvents",(e,events)=>{console.log(events)})
-        let myProfile = await module.exports.getProfile(myAddr);
+        const myProfile = await module.exports.getProfile(myAddr);
         console.log('my profile',myProfile)
         if(myProfile == null || myProfile == '0x') {
           
-          await module.exports.createProfile(ipfsHash, myAddr);
+          await module.exports.createProfile(ipfsHash, myAddr, notify);
 
         } else {
           
-          await module.exports.createNewRevision(myAddr, myProfile, ipfsHash);
+          await module.exports.updateLatestRevision(myAddr, myProfile, ipfsHash, notify);
 
         }
 
@@ -312,7 +312,7 @@ module.exports = {
       }
     },
 
-    createProfile: async(ipfsHash, myAddr) => {
+    createProfile: async(ipfsHash, myAddr, notify = null) => {
 
       try {
         
@@ -329,12 +329,6 @@ module.exports = {
 
     },
 
-    reviseProfile: async(profileId, ipfsHash, myAddr) => {
-
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
-      let item = new MixItem(profileId);
-
-    },
 
     getItemId: async(flagsNonce,myAddr) => {
       
@@ -419,12 +413,50 @@ module.exports = {
    
     },
 
-    addChildToParent: async(myAddr, parent, flagsNonce) => {
+    updateLatestRevision: async(myAddr, itemId, revisionIpfsHash, notify=null) => {
 
       try{
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
-        const itemDag = new web3.eth.Contract(itemDagAbi, itemDagOnlyOwnerAddr);
+        const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
 
+        let reviseItem = await itemStoreIpfsSha256.methods.updateLatestRevision(itemId, revisionIpfsHash);
+        const encodedABI = reviseItem.encodeABI();
+
+        if(notify) {
+          notify.update('message', 'Revising Mix Item!');
+          notify.update('progress', 60);
+        }
+
+        let GasPrice = await Web3Util.getGasPrice();
+        let Nonce = await web3.eth.getTransactionCount(myAddr, "pending");
+      
+        let rawTx = {
+          nonce:Nonce,
+          chainId:76,
+          from: myAddr,
+          to: itemStoreIpfsSha256Addr,
+          gas: 2500000,
+          data: encodedABI,
+          gasPrice:GasPrice
+        }; 
+
+        Web3Util.signAndSendRawTx(rawTx,notify);
+
+      } catch (e) {
+        throw e
+      }
+
+
+
+
+    },
+
+    addChildToParent: async(myAddr, parent, flagsNonce, onlyOwner = false) => {
+
+      try{
+        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const itemDagContractAddr =  onlyOwner ? itemDagOnlyOwnerAddr : itemDagAddr;
+        const itemDag =  new web3.eth.Contract(itemDagAbi, itemDagContractAddr);
         let reviseItem = await itemDag.methods.addChild(parent, itemStoreIpfsSha256Addr, flagsNonce);
         const encodedABI = reviseItem.encodeABI();
 
@@ -435,7 +467,7 @@ module.exports = {
           nonce:Nonce,
           chainId:76,
           from: myAddr,
-          to: itemDagOnlyOwnerAddr,
+          to: itemDagContractAddr,
           gas: 2500000,
           data: encodedABI,
           gasPrice:GasPrice
@@ -448,6 +480,7 @@ module.exports = {
       }
    
     },
+
     
     postNewBlurb: async(myAddr, ipfsHash, parentProfileId, notify = null) => {
 
@@ -458,7 +491,7 @@ module.exports = {
           console.log([parentProfileId]);
           
           
-          await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce);
+          await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce, true);
           await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
           await module.exports.initializeBlurb(myAddr, itemId, 0);
 
@@ -466,6 +499,24 @@ module.exports = {
               throw e
           }
         
+    },
+
+    commentToPost: async(myAddr, ipfsHash, parentProfileId, parentPostId, notify = null) => {
+      try {
+        console.log(parentPostId)
+
+        let flagsNonce = '0x01' + Web3.utils.randomHex(30).substr(2);
+        let itemId = await module.exports.getItemId(flagsNonce, myAddr);
+        
+        //await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce);
+        await module.exports.addChildToParent(myAddr, parentPostId, flagsNonce, false)
+        await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
+        await module.exports.initializeBlurb(myAddr, itemId, 1);
+
+        } catch (e) {
+            throw e
+        }
+
     },
 
     getProfileLocalDb: async(addr, forceUpdate=false) => {

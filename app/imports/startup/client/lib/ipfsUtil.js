@@ -127,6 +127,13 @@ module.exports = {
         let result = await ipfs.files.add(data);
         let hash = result[0].hash;
         return hash;
+    },
+
+    addFileReturnData: async(data) => {
+        const ipfs = global.ipfs;
+        let result = await ipfs.files.add(data);
+        //let res = await module.exports.addFile(data, true);
+        return result[0];
     }
 
 

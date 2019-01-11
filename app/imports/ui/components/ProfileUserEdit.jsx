@@ -53,12 +53,23 @@ class ProfileUserEdit extends React.Component{
             var file = e.target.files[0];
             var reader = new FileReader();
             reader.onload = event => {
-                console.log(event.target.result)
+                let byteArray = event.target.result;
+                SessionUtil.arrayBufferToBase64(byteArray)
+                .then(res => {
+
+                    console.log(res);
+                    this.setState({
+                        image: byteArray,
+                        base64img: res,
+                        profileImg: "data:image/jpeg;base64, " + res
+
+                    })
+
+                })
+                
             };
-            this.setState({
-                image:reader.readAsArrayBuffer(file)
-            })
-            console.log(reader.readAsArrayBuffer(file));
+            
+            reader.readAsArrayBuffer(file);
         } catch(e) {
             console.log(e, "image upload error");
         }
@@ -86,27 +97,45 @@ class ProfileUserEdit extends React.Component{
         bodyTextMessage.setBodyText(this.state.bio);
         content.addMixin(0x34a9a6ec, bodyTextMessage.serializeBinary());
         // Image
+        console.log(this.state.image)
         if (this.state.image) {
-            let image = new Image(this.state.image)
-            //   image.createMixin()
-            //   .then(img => {
-            //     content.addMixin(0x12745469, img);
-            //     console.log(content);
-            //   })
-            image.scaleImage(400,400)
-            .then(scaled=>{
-                console.log(scaled)
-            })
+            const image = new Image(this.state.image)
+              image.createMixin()
+              .then(imgMessage => {
+                console.log(image.imgMessage)
+                content.addMixin(0x12745469, image.imgMessage);
+                console.log(content);
+              })
           
         }
+        let notify = 
+        $.notify({
+            icon: 'glyphicon glyphicon-warning-sign',
+            title: '',
+            message: 'Uploading to IPFS!',
+            target: '_blank',
+            allow_dismiss: false,
+          },{
+            animate: {
+                enter: 'animated fadeInDown',
+                exit: 'animated fadeOutUp'
+            },
+            type:'success',
+            showProgressbar: true,
+            placement: {
+                from: "bottom",
+                align: "center"
+            }
+          });
+
         console.log(content);
-        content.save()
-        .then((res)=>{
-            console.log(res);
-            console.log(Session.get('addr'));
-            MixUtil.createOrReviseMyProfile(res, Session.get('addr'));
+        // content.save()
+        // .then((res)=>{
+        //     console.log(res);
+        //     console.log(Session.get('addr'));
+        //     //MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
             
-        });
+        // });
 
     }
 
@@ -125,6 +154,7 @@ class ProfileUserEdit extends React.Component{
 
     render() {
         let Render;
+        console.log(this.state.image)
         Render = 
         <div style ={{margin:'auto', maxWidth:'800'}}>
         <div id = "edit"  className="w3-col m12 w3-row-padding">

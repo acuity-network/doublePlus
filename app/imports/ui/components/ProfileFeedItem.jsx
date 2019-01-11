@@ -161,7 +161,7 @@ class ProfileFeedItem extends React.Component{
                 </span>
             }
             <button type="button" onClick={this.handleReplyChange.bind(this)} className="btn w3-theme-d2 w3-margin-bottom"><i className="fa fa-comment"></i> &nbsp; {this.state.reply ? 'Cancel': 'Reply'}</button> 
-            <span className="w3-right w3-opacity"> <a href="" onClick={this.route.bind(this, "/comments/"+ this.state.itemId) }> Replies: {this.state.replyCount}</a> </span>
+            <span className="w3-right w3-opacity"> <a onClick={this.route.bind(this, '/comments/'+ this.state.itemId) }> Replies: {this.state.replyCount}</a> </span>
             <span className="w3-right w3-opacity">  Mix Received: {this.state.donations} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             {this.state.reply &&
                 <div style={{ paddingBottom:"20px"}}>

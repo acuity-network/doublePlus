@@ -21,7 +21,7 @@ class CommentReplies extends React.Component{
     }
 
     componentWillMount(){
-        console.log('here')
+     
         MixUtil.getComments(this.state.itemId)
         .then((res)=>{
 
@@ -30,13 +30,10 @@ class CommentReplies extends React.Component{
                 totalItems: res.length,
                 loaded:true,
                 itemCount:(res.length < 10 ? res.length : 10)
-
             });
 
         })
-        this.setState({
-  
-        });
+
     };
 
     shouldComponentUpdate(lastState, nextState) {
@@ -53,7 +50,7 @@ class CommentReplies extends React.Component{
             for(let i = 0; i < this.state.itemCount; i++) {
                 try { 
                     const mixItem = new MixItem(this.state.itemArray[i]);
-                    _feedItems.push(<ProfileFeedItem key = {i} item = {mixItem}/>)
+                    _feedItems.push(<ProfileFeedItem key = {i} item = {mixItem} blurbType={1}/>)
                 } catch(e) {
                     console.log(e)
                 }
@@ -76,21 +73,21 @@ class CommentReplies extends React.Component{
         if(this.state.loaded) {
         Render = 
         <div style ={{margin:'auto', maxWidth:'800px'}}>
-        <div  className="w3-col m12">
-            <div className="w3-row-padding">
-                <div className="w3-col m12">
-                    <InfiniteScroll
-                        dataLength={this.state.itemCount}
-                        next={this.loadMore.bind(this)}
-                        hasMore={!this.state.done}
-                        loader={null}
-                    >
-                        {this.feedItems()}
-                    </InfiniteScroll> 
+            <div  className="w3-col m12">
+                <div className="w3-row-padding">
+                    <div className="w3-col m12">
+                        <InfiniteScroll
+                            dataLength={this.state.itemCount}
+                            next={this.loadMore.bind(this)}
+                            hasMore={!this.state.done}
+                            loader={null}
+                        >
+                            {this.feedItems()}
+                        </InfiniteScroll> 
+                    </div>
                 </div>
-            </div>
-        </div>     
-    </div>
+            </div>     
+        </div>
 
         } else {
             Render = 

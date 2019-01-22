@@ -49,8 +49,12 @@ export default class MixContent {
     let payload = await brotli.compressArray(new Uint8Array(Buffer.from(itemMessage.serializeBinary(),"binary")),11);
     var payloadBuffer = Buffer.from(payload)
     let hash = await IpfsUtil.addFile(payloadBuffer);
-    let infuraHash = await IpfsUtil.addFile(payloadBuffer, true);
+    try{
+      let infuraHash = IpfsUtil.addFile(payloadBuffer, true);
     console.log(hash, infuraHash, 'infura');
+    } catch(e) {
+      
+    }
     let decodedHash = multihashes.decode(multihashes.fromB58String(hash));
 
     if (decodedHash.name != 'sha2-256') {

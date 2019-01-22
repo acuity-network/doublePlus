@@ -102,22 +102,18 @@ export default class Image {
     };
 
     let returnResizedImg = await jpeg.encode(rawImageData, 70);
-    console.log('resized'+ returnResizedImg.data)
-    IpfsUtil.addFile(returnResizedImg.data, true);
-    return IpfsUtil.addFileReturnData(Buffer.from(returnResizedImg.data));
+
+    return Buffer.from(returnResizedImg.data);
 
   };
 
   async createMixin() {
+    try{
         let rawImageData = await jpeg.decode(this.img);
-        var mipmaps = [];
-      
-        console.log(this.img)
-        // var uploadFormData = new FormData();
-        // uploadFormData.append("", new File([event.target.result], {type:"application/octet-stream"}));
-        console.log(rawImageData)
+        let mipmaps = [];
+        // let imgInfuraPost = [];
         mipmaps.push(IpfsUtil.addFileReturnData(Buffer.from(this.img)));
-        IpfsUtil.addFile(Buffer.from(this.img), true);
+        // imgInfuraPost.push(Buffer.from(this.img));
 
         var level = 1;
         do {
@@ -125,30 +121,34 @@ export default class Image {
           var width = Math.floor(rawImageData.width / scale);
           var height = Math.floor(rawImageData.height / scale);
           console.log(level, width, height);
-          mipmaps.push(await this.scaleImage(rawImageData, width, height));
+          let imgData = await this.scaleImage(rawImageData, width, height);
+          mipmaps.push(IpfsUtil.addFileReturnData(imgData));
+          // imgInfuraPost.push(imgData);
           level++;
         }
         while (width > 64 && height > 64);
         const imgMessage = new jpegImageProto.JpegMipmap()
-        console.log('mips'+ mipmaps)
-        Promise.all(mipmaps).then(mipmaps => {
-          console.log(mipmaps)
+        //IpfsUtil.addFiles(imgInfuraPost,true);
+        await Promise.all(mipmaps).then(mipmaps => {
           imgMessage.setWidth(width)
           imgMessage.setHeight(height)
           mipmaps.forEach(mipmap => {
-            console.log(mipmap)
+            //IpfsUtil.pinHash(mipmap.hash, true);
             let mipmapLevelMessage = new jpegImageProto.MipmapLevel()
             mipmapLevelMessage.setFilesize(mipmap.size)
             mipmapLevelMessage.setIpfsHash(Base58.decode(mipmap.hash))
             imgMessage.addMipmapLevel(mipmapLevelMessage)
           })
           let retMessage = imgMessage.serializeBinary();
-          console.log(retMessage)
           this.imgMessage = retMessage;
           return retMessage;
       });
-    };
-  }
+    } catch(e) {
+      console.log(e)
+      return null;
+    }
+  };
+}
 
 
 

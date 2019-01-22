@@ -14,8 +14,8 @@ class ProfileUserEdit extends React.Component{
     constructor(props){
         super(props);
         this.state = { 
-                    profileAddr:this.props.profileAddr,
-                    isMine: Session.get('addr')==this.props.profileAddr
+            profileAddr:this.props.profileAddr,
+            isMine: Session.get('addr')==this.props.profileAddr
         };
     }
 
@@ -39,14 +39,15 @@ class ProfileUserEdit extends React.Component{
             bio: e.target.value
         })
 
-    }
+    };
 
     handleLocationChange (e) {
         this.setState({
             location: e.target.value
         })
 
-    }
+    };
+
 
     onFileChange (e) {
         try {
@@ -99,16 +100,65 @@ class ProfileUserEdit extends React.Component{
         // Image
         console.log(this.state.image)
         if (this.state.image) {
+            let notify =
+            $.notify({
+                icon: 'glyphicon glyphicon-warning-sign',
+                title: '',
+                message: 'Encoding images...',
+                target: '_blank',
+                allow_dismiss: false,
+              },{
+                animate: {
+                    enter: 'animated fadeInDown',
+                    exit: 'animated fadeOutUp'
+                },
+                type:'success',
+                showProgressbar: true,
+                placement: {
+                    from: "bottom",
+                    align: "center"
+                }
+              });
             const image = new Image(this.state.image)
               image.createMixin()
               .then(imgMessage => {
-                console.log(image.imgMessage)
+                
+                console.log('img mixin' ,image.imgMessage)
                 content.addMixin(0x12745469, image.imgMessage);
                 console.log(content);
+                notify = 
+                $.notify({
+                    icon: 'glyphicon glyphicon-warning-sign',
+                    title: '',
+                    message: 'Uploading to IPFS!',
+                    target: '_blank',
+                    allow_dismiss: false,
+                },{
+                    animate: {
+                        enter: 'animated fadeInDown',
+                        exit: 'animated fadeOutUp'
+                    },
+                    type:'success',
+                    showProgressbar: true,
+                    placement: {
+                        from: "bottom",
+                        align: "center"
+                    }
+                });
+                console.log(content);
+        
+                content.save()
+                .then(res=>{
+                    console.log(Session.get('addr'));
+                    MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
+                    this.route('home');
+                    
+                });
+
               })
           
-        }
-        let notify = 
+        } else {
+        notify = 
         $.notify({
             icon: 'glyphicon glyphicon-warning-sign',
             title: '',
@@ -127,15 +177,16 @@ class ProfileUserEdit extends React.Component{
                 align: "center"
             }
           });
-
-        console.log(content);
-        // content.save()
-        // .then((res)=>{
-        //     console.log(res);
-        //     console.log(Session.get('addr'));
-        //     //MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
+        
+        content.save()
+        .then((res)=>{
+            console.log(res);
+            console.log(Session.get('addr'));
+            MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
+            this.route('home');
             
-        // });
+        });
+        }
 
     }
 

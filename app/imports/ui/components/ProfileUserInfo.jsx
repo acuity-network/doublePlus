@@ -25,16 +25,25 @@ class ProfileUserInfo extends React.Component{
     }
 
     componentWillMount(){
-        this.setState({
-            profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg
-        });
-            
+
+        let img = "data:image/jpeg;base64, " + base64img.defaultProfileImg;
+   
             this.setState( {
                 location: this.state.profileObject.location,
                 type: this.state.profileObject.type,
                 bio: this.state.profileObject.bio,
-                name: this.state.profileObject.name
+                name: this.state.profileObject.name,
+                profileImg: img
             });
+
+        MixUtil.getImageFromMipmap(this.state.profileObject.image, 256,256)
+        .then(data=>{
+            
+            this.setState( {
+                profileImg: "data:image/jpeg;base64, " + data
+            });
+
+        })
     };
 
     shouldComponentUpdate(lastState, nextState) {
@@ -43,6 +52,11 @@ class ProfileUserInfo extends React.Component{
 
     route (link) {
         this.props.history.push(link)
+    };
+
+    follow () {
+        MixUtil.followUser(Session.get('addr'), this.state.profileAddr);
+
     };
 
     render() {
@@ -57,6 +71,20 @@ class ProfileUserInfo extends React.Component{
                <p><i className="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> {this.state.bio}</p>
                <p><i className="fa fa-home fa-fw w3-margin-right w3-text-theme"></i> {this.state.location}</p>
                {/* <p><i className="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> June 9, 1990 </p> */}
+               { !this.state.isMine ? 
+               <div>
+                   { Session.get('loggedIn') ?
+                    <div style={{paddingBottom: '10px'}}>
+                        <button onClick={this.follow.bind(this)} style={{width:"100%"}} type="button" className="w3-button  btn-success btn-sm">Follow</button>
+                    </div>
+                    :''
+                    }
+                    <div style={{paddingBottom: '20px'}}>
+                        <button onClick={this.route.bind(this,'/feed/'+this.state.profileAddr)} style={{width:"100%"}} type="button" className="w3-button  btn-light btn-sm">View {this.state.name}'s Feed</button>
+                    </div>
+                </div>
+               :""
+               }
               </div>
             </div>
             <br/>

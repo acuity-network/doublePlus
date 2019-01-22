@@ -2,6 +2,7 @@
 
 const Web3 = require('web3');
 const BN = Web3.utils.BN;
+const accountProfileAddr = '0x7855a6b883c39c8e87d51002b064180ddbf16026';
 
 module.exports = {
     
@@ -97,11 +98,11 @@ module.exports = {
                     notify.update('message', 'Transactions sent.  TxHash : '+ hash);
                     notify.update('progress', 99);
                 }
-                console.log('tx hash'+hash);
+                console.log('tx hash: '+hash);
             })
-            .on('receipt', function(receipt) { //////not returing a receipt currently
-                console.log('here')
-                console.log(receipt);
+            .on('receipt', function(receipt) { 
+    
+                console.log('receipt',receipt);
                 $.notify({
                     icon: 'glyphicon glyphicon-success-sign',
                     title: '',
@@ -122,6 +123,13 @@ module.exports = {
                 });
 
                 ////HANDLE UPDATES BASED ON TO CONTRACT ID
+                if(receipt.to == accountProfileAddr) {
+                    MixUtil.getProfile(Session.get('addr'))
+                    .then(profile =>{
+                        Session.set('profile', profile);
+                    })
+                    
+                };
 
             })
             .on('error', (error) => {
@@ -130,9 +138,7 @@ module.exports = {
                     notify.update('type', 'danger');
                 }
                 throw error;
-            
             });
-                  
 
         } catch(e) {
             console.log(e.message)

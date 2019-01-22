@@ -50,7 +50,6 @@ module.exports = {
           const itemStoreRegistry = new web3.eth.Contract(itemStoreRegistryAbi, itemStoreRegistryAddr);
 
           let itemStoreAddress = await itemStoreRegistry.methods.getItemStore(itemId).call();
-          console.log(itemStoreAddress);
       
           if (itemStoreAddress == "0x") {
             console.log("Item store not found for item.");
@@ -59,7 +58,6 @@ module.exports = {
           let itemStore = new web3.eth.Contract(itemStoreAbi, itemStoreAddress);
       
           let abiVersion = await itemStore.methods.getAbiVersion().call();
-          console.log(abiVersion);
           
           let inUse = await itemStore.methods.getInUse(itemId).call();
 
@@ -70,12 +68,11 @@ module.exports = {
 
           let contractId = await itemStore.methods.getContractId().call();
       
-          console.log(contractId);
           if (contractId != "0x2d54bddf4be19c6c") {
             console.log("Unknown item store.");
             return;
           }
-          console.log('d'+itemStoreAddress);
+
           const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreAddress);
       
           const item = await itemStoreIpfsSha256.methods.getItem(itemId).call();
@@ -102,7 +99,7 @@ module.exports = {
 
           };
           let file = IpfsUtil.getItemFromHexHash(jsonItem.revisionIpfsHashes[0]);
-          console.log(file);
+    
           return jsonItem;
 
       } catch(e) {
@@ -113,14 +110,22 @@ module.exports = {
 
     getTrustedAccounts:async (addr) => {
       const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      
       let trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);
       
       let trusted = await trustedAccounts.methods.getAllTrustedByAccount(addr).call();
-      console.log(trusted);
+
       return (trusted);
 
     },
 
+    isTrusting: async(myAddr, trustingAddr)=>{
+      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      let trusted = [];
+
+      trusted = await module.exports.getTrustedAccounts(myAddr);
+      return (trusted.includes(web3.utils.toChecksumAddress(trustingAddr)))
+    },
     addTrustedAccount:async (myAddr, trustedAddr)=> {
       try{
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
@@ -128,9 +133,7 @@ module.exports = {
         const trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);
         const addTrusted = trustedAccounts.methods.trustAccount(trustedAddr);
         const encodedABI = addTrusted.encodeABI();
-
         let gasEst = await addTrusted.estimateGas();
-        console.log(gasEst)
 
         const notify = $.notify({
           icon: 'glyphicon glyphicon-warning-sign',
@@ -174,6 +177,33 @@ module.exports = {
 
     },
 
+    followUser: async(myAddr, trustedAddr)=> {
+      if(! await module.exports.isTrusting(myAddr, trustedAddr)) {
+        await module.exports.addTrustedAccount(myAddr, trustedAddr);
+      } else {
+        $.notify({
+          icon: 'glyphicon glyphicon-warning-sign',
+          title: '',
+          message: 'Already following User.',
+          target: '_blank',
+          allow_dismiss: false,
+        },{
+          animate: {
+              enter: 'animated fadeInDown',
+              exit: 'animated fadeOutUp'
+          },
+          type:'danger',
+          showProgressbar: false,
+          placement: {
+              from: "bottom",
+              align: "center"
+          }
+        });
+
+      }
+      
+    },
+
     removeTrustedAccount:async(addr)=> {
 
 
@@ -183,24 +213,25 @@ module.exports = {
 
       const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
 
-      let trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);
-      
+      let trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);     
       let count = await trustedAccounts.methods.getTrustedCountByAccount(addr).call();
-      console.log(count);
-      return (count);
 
+      return (count);
     },
 
     getAccountsTrustingData:async(myAddr) => {
       let returnArray =[];
       const trusted = await module.exports.getTrustedAccounts(myAddr);
+
       for(const addr of trusted) { 
         const count = await module.exports.numberOfAccountsTrusting(addr);
+        
         const jsonObj = await {"addr": addr,
                                "numTrusting":count};
+
         await returnArray.push(jsonObj)
       }
-      console.log(returnArray);
+
       return returnArray;
 
     },
@@ -224,13 +255,9 @@ module.exports = {
       const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
       
         try {
-          console.log(mixAccountItemId);
+       
           const setProfile = accountProfile.methods.setProfile(mixAccountItemId);
           const encodedABI = setProfile.encodeABI();
-          console.log('here')
-          //let gasEst = await setProfile.estimateGas();
-          //gasEst = gasEst +gasEst;
-          //console.log(gasEst);
 
           const notify = $.notify({
             icon: 'glyphicon glyphicon-warning-sign',
@@ -274,8 +301,8 @@ module.exports = {
     },
 
     getProfile: async(addr) => {
+      
       try {
-
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
         const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
         let profileId = await accountProfile.methods.getProfileByAccount(addr).call();
@@ -293,7 +320,7 @@ module.exports = {
       try {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
         const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
-        accountProfile.getPastEvents("allEvents",(e,events)=>{console.log(events)})
+       // accountProfile.getPastEvents("allEvents",(e,events)=>{console.log(events)})
         const myProfile = await module.exports.getProfile(myAddr);
         console.log('my profile',myProfile)
         if(myProfile == null || myProfile == '0x') {
@@ -308,7 +335,6 @@ module.exports = {
 
       } catch (e) {
         console.log(e.message)
-
       }
     },
 
@@ -359,7 +385,7 @@ module.exports = {
 
         let GasPrice = await Web3Util.getGasPrice();
         let Nonce = await web3.eth.getTransactionCount(myAddr,'pending');
-        console.log('n1',Nonce)
+  
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -446,9 +472,6 @@ module.exports = {
         throw e
       }
 
-
-
-
     },
 
     addChildToParent: async(myAddr, parent, flagsNonce, onlyOwner = false) => {
@@ -462,7 +485,7 @@ module.exports = {
 
         let GasPrice = await Web3Util.getGasPrice();
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
-        console.log('n2',Nonce)
+
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -488,9 +511,7 @@ module.exports = {
 
           let flagsNonce = '0x01' + Web3.utils.randomHex(30).substr(2);
           let itemId = await module.exports.getItemId(flagsNonce, myAddr);
-          console.log([parentProfileId]);
-          
-          
+                  
           await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce, true);
           await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
           await module.exports.initializeBlurb(myAddr, itemId, 0);
@@ -503,12 +524,11 @@ module.exports = {
 
     commentToPost: async(myAddr, ipfsHash, parentProfileId, parentPostId, notify = null) => {
       try {
-        console.log(parentPostId)
 
         let flagsNonce = '0x01' + Web3.utils.randomHex(30).substr(2);
         let itemId = await module.exports.getItemId(flagsNonce, myAddr);
         
-        //await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce);
+        await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce, true);
         await module.exports.addChildToParent(myAddr, parentPostId, flagsNonce, false)
         await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
         await module.exports.initializeBlurb(myAddr, itemId, 1);
@@ -520,11 +540,11 @@ module.exports = {
     },
 
     getProfileLocalDb: async(addr, forceUpdate=false) => {
-      console.log(profileDb);
+
       let profile = await profileDb.find({ _id: addr }).fetch();
-      //console.log('db',profile)
+
       if(profile.length > 0 && !forceUpdate) {
-        console.log('from DB')
+        console.log('profile from local DB');
         return profile[0];
       } else {
         try {
@@ -541,12 +561,12 @@ module.exports = {
             profile._id = addr;
             profile.profileItemId = profileId;
             try{
-              profile.image = await _item.latestRevision().getImage(1000,1000);
+              profile.image = await _item.latestRevision().getImageMessage();
             } catch (e) {
               profile.image = null;
               console.log(e)
             }
-            console.log(profile);
+
             if(Meteor.isClient) {
               try{
               profileDb.insert({_id:profile._id, profileItemId: profile.profileItemId, name:profile.name, bio:profile.bio, location:profile.location, type:profile.type, image:profile.image, children:profile.children});
@@ -559,11 +579,9 @@ module.exports = {
             return null;
           }
         } catch(e) {
+          console.log(e)
           return null;
-
         }
-
-
 
       }
     },
@@ -574,7 +592,6 @@ module.exports = {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
         const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagOnlyOwnerAddr);
         let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
-        console.log(childrenArray)
         return childrenArray;
       } catch (e) {
         console.log(e)
@@ -584,11 +601,11 @@ module.exports = {
     },
 
     getComments: async(itemId) => {
+      
       try {
         const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
         const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagAddr);
         let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
-        console.log(childrenArray)
         return childrenArray;
       } catch (e) {
         console.log(e)
@@ -645,7 +662,7 @@ module.exports = {
 
         let GasPrice = await Web3Util.getGasPrice();
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
-        console.log('n2',Nonce)
+   
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -685,7 +702,6 @@ module.exports = {
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let blurbInfo = await blurbsFactory.methods.getBlurbInfo(itemId).call();
-        console.log(blurbInfo);
         return blurbInfo;
       } catch(e) {
         console.log(e);
@@ -756,10 +772,11 @@ module.exports = {
               let reversedChildren = await _profile.children.reverse(); //reverse array to get newest first
               let initItemArray = await reversedChildren.slice(0,5); //get the last 5 post per each account following
               await initItemArray.forEach( async _item =>{
-                await returnFeedArray.push(new MixItem(_item));
+                if(_item){
+                  await returnFeedArray.push(new MixItem(_item));
+                }
               })
             }
-
         }
 
         let initalizedItems = await module.exports.initAllItems(returnFeedArray);
@@ -768,12 +785,10 @@ module.exports = {
           }
         
         )
-        
         return initalizedItems;
 
       } catch(e) {
-
-        console.log(e);
+        console.log('initalized'+e);
         return [];
       }
 
@@ -781,8 +796,30 @@ module.exports = {
 
     initAllItems: async(arrayOfItems) => {
 
-      return Promise.all( arrayOfItems.map(async _item => await _item.init()));
+      return Promise.all( arrayOfItems.map(async _item => await _item.init()) );
 
+    },
+
+    getImageFromMipmap:async(imageMessage, widthMin, heightMin) => {
+      //let imageMessage = new jpegImageProto.JpegMipmap.deserializeBinary(this.content.getPayloads('0x12745469')[0])
+      let width = imageMessage.getWidth()
+      let height = imageMessage.getHeight()
+      let mipmapList = imageMessage.getMipmapLevelList()
+  
+      let i, scale
+      for (i = 0; i < mipmapList.length; i++) {
+        scale = Math.pow(2, i)
+        if (width / scale < widthMin * 4 || height / scale < heightMin * 4) {
+          break
+        }
+      }
+  
+      let widthOut = Math.round(width / scale)
+      let heightOut = Math.round(height / scale)
+      //http://localhost:8081/ipfs/http://localhost:8081/ipfs/
+      // return '<img src="' + Base58.encode(mipmapList[i].getIpfsHash()) + '" width="' + widthOut + '" height="' + heightOut + '">'
+      let data = await IpfsUtil.getItemFromIpfsHash(Base58.encode(mipmapList[i].getIpfsHash()))
+      return await SessionUtil.arrayBufferToBase64(data[0].content);
     }
 
 

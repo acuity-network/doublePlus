@@ -33,6 +33,7 @@ export default class MixRevision {
     let width = imageMessage.getWidth()
     let height = imageMessage.getHeight()
     let mipmapList = imageMessage.getMipmapLevelList()
+    console.log('mes'+imageMessage);
 
     let i, scale
     for (i = 0; i < mipmapList.length; i++) {
@@ -45,7 +46,17 @@ export default class MixRevision {
     let widthOut = Math.round(width / scale)
     let heightOut = Math.round(height / scale)
     //http://localhost:8081/ipfs/http://localhost:8081/ipfs/
-    return '<img src="' + Base58.encode(mipmapList[i].getIpfsHash()) + '" width="' + widthOut + '" height="' + heightOut + '">'
+    
+    // return '<img src="' + Base58.encode(mipmapList[i].getIpfsHash()) + '" width="' + widthOut + '" height="' + heightOut + '">'
+    IpfsUtil.getItemFromIpfsHash(Base58.encode(mipmapList[i].getIpfsHash()))
+    .then(data => {
+      console.log('image'+data)
+      return data;
+    })
+  }
+
+  getImageMessage() {
+    return new jpegImageProto.JpegMipmap.deserializeBinary(this.content.getPayloads('0x12745469')[0])
   }
 
   getBodyText() {

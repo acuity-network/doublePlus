@@ -13,8 +13,6 @@ module.exports = {
         try{
             if(LocalStore.get('browserIpfs')) {
                 let scriptURL = useSecondaryScript ? "https://unpkg.com/ipfs/dist/index.min.js" : "https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js";
-                console.log(scriptURL)
-                
                 $.getScript(scriptURL, async ()=>{
 
                     try{
@@ -30,7 +28,6 @@ module.exports = {
 
                     console.log(await global.ipfs.bootstrap.list());
                     global.ipfs.on('ready', async () => { 
-                        
                         Session.set('ipfsConnected',false);
                         Session.set('ipfsId',null);
                         let files = await module.exports.getItemFromIpfsHash('Qmaisz6NMhDB51cCvNWa1GMS7LU1pAxdF4Ld6Ft9kZEP2a',false);
@@ -77,10 +74,10 @@ module.exports = {
                 if(files && files.length > 0) {
                     Session.set('ipfsConnected',true);
                 }
+
                 let id = await ipfs.id();
-                console.log(id);
                 Session.set('ipfsId', id.id);
-                console.log(files);
+          
         }
         } catch(e) {
             
@@ -101,7 +98,7 @@ module.exports = {
 
         const ipfs = global.ipfs;
         let promise = new Promise((resolve, reject) => {
-            ipfs.files.get(hash).then(files =>{resolve(files)});
+            ipfs.get(hash).then(files =>{resolve(files)});
         
         })
 
@@ -124,16 +121,40 @@ module.exports = {
 
     addFile: async(data, isInfuraPost = false) => {
         const ipfs = isInfuraPost ? ipfsAPI('ipfs.infura.io', '5001', {protocol: 'https'}) : global.ipfs;
-        let result = await ipfs.files.add(data);
+        let result = await ipfs.add(data);
         let hash = result[0].hash;
         return hash;
     },
 
     addFileReturnData: async(data) => {
         const ipfs = global.ipfs;
-        let result = await ipfs.files.add(data);
+        let result = await ipfs.add(data);
         //let res = await module.exports.addFile(data, true);
         return result[0];
+    },
+
+    addFiles: async(dataArray, isInfuraPost = false) => {
+        let hashes = [];
+        const ipfs = isInfuraPost ? ipfsAPI('ipfs.infura.io', '5001', {protocol: 'https'}) : global.ipfs;
+        await dataArray.forEach(async data=>{
+            try{
+
+                let result = await ipfs.add(data);
+                hashes.push(result[0].hash);
+
+            }catch(e) {
+                console.log(e)
+            }
+
+        })
+        return hashes;
+    },
+
+    pinHash: async(hash, isInfuraPost = false) => {
+        const ipfs = isInfuraPost ? ipfsAPI('ipfs.infura.io', '5001', {protocol: 'https'}) : global.ipfs;
+        let result = await ipfs.pin.add(hash);
+        return result;
+
     }
 
 

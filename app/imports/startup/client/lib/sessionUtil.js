@@ -21,16 +21,13 @@ module.exports = {
             Session.set('addr', wallet.getAddressString());
 
             Web3Util.getBalance(wallet.getAddressString()).then((res,e)=>{
-                console.log(res);
                 Session.set('balance',parseFloat(res).toFixed(4));
             });
 
             let profile = await MixUtil.getProfile(Session.get('addr'));
-            console.log(profile);
             Session.set('profile', profile);
-            console.log('my', profile);
-            //await module.exports.syncFollowingToLocalDB();
-            //console.log(followingDb.find())
+            console.log('myProfile', profile);
+
             return true;
         } catch(e) {
             console.log(e.message);
@@ -46,7 +43,6 @@ module.exports = {
             for( const item of following) {
                 Session.set('followingDbSyncing',true);
                 
-                console.log(Session.get('followingDbSyncing'));
                 MixUtil.getProfile(item)
                 .then(_profileId => {
                     followingDb.insert({address: item, profileId: _profileId})
@@ -55,14 +51,10 @@ module.exports = {
                     followingDb.insert({address: item, profileId:null})
                 });
                 Session.set('followingDbSyncing', following[following.length-1]==item ? false: true);
-                
             }
 
         } catch (e) {
-
             console.log(e);
-
-
         }
 
 

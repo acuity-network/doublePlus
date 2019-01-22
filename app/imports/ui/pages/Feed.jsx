@@ -24,7 +24,7 @@ class Feed extends React.Component{
 
         MixUtil.cultivateMyFeed(this.state.feedAddr)
         .then(_itemArray => {
-            console.log(_itemArray);
+
             this.setState({
                 itemArray:_itemArray,
                 totalItems:_itemArray.length,
@@ -48,13 +48,10 @@ class Feed extends React.Component{
         let _feedItems = []
         
         if(this.state.loaded) {
-            console.log(this.state.itemArray.length)
             for(let i = 0; i < this.state.itemCount; i++) {
                 try { 
                     const mixItem = this.state.itemArray[i]
-                    console.log(i);
-                    console.log(this.state.itemArray)
-                    _feedItems.push(<ProfileFeedItem key = {i} item = {mixItem}/>)
+                    _feedItems.push(<ProfileFeedItem key = {i} item = {mixItem} blurbType={0}/>)
                 } catch(e) {
                     console.log(e)
                 }
@@ -76,25 +73,36 @@ class Feed extends React.Component{
     render() {
         let Render;
 
-        if(this.state.loaded) {
+        if(this.state.loaded && this.state.itemCount>0) {
         Render = 
         <div style ={{margin:'auto', maxWidth:'800px'}}>
-        <div  className="w3-col m12">
-            <div className="w3-row-padding">
-                <div className="w3-col m12">
-                    <InfiniteScroll
-                        dataLength={this.state.itemCount}
-                        next={this.loadMore.bind(this)}
-                        hasMore={!this.state.done}
-                        loader={null}
-                    >
-                        {this.feedItems()}
-                    </InfiniteScroll> 
+            <div  className="w3-col m12">
+                <div className="w3-row-padding">
+                    <div className="w3-col m12">
+                        <InfiniteScroll
+                            dataLength={this.state.itemCount}
+                            next={this.loadMore.bind(this)}
+                            hasMore={!this.state.done}
+                            loader={null}
+                        >
+                            {this.feedItems()}
+                        </InfiniteScroll> 
+                    </div>
+                </div>
+            </div>     
+        </div>
+        }else if(this.state.loaded){
+            Render = 
+            <div>
+                <div style ={{margin:'auto', maxWidth:'800px'}}></div>
+                <div  className="w3-col m12">
+                    <div className="w3-row-padding">
+                        <div className="w3-col m12">
+                            <h2>This feed has no post.</h2>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>     
-    </div>
-
         } else {
             Render = 
             <Loading></Loading>

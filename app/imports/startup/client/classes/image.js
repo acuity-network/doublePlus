@@ -1,7 +1,9 @@
-const pica = require('pica')
+const pica1 = require('pica')
 import jpegImageProto from '../lib/protobuf/jpeg-image_pb.js'
 const Base58 = require("base-58");
 const jpeg = require('jpeg-js');
+const pica = new pica1();
+
 //const fs = require('file-system');
 
 // export default class Image {
@@ -84,12 +86,8 @@ export default class Image {
     this.img = img
   }
 
-  async scaleImage(width, height) {
-    
-    
-    console.log(this.img);
-    console.log(this.img)
-    let rawImageData = await jpeg.decode(this.img);
+  async scaleImage(rawImageData, width, height) {
+  
     let resizedImg = await pica.resizeBuffer({
       src: rawImageData.data, 
       width: rawImageData.width, 
@@ -97,18 +95,61 @@ export default class Image {
       toWidth: width,
       toHeight: height
     });
-
     rawImageData = {
       data:resizedImg,
       width:width,
       height:height
     };
 
-    this.resizedImg = await jpeg.encode(rawImageData, 70);
-    console.log('resized'+ this.resizedImg)
-    return this.resizedImg;
+    let returnResizedImg = await jpeg.encode(rawImageData, 70);
 
-  }
+    return Buffer.from(returnResizedImg.data);
+
+  };
+
+  async createMixin() {
+    try{
+        let rawImageData = await jpeg.decode(this.img);
+        let mipmaps = [];
+        // let imgInfuraPost = [];
+        mipmaps.push(IpfsUtil.addFileReturnData(Buffer.from(this.img)));
+        // imgInfuraPost.push(Buffer.from(this.img));
+
+        var level = 1;
+        do {
+          var scale = Math.pow(2, level);
+          var width = Math.floor(rawImageData.width / scale);
+          var height = Math.floor(rawImageData.height / scale);
+          console.log(level, width, height);
+          let imgData = await this.scaleImage(rawImageData, width, height);
+          mipmaps.push(IpfsUtil.addFileReturnData(imgData));
+          // imgInfuraPost.push(imgData);
+          level++;
+        }
+        while (width > 64 && height > 64);
+        const imgMessage = new jpegImageProto.JpegMipmap()
+        //IpfsUtil.addFiles(imgInfuraPost,true);
+        await Promise.all(mipmaps).then(mipmaps => {
+          imgMessage.setWidth(width)
+          imgMessage.setHeight(height)
+          mipmaps.forEach(mipmap => {
+            //IpfsUtil.pinHash(mipmap.hash, true);
+            let mipmapLevelMessage = new jpegImageProto.MipmapLevel()
+            mipmapLevelMessage.setFilesize(mipmap.size)
+            mipmapLevelMessage.setIpfsHash(Base58.decode(mipmap.hash))
+            imgMessage.addMipmapLevel(mipmapLevelMessage)
+          })
+          let retMessage = imgMessage.serializeBinary();
+          this.imgMessage = retMessage;
+          return retMessage;
+      });
+    } catch(e) {
+      console.log(e)
+      return null;
+    }
+  };
+}
+
 
 
 
@@ -197,4 +238,4 @@ export default class Image {
 	// 				});
 
   //       });
-      }
+      

@@ -41,13 +41,11 @@ export default class MixItem {
             
         let inUse = await this.itemStore.methods.getInUse(this.itemId).call();
         
-        console.log(this.itemStoreAddress);
-        
         if (!inUse) {
             throw 'Item not found.'
         } 
         let contractId = await this.itemStore.methods.getContractId().call();
-        console.log(contractId);
+
         if (contractId != "0x1f1e136d1003177d") {
             throw 'Unknown item store.'
         }  
@@ -58,19 +56,22 @@ export default class MixItem {
 
         for (var i = 0; i < this.item.revisionCount; i++) {
             await this.revisions.push(new MixRevision(this, i));
-            console.log(this);
         }
 
         return(this);
     } catch (e) {
         
-        throw e;
+        console.log(e)
     }
  
   }
 
   owner() {
     return this.item.owner
+  }
+
+  latestTimeStamp() {
+    return this.item.timestamps[this.item.timestamps.length - 1]
   }
 
   itemId() {

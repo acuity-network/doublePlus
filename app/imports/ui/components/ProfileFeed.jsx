@@ -47,16 +47,15 @@ class ProfileFeed extends React.Component{
         
         for (let i = this.state.profileChildren.length - 1; (i>(this.state.profileChildren.length-this.state.itemCount)); i--) {
             if(i>=0) {
-                const mixItem = new MixItem(this.state.profileChildren[i]);
-                _profileItems.push(<ProfileFeedItem key = {i} item = {mixItem}/>)
                 
+                const mixItem = new MixItem(this.state.profileChildren[i]);
+                 _profileItems.push(<ProfileFeedItem key = {i}  item = {mixItem} blurbType = {0}/>)
+                    
             } else {  
                 break;
             }
             
         }
-        
-
         return _profileItems;
 
     };
@@ -71,10 +70,6 @@ class ProfileFeed extends React.Component{
     
     render() {
         
-        
-
-
-
 
         let Render;
         Render = 

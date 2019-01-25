@@ -5,8 +5,6 @@ import IpfsStats from '../components/IpfsStats.jsx'
 import AccountRouter from '../components/AccountRouter.jsx'
 import base64img from '../../startup/client/lib/base64img.js'
 
-//console.log(base64Gif);
-
 class Home extends React.Component {
   
   constructor(props){
@@ -28,7 +26,7 @@ class Home extends React.Component {
     })
     
   };
-
+  compatiblecompatiblecompatible
   componentWillUnmount() {
       this.autoRun.stop();
   };
@@ -58,23 +56,18 @@ class Home extends React.Component {
         
                 <div className="w3-card w3-round w3-white">
                     <div className="w3-center w3-container w3-padding">
-                    
                     {/* <h1  >
                         Welcome to the Decentralized Web!
                     </h1> */}
                     {/* <img style={{paddingTop:'30px'}} src="/img/spin-2.gif" /> */}
                     <img style={{paddingTop:'30px'}} src={this.state.gif} />
-                    <br/>
-                    <br/>
-                    <br/>
+                    <br/><br/><br/>
                     {!this.state.loggedIn ? <div>
                     
                     <button onClick={this.route.bind(this,'/login')} style={{width:"60%"}} type="button" className="w3-button  btn-success btn-lg">Login</button>
-                    <br/>
-                    <br/>
+                    <br/><br/>
                     <button onClick={this.route.bind(this, '/create')} style={{width:"60%"}} type="button" className="w3-button btn-lg btn-light">Create Account</button>
-                    <br/>
-                    <br/>
+                    <br/><br/>
                     </div>:''}
                     </div>
                 </div>
@@ -96,8 +89,9 @@ class Home extends React.Component {
 
                         </div>
                     </div>
+                    <p className = "w3-center">This may take up to 15 seconds the first time.  Currently browser IPFS isn't compatible with FireFox.</p>
                     <div className="modal-footer">
-                        <button type="button" onClick={this.handleClick.bind(this)} className="w3-button w3-theme" data-dismiss="modal">Close</button>
+                        <button type="button" onClick={this.handleClick.bind(this)} className="btn btn-danger" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>

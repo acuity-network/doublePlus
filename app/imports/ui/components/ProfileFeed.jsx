@@ -18,19 +18,19 @@ class ProfileFeed extends React.Component{
                             this.props.profileObject,
                         itemsPerSection:
                             10,
-                        profileChildren:
-                            this.props.profileObject.children.reverse(),
+                        profilePost:
+                            this.props.profileObject.post.reverse(),
                         itemCount:
-                            this.props.profileObject.children.length < 10 ? this.props.profileObject.children.length: 10,
+                            this.props.profileObject.post.length < 10 ? this.props.profileObject.post.length: 10,
                         totalItems:
-                            this.props.profileObject.children.length, 
+                            this.props.profileObject.post.length, 
                         done:
                             false
                     };
     }
 
     componentWillMount(){
-        console.log(this.state.totalItems, this.state.profileChildren)
+        console.log(this.state.totalItems, this.state.profilePost)
         
     };
 
@@ -47,7 +47,7 @@ class ProfileFeed extends React.Component{
             console.log(this.state.itemCount);
             for(let i = 0; i < this.state.itemCount; i++) {
                 try { 
-                const mixItem = new MixItem(this.state.profileChildren[i]);
+                const mixItem = new MixItem(this.state.profilePost[i]);
                  _profileItems.push(<ProfileFeedItem key = {i}  item = {mixItem} blurbType = {0}/>)
                 } catch(e) {
                     console.log(e)

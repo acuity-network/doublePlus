@@ -12,7 +12,7 @@ module.exports = {
             LocalStore.set('nodeURL', "https://rpc.doubleplus.io/");
         }
 
-        Session.set('gasPrice', null);
+        Session.set('gasPrice', 1);
         Session.set('hashRate', null);
         Session.set('peers',null);
         Session.set('blockNum',null);
@@ -41,8 +41,6 @@ module.exports = {
                 });
                 
             }
-            let price = await web3.eth.getGasPrice();
-            Session.set('gasPrice', price);
             let hashRate = await web3.eth.getHashrate();
             Session.set('hashRate', hashRate);
             let peers = await web3.eth.net.getPeerCount();
@@ -57,7 +55,7 @@ module.exports = {
     getBalance: async(addr) => {
         try{
             const web3 = global.web3;
-            web3.eth.defaultBlock = "latest";
+            web3.eth.defaultBlock = "pending";
             let bal = await web3.eth.getBalance(addr);
             let ethBal = await web3.utils.fromWei(bal,"ether");
             return ethBal;

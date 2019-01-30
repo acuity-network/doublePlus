@@ -24,7 +24,7 @@ const itemDagAddr = '0xbd3af0bdcf4c8a6dfd8f6ff2129409632decfc7e';
 const itemDagOnlyOwnerAddr = '0xd6cc1712b46a599f87f023fad83bc06473bb2b8d';
 
 const blurbsAbi = require('../lib/jsonAbis/Blurbs.abi.json');
-const blurbsAddr = '0xe9dfe7da1310e73d515447695fe2a425ece9abde';
+const blurbsAddr = '0x67e27cd15b4df2e1bc85729e59e6e7964274b9af';
 
 import MixItem from '../classes/MixItem.js'
 const MixContent = require('../classes/MixContent.js')
@@ -153,7 +153,8 @@ module.exports = {
           }
         });
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr);
       
         let rawTx = {
@@ -277,7 +278,8 @@ module.exports = {
             }
           });
 
-          let GasPrice = await Web3Util.getGasPrice();
+          //let GasPrice = await Web3Util.getGasPrice();
+          let GasPrice = Session.get('gasPrice');
           let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
 
           let rawTx = {
@@ -382,7 +384,8 @@ module.exports = {
           notify.update('progress', 60);
         }
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr,'pending');
   
         let rawTx = {
@@ -417,7 +420,8 @@ module.exports = {
           notify.update('progress', 60);
         }
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, "pending");
       
         let rawTx = {
@@ -452,7 +456,8 @@ module.exports = {
           notify.update('progress', 60);
         }
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, "pending");
       
         let rawTx = {
@@ -482,7 +487,8 @@ module.exports = {
         let reviseItem = await itemDag.methods.addChild(parent, itemStoreIpfsSha256Addr, flagsNonce);
         const encodedABI = reviseItem.encodeABI();
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
 
         let rawTx = {
@@ -538,6 +544,22 @@ module.exports = {
 
     },
 
+    getBlurbsByItemType: async(addr, blurbType) => {
+
+      try{
+        const web3 = global.web3;
+        const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
+
+        let blurbs = await blurbsFactory.methods.getBlurbsByType(addr, blurbType).call();
+        
+        return blurbs;
+
+      } catch(e) {
+        console.log(e);
+        return [];
+      }
+    },
+
     getProfileLocalDb: async(addr, forceUpdate=false) => {
 
       let profile = await profileDb.find({ _id: addr }).fetch();
@@ -555,6 +577,7 @@ module.exports = {
             
             let profile = await _item.latestRevision().getProfile();
             profile.children = await module.exports.getChildren(profileId);
+            profile.post = (await module.exports.getBlurbsByItemType(addr, 0));
             profile.bio = await _item.latestRevision().getBodyText();
             profile.name = await _item.latestRevision().getTitle();
             profile._id = addr;
@@ -568,7 +591,7 @@ module.exports = {
 
             if(Meteor.isClient) {
               try{
-              profileDb.insert({_id:profile._id, profileItemId: profile.profileItemId, name:profile.name, bio:profile.bio, location:profile.location, type:profile.type, image:profile.image, children:profile.children});
+              profileDb.insert({_id:profile._id, profileItemId: profile.profileItemId, name:profile.name, bio:profile.bio, location:profile.location, type:profile.type, image:profile.image, children:profile.children, post:profile.post});
               } catch(e) {
                 
               }
@@ -626,7 +649,8 @@ module.exports = {
           notify.update('progress', 60);
         }
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
         //currently just 1 mix, will update in future.
         let weiAmount = await web3.utils.toWei(amount,"ether");
@@ -659,7 +683,8 @@ module.exports = {
         let addBlurb = await blurbsFactory.methods.addBlurb(itemId, blurbType);
         const encodedABI = addBlurb.encodeABI();
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
    
         let rawTx = {
@@ -720,6 +745,7 @@ module.exports = {
         const encodedABI = withdraw.encodeABI();
 
         let GasPrice = await Web3Util.getGasPrice();
+        
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
 
         if(notify) {
@@ -766,24 +792,22 @@ module.exports = {
         let returnFeedArray = [];
         let accountsTrusting = await module.exports.getTrustedAccounts(myAddr);
           for (let i = 0; i < accountsTrusting.length; i++) {
-            let _profile = await module.exports.getProfileLocalDb(accountsTrusting[i], true);
-            if(_profile) {
-              let reversedChildren = await _profile.children.reverse(); //reverse array to get newest first
-              let initItemArray = await reversedChildren.slice(0,10); //get the last 5 post per each account following
+            
+              let post = await module.exports.getBlurbsByItemType(accountsTrusting[i],0); //reverse array to get newest first
+              let initItemArray = await post.slice(Math.max(post.length - 3, 0)); //get the last 2 post per each account following
               await initItemArray.forEach( async _item =>{
                 if(_item){
                   await returnFeedArray.push(new MixItem(_item));
                 }
+              
               })
-            }
-        }
+        };
 
         let initalizedItems = await module.exports.initAllItems(returnFeedArray);
         await initalizedItems.sort((itemA, itemB) => {
           return (itemB.latestTimeStamp() - itemA.latestTimeStamp())
-          }
+        })
         
-        )
         return initalizedItems;
 
       } catch(e) {

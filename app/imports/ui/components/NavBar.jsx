@@ -50,14 +50,18 @@ class NavBar extends React.Component{
                     <li className="nav-item">
                         <a className="nav-link" onClick={this.route.bind(this,'/',false)} >Home</a>
                     </li>
-                    <li className="nav-item">
+                    {/* <li className="nav-item">
                         <a className="nav-link" href="#">About</a>
-                    </li>
+                    </li> */}
+                    
                     <li className="nav-item">
-                        <a className="nav-link" target="_blank" href="https://graviex.net/markets/mixbtc">Get Mix</a>
+                        <a className="nav-link" target="_blank" href="https://graviex.net/markets/mixbtc">Get MIX</a>
                     </li>
                     <li className="nav-item">
                         <a className="nav-link" target="_blank" href="https://mix-blockchain.org/">What's MIX?</a>
+                    </li>
+                    <li className="nav-item">
+                        <a className="nav-link" target="_blank" href="https://discord.gg/vd7dknY">Discord</a>
                     </li>
                     <li className="nav-item">
                         <a className="nav-link" target="_blank" href="https://github.com/mix-blockchain/doublePlus/">GitHub</a>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 import 'jquery';
 
 import Header from '../components/Header.jsx';
@@ -27,8 +27,6 @@ export default class MainLayout extends React.Component {
     this.autoRun = Tracker.autorun(()=>{
       this.setState({
             
-            
-          
       });
     })
 

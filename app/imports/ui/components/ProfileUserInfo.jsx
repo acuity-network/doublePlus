@@ -40,7 +40,7 @@ class ProfileUserInfo extends React.Component{
         .then(data=>{
             
             this.setState( {
-                profileImg: "data:image/jpeg;base64, " + data
+                profileImg: "data:image/jpeg;base64, " + SessionUtil.arrayBufferToBase64(data)
             });
 
         })

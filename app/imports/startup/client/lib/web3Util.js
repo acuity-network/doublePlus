@@ -16,7 +16,8 @@ module.exports = {
         Session.set('hashRate', null);
         Session.set('peers',null);
         Session.set('blockNum',null);
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        global.web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        global.web3.eth.defaultBlock = "pending";
         try {
             let block = await web3.eth.getBlockNumber();
             if (block > 1) {
@@ -55,7 +56,19 @@ module.exports = {
 
     getBalance: async(addr) => {
         try{
-            const web3 = await new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+            const web3 = global.web3;
+            web3.eth.defaultBlock = "latest";
+            let bal = await web3.eth.getBalance(addr);
+            let ethBal = await web3.utils.fromWei(bal,"ether");
+            return ethBal;
+        } catch(e) {
+            throw e;
+        }
+    },
+
+    getUnconfirmedBalance: async(addr) => {
+        try{
+            const web3 = global.web3;
             let bal = await web3.eth.getBalance(addr);
             let ethBal = await web3.utils.fromWei(bal,"ether");
             return ethBal;
@@ -85,7 +98,7 @@ module.exports = {
             notify.update('message', 'Broadcasting Tranaction...');
         }
         try {
-            const web3 = await new Web3 (new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+            const web3 = global.web3;
             
             if(notify) { 
                 notify.update('progress', 95);
@@ -165,7 +178,7 @@ module.exports = {
                     align: "center"
                 }
             });
-            web3 = new Web3 (new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+            const web3 = global.web3;
             let GasPrice = await web3.eth.getGasPrice();
             let Nonce = await web3.eth.getTransactionCount(fromAddr);
             let weiAmount = await web3.utils.toWei(ethAmount,"ether");
@@ -185,13 +198,13 @@ module.exports = {
     },
 
     getGasPrice: async () =>{
-        web3 = new Web3 (new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         let GasPrice = await web3.eth.getGasPrice();
         return web3.utils.toBN(GasPrice)
     },
 
     isAddress: (addr)=>{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         return web3.utils.isAddress(addr);
     }
 

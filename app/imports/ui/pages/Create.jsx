@@ -73,7 +73,7 @@ class Create extends React.Component{
                     <div  style={{paddingBottom: "20px"}}>
                         
                         <button onClick= {this.createHandle.bind(this)} id="create" type="button" className="btn btn-light"><i className=""></i> &nbsp;Create</button>&nbsp;&nbsp;
-                        <a href="#" onClick = {this.loginHandle.bind(this)} >Login with existing account</a>
+                        <a onClick = {this.loginHandle.bind(this)} >Login with existing account</a>
                     </div>
                 </div>
             </div>

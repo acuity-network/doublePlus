@@ -51,7 +51,7 @@ class SidePanel extends React.Component{
           },
           type:'success',
           placement: {
-              from: "top",
+              from: "bottom",
               align: "center"
           }
       });

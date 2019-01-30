@@ -1,6 +1,5 @@
 
 const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
 
 const itemStoreRegistryAbi = require('../lib/jsonAbis/itemStoreRegistry.abi.json');
 const itemStoreRegistryAddr = '0x8928f846012b98aac5cd2f4ef4029097cd4110fc';
@@ -46,7 +45,7 @@ module.exports = {
 
 
         try{
-          const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+          const web3 = global.web3;
           const itemStoreRegistry = new web3.eth.Contract(itemStoreRegistryAbi, itemStoreRegistryAddr);
 
           let itemStoreAddress = await itemStoreRegistry.methods.getItemStore(itemId).call();
@@ -109,7 +108,7 @@ module.exports = {
     },
 
     getTrustedAccounts:async (addr) => {
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
       
       let trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);
       
@@ -120,7 +119,7 @@ module.exports = {
     },
 
     isTrusting: async(myAddr, trustingAddr)=>{
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
       let trusted = [];
 
       trusted = await module.exports.getTrustedAccounts(myAddr);
@@ -128,7 +127,7 @@ module.exports = {
     },
     addTrustedAccount:async (myAddr, trustedAddr)=> {
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
 
         const trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);
         const addTrusted = trustedAccounts.methods.trustAccount(trustedAddr);
@@ -211,7 +210,7 @@ module.exports = {
 
     numberOfAccountsTrusting:async(addr) => {
 
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
 
       let trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);     
       let count = await trustedAccounts.methods.getTrustedCountByAccount(addr).call();
@@ -239,7 +238,7 @@ module.exports = {
 
     accountHasProfile: async(addr) => {
 
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
       const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
       try {
         return await accountProfile.methods.hasProfile(addr).call();
@@ -250,7 +249,7 @@ module.exports = {
     },
 
     associateProfileToAccount: async(myAddr, mixAccountItemId) => {
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
       
       const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
       
@@ -303,7 +302,7 @@ module.exports = {
     getProfile: async(addr) => {
       
       try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
         let profileId = await accountProfile.methods.getProfileByAccount(addr).call();
         return profileId;
@@ -318,7 +317,7 @@ module.exports = {
     createOrReviseMyProfile: async(ipfsHash, myAddr, notify = null) => {
       
       try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
        // accountProfile.getPastEvents("allEvents",(e,events)=>{console.log(events)})
         const myProfile = await module.exports.getProfile(myAddr);
@@ -342,7 +341,7 @@ module.exports = {
 
       try {
         
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         let flagsNonce = '0x01' + web3.utils.randomHex(30).substr(2);
         let itemId = await module.exports.getItemId(flagsNonce, myAddr);
 
@@ -358,7 +357,7 @@ module.exports = {
 
     getItemId: async(flagsNonce,myAddr) => {
       
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
       const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
       let itemId = await itemStoreIpfsSha256.methods.getNewItemId(myAddr, flagsNonce).call({from:myAddr});
       return itemId;
@@ -369,7 +368,7 @@ module.exports = {
     createNewItem: async(myAddr, ipfsHash, flagsNonce, notify = null) => {
       
       try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         
         const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
         let createItem;
@@ -407,7 +406,7 @@ module.exports = {
     createNewRevision: async(myAddr, mixItemId, revisionIpfsHash, notify=null) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
 
         let reviseItem = await itemStoreIpfsSha256.methods.createNewRevision(mixItemId, revisionIpfsHash);
@@ -442,7 +441,7 @@ module.exports = {
     updateLatestRevision: async(myAddr, itemId, revisionIpfsHash, notify=null) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
 
         let reviseItem = await itemStoreIpfsSha256.methods.updateLatestRevision(itemId, revisionIpfsHash);
@@ -477,7 +476,7 @@ module.exports = {
     addChildToParent: async(myAddr, parent, flagsNonce, onlyOwner = false) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const itemDagContractAddr =  onlyOwner ? itemDagOnlyOwnerAddr : itemDagAddr;
         const itemDag =  new web3.eth.Contract(itemDagAbi, itemDagContractAddr);
         let reviseItem = await itemDag.methods.addChild(parent, itemStoreIpfsSha256Addr, flagsNonce);
@@ -589,7 +588,7 @@ module.exports = {
     getChildren: async(itemId) => {
 
       try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagOnlyOwnerAddr);
         let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
         return childrenArray;
@@ -603,7 +602,7 @@ module.exports = {
     getComments: async(itemId) => {
       
       try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagAddr);
         let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
         return childrenArray;
@@ -614,9 +613,9 @@ module.exports = {
 
     },
 
-    donateToItem: async(myAddr, itemId, notify = null, amount = 1) => {
+    donateToItem: async(myAddr, itemId, notify = null, amount = "1") => {
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let donateBlurb = await blurbsFactory.methods.donate(itemId);
@@ -630,7 +629,7 @@ module.exports = {
         let GasPrice = await Web3Util.getGasPrice();
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
         //currently just 1 mix, will update in future.
-        let weiAmount = await web3.utils.toWei(web3.utils.toBN(amount),"ether");
+        let weiAmount = await web3.utils.toWei(amount,"ether");
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -654,7 +653,7 @@ module.exports = {
     initializeBlurb: async(myAddr, itemId, blurbType) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let addBlurb = await blurbsFactory.methods.addBlurb(itemId, blurbType);
@@ -683,7 +682,7 @@ module.exports = {
 
     getTotalDonationsForItem: async(itemId) => {
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let donations = await blurbsFactory.methods.getBlurbTotalDonations(itemId).call();
@@ -698,7 +697,7 @@ module.exports = {
 
     getBlurbInfo: async(itemId) => {
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let blurbInfo = await blurbsFactory.methods.getBlurbInfo(itemId).call();
@@ -714,7 +713,7 @@ module.exports = {
     withdrawDonationBalance: async(myAddr, notify = null) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let withdraw = await blurbsFactory.methods.withdraw();
@@ -749,11 +748,11 @@ module.exports = {
     donationBalance: async(myAddr) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let donationBalance = await blurbsFactory.methods.currentBalance(myAddr).call();
-        return (web3.utils.fromWei(web3.utils.toBN(donationBalance),"ether"));
+        return (web3.utils.fromWei(String(donationBalance),"ether"));
       } catch(e) {
         console.log(e);
         return 0;
@@ -770,7 +769,7 @@ module.exports = {
             let _profile = await module.exports.getProfileLocalDb(accountsTrusting[i], true);
             if(_profile) {
               let reversedChildren = await _profile.children.reverse(); //reverse array to get newest first
-              let initItemArray = await reversedChildren.slice(0,5); //get the last 5 post per each account following
+              let initItemArray = await reversedChildren.slice(0,10); //get the last 5 post per each account following
               await initItemArray.forEach( async _item =>{
                 if(_item){
                   await returnFeedArray.push(new MixItem(_item));
@@ -819,7 +818,7 @@ module.exports = {
       //http://localhost:8081/ipfs/http://localhost:8081/ipfs/
       // return '<img src="' + Base58.encode(mipmapList[i].getIpfsHash()) + '" width="' + widthOut + '" height="' + heightOut + '">'
       let data = await IpfsUtil.getItemFromIpfsHash(Base58.encode(mipmapList[i].getIpfsHash()))
-      return await SessionUtil.arrayBufferToBase64(data[0].content);
+      return data[0].content;
     }
 
 

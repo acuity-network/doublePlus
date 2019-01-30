@@ -15,15 +15,48 @@ class ProfileUserEdit extends React.Component{
         super(props);
         this.state = { 
             profileAddr:this.props.profileAddr,
-            isMine: Session.get('addr')==this.props.profileAddr
+            isMine: Session.get('addr')==this.props.profileAddr,
+            profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg,
+            type:"0"
         };
     }
 
     componentWillMount(){
-        this.setState({
-            profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg
-  
-        });
+        //Load existing profile if available
+
+        MixUtil.getProfileLocalDb(Session.get('addr'), true)
+        .then(profileObject =>{
+            if(profileObject) {
+                this.setState({
+                    name:profileObject.name,
+                    bio:profileObject.bio,
+                    type:String(profileObject.type),
+                    imgMip:profileObject.image,
+                    location:profileObject.location,
+                    loaded:true
+                });
+                console.log(profileObject.type);
+                if(profileObject.image){
+                    MixUtil.getImageFromMipmap(profileObject.image,250,250)
+                    .then(data => {
+                        this.setState({
+                            image:data,
+                            profileImg:"data:image/jpeg;base64, "+ SessionUtil.arrayBufferToBase64(data)
+                        })
+                    })
+                }
+            } else {
+                this.setState({
+                    loaded:true
+                })
+            }
+
+
+
+        })
+        
+        
+        
     };
 
     shouldComponentUpdate(lastState, nextState) {
@@ -55,19 +88,16 @@ class ProfileUserEdit extends React.Component{
             var reader = new FileReader();
             reader.onload = event => {
                 let byteArray = event.target.result;
-                SessionUtil.arrayBufferToBase64(byteArray)
-                .then(res => {
-
-                    console.log(res);
-                    this.setState({
-                        image: byteArray,
-                        base64img: res,
-                        profileImg: "data:image/jpeg;base64, " + res
-
-                    })
+                let res = SessionUtil.arrayBufferToBase64(byteArray)
+                
+                this.setState({
+                    image: byteArray,
+                    base64img: res,
+                    profileImg: "data:image/jpeg;base64, " + res,
+                    imgAltered:true
 
                 })
-                
+         
             };
             
             reader.readAsArrayBuffer(file);
@@ -78,6 +108,25 @@ class ProfileUserEdit extends React.Component{
     };
 
     save () {
+        let notify =
+            $.notify({
+                icon: 'glyphicon glyphicon-warning-sign',
+                title: '',
+                message: 'Encoding data...',
+                target: '_blank',
+                allow_dismiss: false,
+              },{
+                animate: {
+                    enter: 'animated fadeInDown',
+                    exit: 'animated fadeOutUp'
+                },
+                type:'success',
+                showProgressbar: true,
+                placement: {
+                    from: "bottom",
+                    align: "center"
+                }
+              });
 
         let content = new MixContent();
         // Account profile
@@ -100,25 +149,7 @@ class ProfileUserEdit extends React.Component{
         // Image
         console.log(this.state.image)
         if (this.state.image) {
-            let notify =
-            $.notify({
-                icon: 'glyphicon glyphicon-warning-sign',
-                title: '',
-                message: 'Encoding images...',
-                target: '_blank',
-                allow_dismiss: false,
-              },{
-                animate: {
-                    enter: 'animated fadeInDown',
-                    exit: 'animated fadeOutUp'
-                },
-                type:'success',
-                showProgressbar: true,
-                placement: {
-                    from: "bottom",
-                    align: "center"
-                }
-              });
+            
             const image = new Image(this.state.image)
               image.createMixin()
               .then(imgMessage => {
@@ -205,7 +236,7 @@ class ProfileUserEdit extends React.Component{
 
     render() {
         let Render;
-        console.log(this.state.image)
+      
         Render = 
         <div style ={{margin:'auto', maxWidth:'800'}}>
         <div id = "edit"  className="w3-col m12 w3-row-padding">
@@ -221,12 +252,12 @@ class ProfileUserEdit extends React.Component{
     
                </div>
                <hr/>
-               <label htmlFor="name">Name:</label> <br/><input onChange={this.handleNameChange.bind(this)} className="form-control" id="name" placeholder="Name..." type="text"/> 
-               <label htmlFor="bio">Bio:</label> <br/><input onChange={this.handleBioChange.bind(this)} className="form-control" id="bio" placeholder="My bio..." type="text"/>
-               <label htmlFor="location">Location:</label> <br/><input onChange={this.handleLocationChange.bind(this)} className="form-control" id="location" placeholder="Location..." type="text"/> 
+               <label htmlFor="name">Name:</label> <br/><input onChange={this.handleNameChange.bind(this)} value={this.state.name} className="form-control" id="name" placeholder="Name..." type="text"/> 
+               <label htmlFor="bio">Bio:</label> <br/><input onChange={this.handleBioChange.bind(this)} value={this.state.bio} className="form-control" id="bio" placeholder="My bio..." type="text"/>
+               <label htmlFor="location">Location:</label> <br/><input onChange={this.handleLocationChange.bind(this)} value={this.state.location} className="form-control" id="location" placeholder="Location..." type="text"/> 
                
                <label htmlFor="typeChange">Profile Type: </label> <br/>
-                <select defaultValue = '' style={{width:'40%'}} onChange = {this.handleTypeChange.bind(this)} className="form-control" id="typeChange">
+                <select value ={this.state.type} style={{width:'40%'}} onChange = {this.handleTypeChange.bind(this)} className="form-control" id="typeChange">
                     <option value="0">Anon</option>
                     <option value="1">Person</option>
                     <option value="2">Project</option>

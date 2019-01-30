@@ -26,7 +26,7 @@ class Home extends React.Component {
     })
     
   };
-  compatiblecompatiblecompatible
+  
   componentWillUnmount() {
       this.autoRun.stop();
   };

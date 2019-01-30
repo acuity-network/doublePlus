@@ -21,11 +21,16 @@ class CommentReplies extends React.Component{
     }
 
     componentWillMount(){
-     
-        MixUtil.getComments(this.state.itemId)
-        .then((res)=>{
+        this.initalize(this.state.itemId);
+    };
 
+    initalize(itemId){
+        console.log(this.state.itemId)
+        MixUtil.getComments(itemId)
+        .then((res)=>{
+            console.log(res)
             this.setState({
+                itemId:itemId,
                 itemArray: res.reverse(),
                 totalItems: res.length,
                 loaded:true,
@@ -33,6 +38,13 @@ class CommentReplies extends React.Component{
             });
 
         })
+    };
+
+    componentWillReceiveProps(nextProps){
+        console.log(nextProps.itemId, this.state.itemId)
+        // if(nextProps.itemId !== this.state.itemId) {
+            this.initalize(nextProps.itemId);
+        // };
 
     };
 
@@ -69,7 +81,7 @@ class CommentReplies extends React.Component{
 
     render() {
         let Render;
-
+        console.log(this.state.itemArray)
         if(this.state.loaded) {
         Render = 
         <div style ={{margin:'auto', maxWidth:'800px'}}>

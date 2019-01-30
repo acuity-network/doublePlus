@@ -32,7 +32,6 @@ class AccountRouter extends React.Component{
 
     }
 
-
     routeHandle () {
         console.log(this.state.routeAddr)
         let addr = this.state.routeAddr;

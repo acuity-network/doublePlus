@@ -30,7 +30,7 @@ export default class MixItem {
 
   async init () {
     try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         
         this.itemStoreRegistry = new web3.eth.Contract(itemStoreRegistryAbi, itemStoreRegistryAddr);
         this.itemStoreShortId = new web3.eth.Contract(itemStoreShortIdAbi, itemStoreShortIdAddr);

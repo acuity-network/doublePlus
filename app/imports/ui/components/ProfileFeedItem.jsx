@@ -4,6 +4,7 @@ import base64img from '../../startup/client/lib/base64img.js';
 import ReplyBox from './ReplyBox.jsx';
 const web3 = require('web3');
 
+
 class ProfileFeedItem extends React.Component{
 
     constructor(props){
@@ -18,7 +19,8 @@ class ProfileFeedItem extends React.Component{
 
         };
 
-    }
+    };
+
 
     componentWillMount(){
         this.setState({
@@ -37,6 +39,21 @@ class ProfileFeedItem extends React.Component{
             }
         }
     };
+
+    componentWillReceiveProps(nextProps) {
+
+         //if not initalized then initalize
+         if(nextProps.item) {
+            if(!nextProps.item.item) {
+                nextProps.item.init()
+                .then(_item => {
+                    this.intitalizeStateItems(_item);
+                })
+            } else {
+                this.intitalizeStateItems(nextProps.item);
+            }
+        }
+    }
 
     intitalizeStateItems(_item) {
 
@@ -83,7 +100,7 @@ class ProfileFeedItem extends React.Component{
             .then(data=>{
         
                 this.setState( {
-                    profileImg: "data:image/jpeg;base64, " + data
+                    profileImg: "data:image/jpeg;base64, " + SessionUtil.arrayBufferToBase64(data)
                 });
                 
             })
@@ -140,7 +157,6 @@ class ProfileFeedItem extends React.Component{
 
           MixUtil.donateToItem(Session.get('addr'),this.state.itemId, notify);
 
-
     };
 
     route (link) {
@@ -154,7 +170,7 @@ class ProfileFeedItem extends React.Component{
             <div className="w3-container w3-card w3-white w3-round w3-margin"><br/>
                 <img  src = {this.state.profileImg} alt="Avatar" className="w3-left w3-circle w3-margin-right" style={{width:'60px'}}/>
                 <span className="w3-right w3-opacity">{this.state.timeStamp}</span>
-                <h3>{this.state.name}</h3> <a href="#" onClick={this.route.bind(this,'/profile/'+this.state.owner)} > {this.state.owner}</a>
+                <h3>{this.state.name}</h3> <a onClick={this.route.bind(this,'/profile/'+this.state.owner)} > {this.state.owner}</a>
                 
                 <hr className="w3-clear"/>
                 <p style={{paddingBottom:"10px",fontSize:"20px"}}> &nbsp; {this.state.bodyText}</p>

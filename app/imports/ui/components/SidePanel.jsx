@@ -6,17 +6,27 @@ import clipboard from 'clipboard';
 
 class SidePanel extends React.Component{
 
+    constructor(props){
+        super(props);
+        // this.state = { 
+        //     isLogged : Session.get('loggedIn'),
+        //     addr : Session.get('addr'),
+        //     balance :  Session.get('balance')
+
+        // };
+    }
+
     componentWillMount(){
-        Tracker.autorun(()=>{
-          this.setState({
-            isLogged : Session.get('loggedIn'),
-            addr : Session.get('addr'),
-            balance :  Session.get('balance')
-            
+        console.log('mounting')
+        this.autoRun = Tracker.autorun(()=>{
+            this.setState({
+              isLogged : Session.get('loggedIn'),
+              addr : Session.get('addr'),
+              balance :  Session.get('balance')
+              
+            });
           });
-        });
-      
-      };
+    };
     
     
     route (link, toggle=false) {
@@ -64,8 +74,10 @@ class SidePanel extends React.Component{
 
     componentDidMount() {
         const clipButton = new clipboard('.addr', {
-            text: () => {return this.state.addr}
+            text: () => {return Session.get('addr')}
         });
+
+
     };
 
     copyMyAddrClipBoard(e) {
@@ -91,8 +103,10 @@ class SidePanel extends React.Component{
     }
 
     render() {
+
         let Render;
-        if(this.state.isLogged) {
+        
+        if(Session.get('loggedIn')) {
             Render =        
                 <nav id="sidebar">
                     <div className="sidebar-header">
@@ -107,7 +121,7 @@ class SidePanel extends React.Component{
                             <a  onClick={this.route.bind(this, '/profile/'+Session.get('addr'),true)}>My Profile</a>
                         </li>
                         <li>
-                            <a  onClick={this.route.bind(this, '/wallet',true)}>Wallet<span style={{float:'right', fontWeight:'lighter'}}>{this.state.balance} Mix</span></a>
+                            <a  onClick={this.route.bind(this, '/wallet',true)}>Wallet<span style={{float:'right', fontWeight:'lighter'}}>{Session.get('balance')} Mix</span></a>
                         </li>
                         <li>
                             <a  onClick={this.route.bind(this, '/trusted',true)}>Following</a>
@@ -159,8 +173,6 @@ class SidePanel extends React.Component{
         return(Render);
     };
 
-    componentWillUnmount() {
-    };
 
 }
 

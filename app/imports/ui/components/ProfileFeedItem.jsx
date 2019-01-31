@@ -23,9 +23,6 @@ class ProfileFeedItem extends React.Component{
 
 
     componentWillMount(){
-        this.setState({
-            profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg
-        });
 
         //if not initalized then initalize
         if(this.state.item) {
@@ -56,6 +53,10 @@ class ProfileFeedItem extends React.Component{
     }
 
     intitalizeStateItems(_item) {
+
+        this.setState({
+            profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg
+        });
 
         this.setState({
             owner:_item.owner(),
@@ -98,10 +99,11 @@ class ProfileFeedItem extends React.Component{
 
             MixUtil.getImageFromMipmap(_profile.image, 256,256)
             .then(data=>{
-        
-                this.setState( {
-                    profileImg: "data:image/jpeg;base64, " + SessionUtil.arrayBufferToBase64(data)
-                });
+                if(data) {  
+                    this.setState( {
+                        profileImg: "data:image/jpeg;base64, " + SessionUtil.arrayBufferToBase64(data)
+                    });
+                }
                 
             })
         });
@@ -148,7 +150,7 @@ class ProfileFeedItem extends React.Component{
                 exit: 'animated fadeOutUp'
             },
             type:'info',
-            showProgressbar: true,
+            showProgressbar: false,
             placement: {
                 from: "bottom",
                 align: "center"
@@ -165,6 +167,7 @@ class ProfileFeedItem extends React.Component{
 
     render() {
         let Render;
+        console.log(this.props.blurbType, this.state.blurbType);
         if(this.props.blurbType == this.state.blurbType) {
             Render = 
             <div className="w3-container w3-card w3-white w3-round w3-margin"><br/>

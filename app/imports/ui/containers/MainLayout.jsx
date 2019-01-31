@@ -2,6 +2,8 @@ import React from 'react';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 import 'jquery';
 
+import base64img from '../../startup/client/lib/base64img.js'
+
 import Header from '../components/Header.jsx';
 import Home from '../pages/Home.jsx';
 import NotFound from '../pages/NotFound.jsx';
@@ -24,9 +26,14 @@ export default class MainLayout extends React.Component {
   
   componentWillMount(){
 
+    this.setState({
+      gif:
+        "data:image/gif;base64, "+ base64img.base64Gif
+    })
+
     this.autoRun = Tracker.autorun(()=>{
       this.setState({
-            
+            ipfsInit: Session.get('ipfsConnected')
       });
     })
 
@@ -70,6 +77,8 @@ export default class MainLayout extends React.Component {
   
   
   render() {
+
+    if(this.state.ipfsInit) {
     
 
     return (
@@ -106,5 +115,36 @@ export default class MainLayout extends React.Component {
         </div>
       </Router>
     );
+    } else {
+      let render = 
+      <div>
+          <div className="modal" id="ipfsModal" style = {{paddingTop:'50px'}}>
+          <div className="modal-dialog modal-lg" role="document">
+              <div className="modal-content">
+                  <div className="modal-header">
+                      <h5 className="modal-title">IPFS Daemon Starting...</h5>
+
+                  </div>
+                  <div className="modal-body">
+                      <div className = "w3-center w3-container w3-padding">
+                          <img src = {this.state.gif}/>
+
+                      </div>
+                  </div>
+                  <p className = "w3-center">This may take up to 15 seconds the first time.  Currently browser IPFS isn't compatible with FireFox.</p>
+                  <div className="modal-footer">
+                      {/* <button type="button"  className="btn btn-danger" data-dismiss="modal">Close</button> */}
+                  </div>
+              </div>
+          </div>
+        </div> 
+      </div>
+
+
+      $('#ipfsModal').show();
+
+      return(render)
+
+    }
   }
 }

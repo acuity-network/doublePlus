@@ -39,10 +39,12 @@ class ProfileUserEdit extends React.Component{
                 if(profileObject.image){
                     MixUtil.getImageFromMipmap(profileObject.image,250,250)
                     .then(data => {
-                        this.setState({
-                            image:data,
-                            profileImg:"data:image/jpeg;base64, "+ SessionUtil.arrayBufferToBase64(data)
-                        })
+                        if(data) {
+                            this.setState({
+                                image:data,
+                                profileImg:"data:image/jpeg;base64, "+ SessionUtil.arrayBufferToBase64(data)
+                            })
+                        }
                     })
                 }
             } else {
@@ -121,7 +123,7 @@ class ProfileUserEdit extends React.Component{
                     exit: 'animated fadeOutUp'
                 },
                 type:'success',
-                showProgressbar: true,
+                showProgressbar: false,
                 placement: {
                     from: "bottom",
                     align: "center"
@@ -170,7 +172,7 @@ class ProfileUserEdit extends React.Component{
                         exit: 'animated fadeOutUp'
                     },
                     type:'success',
-                    showProgressbar: true,
+                    showProgressbar: false,
                     placement: {
                         from: "bottom",
                         align: "center"
@@ -202,7 +204,7 @@ class ProfileUserEdit extends React.Component{
                 exit: 'animated fadeOutUp'
             },
             type:'success',
-            showProgressbar: true,
+            showProgressbar: false,
             placement: {
                 from: "bottom",
                 align: "center"

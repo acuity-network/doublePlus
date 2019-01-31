@@ -89,7 +89,7 @@ class ReplyBox extends React.Component{
                 exit: 'animated fadeOutUp'
             },
             type:'info',
-            showProgressbar: true,
+            showProgressbar: false,
             placement: {
                 from: "bottom",
                 align: "center"
@@ -117,7 +117,7 @@ class ReplyBox extends React.Component{
         content.save()
         .then((ipfsHash)=>{
             notify.update('message', 'Item published to IPFS! Hash: ' + ipfsHash);
-            notify.update('progress', 50);
+            // notify.update('progress', 50);
             console.log(ipfsHash);
             MixUtil.commentToPost(Session.get('addr'),ipfsHash,Session.get('profile'), this.state.parentItemId, notify)
             .catch((e)=>{
@@ -139,6 +139,10 @@ class ReplyBox extends React.Component{
                 });
 
             })
+            this.setState({
+                postText:'',
+                charCount:0
+            })
             
         });
 
@@ -157,7 +161,7 @@ class ReplyBox extends React.Component{
         Render =
         <div style={{paddingTop:"10px"}}>
             <div className="form-group loginText">
-                <textarea style={{ width: '100%'}}  onChange={this.handleReplyChange.bind(this)} className="form-control" id="reply" placeholder="Reply to post..." type="text"/>
+                <textarea style={{ width: '100%'}} value={this.state.postText} onChange={this.handleReplyChange.bind(this)} className="form-control" id="reply" placeholder="Reply to post..." type="text"/>
             </div>
             <div style={{paddingBottom:"30px"}}>
                 <button  onClick = {this.handlePostSubmit.bind(this)} style={{float: 'right'}} type="button" className="btn btn-info"><i className="fa fa-pencil"></i> &nbsp;Reply</button>

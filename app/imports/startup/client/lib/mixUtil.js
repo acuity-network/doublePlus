@@ -146,7 +146,7 @@ module.exports = {
               exit: 'animated fadeOutUp'
           },
           type:'info',
-          showProgressbar: true,
+          showProgressbar: false,
           placement: {
               from: "bottom",
               align: "center"
@@ -167,7 +167,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx,notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx);
+        return hash;
 
       } catch(e) {
 
@@ -271,7 +272,7 @@ module.exports = {
                 exit: 'animated fadeOutUp'
             },
             type:'info',
-            showProgressbar: true,
+            showProgressbar: false,
             placement: {
                 from: "bottom",
                 align: "center"
@@ -292,7 +293,8 @@ module.exports = {
             gasPrice:GasPrice
           }; 
 
-          Web3Util.signAndSendRawTx(rawTx,notify);
+          let hash = await Web3Util.signAndSendRawTx(rawTx);
+          return hash;
     
         } catch (e) {
           console.log(e.message);
@@ -367,7 +369,7 @@ module.exports = {
     },
 
     
-    createNewItem: async(myAddr, ipfsHash, flagsNonce, notify = null) => {
+    createNewItem: async(myAddr, ipfsHash, flagsNonce, notify = false) => {
       
       try {
         const web3 = global.web3;
@@ -379,14 +381,11 @@ module.exports = {
         const encodedABI = createItem.encodeABI();
 
         let gasEst = await createItem.estimateGas();
-        if(notify) {
-          notify.update('message', 'Creating new Mix Item!');
-          notify.update('progress', 60);
-        }
 
         //let GasPrice = await Web3Util.getGasPrice();
         let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr,'pending');
+        console.log('n1', Nonce)
   
         let rawTx = {
           nonce:Nonce,
@@ -398,7 +397,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx,notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
+        return hash;
 
       } catch (e) {
         throw e
@@ -417,7 +417,7 @@ module.exports = {
 
         if(notify) {
           notify.update('message', 'Revising Mix Item!');
-          notify.update('progress', 60);
+          // notify.update('progress', 60);
         }
 
         //let GasPrice = await Web3Util.getGasPrice();
@@ -434,7 +434,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx,notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
+        return hash;
 
       } catch (e) {
         throw e
@@ -453,7 +454,7 @@ module.exports = {
 
         if(notify) {
           notify.update('message', 'Revising Mix Item!');
-          notify.update('progress', 60);
+          // notify.update('progress', 60);
         }
 
         //let GasPrice = await Web3Util.getGasPrice();
@@ -470,7 +471,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx,notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
+        return hash;
 
       } catch (e) {
         throw e
@@ -490,7 +492,7 @@ module.exports = {
         //let GasPrice = await Web3Util.getGasPrice();
         let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
-
+        console.log('n2', Nonce)
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -501,7 +503,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx);
+        let hash = await Web3Util.signAndSendRawTx(rawTx);
+        return hash;
 
       } catch (e) {
         throw e
@@ -520,6 +523,7 @@ module.exports = {
           await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce, true);
           await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
           await module.exports.initializeBlurb(myAddr, itemId, 0);
+          
 
           } catch (e) {
               throw e
@@ -537,6 +541,7 @@ module.exports = {
         await module.exports.addChildToParent(myAddr, parentPostId, flagsNonce, false)
         await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
         await module.exports.initializeBlurb(myAddr, itemId, 1);
+        
 
         } catch (e) {
             throw e
@@ -646,7 +651,7 @@ module.exports = {
 
         if(notify) {
           notify.update('message', 'Sending 1 Mix!');
-          notify.update('progress', 60);
+          // notify.update('progress', 60);
         }
 
         //let GasPrice = await Web3Util.getGasPrice();
@@ -665,7 +670,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx, notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
+        return hash;
 
       } catch (e) {
         throw e
@@ -686,7 +692,7 @@ module.exports = {
         //let GasPrice = await Web3Util.getGasPrice();
         let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
-   
+        console.log('n3', Nonce)
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -697,7 +703,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx);
+        let hash = await Web3Util.signAndSendRawTx(rawTx);
+        return hash;
 
       } catch (e) {
         console.log(e);
@@ -726,6 +733,7 @@ module.exports = {
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let blurbInfo = await blurbsFactory.methods.getBlurbInfo(itemId).call();
+        console.log(blurbInfo)
         return blurbInfo;
       } catch(e) {
         console.log(e);
@@ -750,7 +758,7 @@ module.exports = {
 
         if(notify) {
           notify.update('message', 'Withdrawing Balance!');
-          notify.update('progress', 60);
+          // notify.update('progress', 60);
         }
 
         let rawTx = {
@@ -763,7 +771,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx, notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
+        return hash;
 
       } catch (e) {
         console.log(e);
@@ -841,8 +850,12 @@ module.exports = {
       let heightOut = Math.round(height / scale)
       //http://localhost:8081/ipfs/http://localhost:8081/ipfs/
       // return '<img src="' + Base58.encode(mipmapList[i].getIpfsHash()) + '" width="' + widthOut + '" height="' + heightOut + '">'
-      let data = await IpfsUtil.getItemFromIpfsHash(Base58.encode(mipmapList[i].getIpfsHash()))
-      return data[0].content;
+      if(mipmapList[i]) {
+        let data = await IpfsUtil.getItemFromIpfsHash(Base58.encode(mipmapList[i].getIpfsHash()))
+        return data[0].content;
+      } else {
+        return null;
+      }
     }
 
 

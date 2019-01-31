@@ -75,85 +75,80 @@ module.exports = {
         }
     },
 
-    signAndSendRawTx: async(rawTx, notify = null) => {
-        let privKey = Session.get('priv');
-        if (!privKey) {
-            console.log('not logged in');
-        }
-        let tx = await new EthTx(rawTx);
-        if(notify) {    
-            notify.update('progress', 25);
-            notify.update('message', 'Signing Transaction...');
-        }
-        
-        
-        let privateKey = await new Buffer(privKey, 'hex')
-        await tx.sign(privateKey);
-        let serializedTx = await tx.serialize();
-        let hexTx = serializedTx.toString('hex');
-        if(notify) {    
-            notify.update('progress', 50);
-            notify.update('message', 'Broadcasting Tranaction...');
-        }
-        try {
-            const web3 = global.web3;
-            
-            if(notify) { 
-                notify.update('progress', 95);
+    signAndSendRawTx: (rawTx, notify = null) => { return new Promise(async function(resolve, reject) {
+            let privKey = Session.get('priv');
+            if (!privKey) {
+                console.log('not logged in');
             }
-            await web3.eth.sendSignedTransaction('0x'+ hexTx)
-            .on('transactionHash', (hash) => {
+            let tx = await new EthTx(rawTx);
+            
+            
+            let privateKey = await new Buffer(privKey, 'hex')
+            await tx.sign(privateKey);
+            let serializedTx = await tx.serialize();
+            let hexTx = serializedTx.toString('hex');
+
+            try {
+                const web3 = global.web3;
                 
-                if(notify) {
-                    notify.update('type', 'success');
-                    notify.update('message', 'Transactions sent.  TxHash : '+ hash);
-                    notify.update('progress', 99);
+                if(notify) { 
+                    // notify.update('progress', 95);
                 }
-                console.log('tx hash: '+hash);
-            })
-            .on('receipt', function(receipt) { 
-    
-                console.log('receipt',receipt);
-                $.notify({
-                    icon: 'glyphicon glyphicon-success-sign',
-                    title: '',
-                    message: 'Transaction successfully included in block: ' + receipt.blockNumber,
-                    target: '_blank',
-                    allow_dismiss: false,
-                },{
-                    animate: {
-                        enter: 'animated fadeInDown',
-                        exit: 'animated fadeOutUp'
-                    },
-                    type:'success',
-                    showProgressbar: false,
-                    placement: {
-                        from: "bottom",
-                        align: "center"
+                web3.eth.sendSignedTransaction('0x'+ hexTx)
+                .on('transactionHash', (hash) => {
+                    
+                    if(notify) {
+                        notify.update('type', 'success');
+                        notify.update('message', 'Transactions sent.  TxHash : '+ hash);
+                        // notify.update('progress', 99);
                     }
+                    console.log('tx hash: '+hash);
+                    resolve(hash);
+                })
+                .on('receipt', function(receipt) { 
+        
+                    console.log('receipt',receipt);
+                    $.notify({
+                        icon: 'glyphicon glyphicon-success-sign',
+                        title: '',
+                        message: 'Transaction successfully included in block: ' + receipt.blockNumber,
+                        target: '_blank',
+                        allow_dismiss: false,
+                    },{
+                        animate: {
+                            enter: 'animated fadeInDown',
+                            exit: 'animated fadeOutUp'
+                        },
+                        type:'success',
+                        showProgressbar: false,
+                        placement: {
+                            from: "bottom",
+                            align: "center"
+                        }
+                    });
+
+                    ////HANDLE UPDATES BASED ON TO CONTRACT ID
+                    if(receipt.to == accountProfileAddr) {
+                        MixUtil.getProfile(Session.get('addr'))
+                        .then(profile =>{
+                            Session.set('profile', profile);
+                        })
+                        
+                    };
+
+                })
+                .on('error', (error) => {
+                    if(notify) {
+                        notify.update('message', error);
+                        notify.update('type', 'danger');
+                    }
+                    reject(error);
                 });
 
-                ////HANDLE UPDATES BASED ON TO CONTRACT ID
-                if(receipt.to == accountProfileAddr) {
-                    MixUtil.getProfile(Session.get('addr'))
-                    .then(profile =>{
-                        Session.set('profile', profile);
-                    })
-                    
-                };
-
-            })
-            .on('error', (error) => {
-                if(notify) {
-                    notify.update('message', error);
-                    notify.update('type', 'danger');
-                }
-                throw error;
-            });
-
-        } catch(e) {
-            console.log(e.message)
-        }
+            } catch(e) {
+                console.log(e.message)
+            }
+        })
     },
 
     sendTo:async(fromAddr,toAddr,ethAmount) => {
@@ -170,7 +165,7 @@ module.exports = {
                     exit: 'animated fadeOutUp'
                 },
                 type:'info',
-                showProgressbar: true,
+                showProgressbar: false,
                 placement: {
                     from: "bottom",
                     align: "center"

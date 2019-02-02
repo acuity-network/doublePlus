@@ -12,11 +12,12 @@ module.exports = {
             LocalStore.set('nodeURL', "https://rpc.doubleplus.io/");
         }
 
-        Session.set('gasPrice', null);
+        Session.set('gasPrice', 1);
         Session.set('hashRate', null);
         Session.set('peers',null);
         Session.set('blockNum',null);
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        global.web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        global.web3.eth.defaultBlock = "pending";
         try {
             let block = await web3.eth.getBlockNumber();
             if (block > 1) {
@@ -40,8 +41,6 @@ module.exports = {
                 });
                 
             }
-            let price = await web3.eth.getGasPrice();
-            Session.set('gasPrice', price);
             let hashRate = await web3.eth.getHashrate();
             Session.set('hashRate', hashRate);
             let peers = await web3.eth.net.getPeerCount();
@@ -55,7 +54,8 @@ module.exports = {
 
     getBalance: async(addr) => {
         try{
-            const web3 = await new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+            const web3 = global.web3;
+            web3.eth.defaultBlock = "pending";
             let bal = await web3.eth.getBalance(addr);
             let ethBal = await web3.utils.fromWei(bal,"ether");
             return ethBal;
@@ -64,85 +64,91 @@ module.exports = {
         }
     },
 
-    signAndSendRawTx: async(rawTx, notify = null) => {
-        let privKey = Session.get('priv');
-        if (!privKey) {
-            console.log('not logged in');
+    getUnconfirmedBalance: async(addr) => {
+        try{
+            const web3 = global.web3;
+            let bal = await web3.eth.getBalance(addr);
+            let ethBal = await web3.utils.fromWei(bal,"ether");
+            return ethBal;
+        } catch(e) {
+            throw e;
         }
-        let tx = await new EthTx(rawTx);
-        if(notify) {    
-            notify.update('progress', 25);
-            notify.update('message', 'Signing Transaction...');
-        }
-        
-        
-        let privateKey = await new Buffer(privKey, 'hex')
-        await tx.sign(privateKey);
-        let serializedTx = await tx.serialize();
-        let hexTx = serializedTx.toString('hex');
-        if(notify) {    
-            notify.update('progress', 50);
-            notify.update('message', 'Broadcasting Tranaction...');
-        }
-        try {
-            const web3 = await new Web3 (new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
-            
-            if(notify) { 
-                notify.update('progress', 95);
+    },
+
+    signAndSendRawTx: (rawTx, notify = null) => { return new Promise(async function(resolve, reject) {
+            let privKey = Session.get('priv');
+            if (!privKey) {
+                console.log('not logged in');
             }
-            await web3.eth.sendSignedTransaction('0x'+ hexTx)
-            .on('transactionHash', (hash) => {
+            let tx = await new EthTx(rawTx);
+            
+            
+            let privateKey = await new Buffer(privKey, 'hex')
+            await tx.sign(privateKey);
+            let serializedTx = await tx.serialize();
+            let hexTx = serializedTx.toString('hex');
+
+            try {
+                const web3 = global.web3;
                 
-                if(notify) {
-                    notify.update('type', 'success');
-                    notify.update('message', 'Transactions sent.  TxHash : '+ hash);
-                    notify.update('progress', 99);
+                if(notify) { 
+                    // notify.update('progress', 95);
                 }
-                console.log('tx hash: '+hash);
-            })
-            .on('receipt', function(receipt) { 
-    
-                console.log('receipt',receipt);
-                $.notify({
-                    icon: 'glyphicon glyphicon-success-sign',
-                    title: '',
-                    message: 'Transaction successfully included in block: ' + receipt.blockNumber,
-                    target: '_blank',
-                    allow_dismiss: false,
-                },{
-                    animate: {
-                        enter: 'animated fadeInDown',
-                        exit: 'animated fadeOutUp'
-                    },
-                    type:'success',
-                    showProgressbar: false,
-                    placement: {
-                        from: "bottom",
-                        align: "center"
+                web3.eth.sendSignedTransaction('0x'+ hexTx)
+                .on('transactionHash', (hash) => {
+                    
+                    if(notify) {
+                        notify.update('type', 'success');
+                        notify.update('message', 'Transactions sent.  TxHash : '+ hash);
+                        // notify.update('progress', 99);
                     }
+                    console.log('tx hash: '+hash);
+                    resolve(hash);
+                })
+                .on('receipt', function(receipt) { 
+        
+                    console.log('receipt',receipt);
+                    $.notify({
+                        icon: 'glyphicon glyphicon-success-sign',
+                        title: '',
+                        message: 'Transaction successfully included in block: ' + receipt.blockNumber,
+                        target: '_blank',
+                        allow_dismiss: false,
+                    },{
+                        animate: {
+                            enter: 'animated fadeInDown',
+                            exit: 'animated fadeOutUp'
+                        },
+                        type:'success',
+                        showProgressbar: false,
+                        placement: {
+                            from: "bottom",
+                            align: "center"
+                        }
+                    });
+
+                    ////HANDLE UPDATES BASED ON TO CONTRACT ID
+                    if(receipt.to == accountProfileAddr) {
+                        MixUtil.getProfile(Session.get('addr'))
+                        .then(profile =>{
+                            Session.set('profile', profile);
+                        })
+                        
+                    };
+
+                })
+                .on('error', (error) => {
+                    if(notify) {
+                        notify.update('message', error);
+                        notify.update('type', 'danger');
+                    }
+                    reject(error);
                 });
 
-                ////HANDLE UPDATES BASED ON TO CONTRACT ID
-                if(receipt.to == accountProfileAddr) {
-                    MixUtil.getProfile(Session.get('addr'))
-                    .then(profile =>{
-                        Session.set('profile', profile);
-                    })
-                    
-                };
-
-            })
-            .on('error', (error) => {
-                if(notify) {
-                    notify.update('message', error);
-                    notify.update('type', 'danger');
-                }
-                throw error;
-            });
-
-        } catch(e) {
-            console.log(e.message)
-        }
+            } catch(e) {
+                console.log(e.message)
+            }
+        })
     },
 
     sendTo:async(fromAddr,toAddr,ethAmount) => {
@@ -159,13 +165,13 @@ module.exports = {
                     exit: 'animated fadeOutUp'
                 },
                 type:'info',
-                showProgressbar: true,
+                showProgressbar: false,
                 placement: {
                     from: "bottom",
                     align: "center"
                 }
             });
-            web3 = new Web3 (new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+            const web3 = global.web3;
             let GasPrice = await web3.eth.getGasPrice();
             let Nonce = await web3.eth.getTransactionCount(fromAddr);
             let weiAmount = await web3.utils.toWei(ethAmount,"ether");
@@ -185,13 +191,13 @@ module.exports = {
     },
 
     getGasPrice: async () =>{
-        web3 = new Web3 (new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         let GasPrice = await web3.eth.getGasPrice();
         return web3.utils.toBN(GasPrice)
     },
 
     isAddress: (addr)=>{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         return web3.utils.isAddress(addr);
     }
 

@@ -38,10 +38,11 @@ class ProfileUserInfo extends React.Component{
 
         MixUtil.getImageFromMipmap(this.state.profileObject.image, 256,256)
         .then(data=>{
-            
-            this.setState( {
-                profileImg: "data:image/jpeg;base64, " + data
-            });
+           if(data) {   
+                this.setState( {
+                    profileImg: "data:image/jpeg;base64, " + SessionUtil.arrayBufferToBase64(data)
+                });
+            }
 
         })
     };

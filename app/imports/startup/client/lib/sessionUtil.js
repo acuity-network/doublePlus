@@ -61,7 +61,7 @@ module.exports = {
     },
 
 
-    arrayBufferToBase64: async( buffer ) => {
+    arrayBufferToBase64: ( buffer ) => {
         var binary = '';
         var bytes = new Uint8Array( buffer );
         var len = bytes.byteLength;

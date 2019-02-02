@@ -7,7 +7,8 @@ class Receive extends React.Component{
         super(props);
         this.state = { 
             addr: Session.get('addr'),
-            balance: Session.get('balance')
+            balance: Session.get('balance'),
+            unconfirmedBalance:0
         };
     }
 
@@ -17,6 +18,13 @@ class Receive extends React.Component{
             Session.set('balance',parseFloat(res).toFixed(4));
             this.setState({
                 balance: parseFloat(res).toFixed(4)
+            });
+        })
+
+        Web3Util.getUnconfirmedBalance(Session.get('addr'))
+        .then((res)=>{
+            this.setState({
+                unconfirmedBalance: parseFloat(parseFloat(res).toFixed(4) - Session.get('balance')).toFixed(4)
             });
         })
 

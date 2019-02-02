@@ -15,15 +15,50 @@ class ProfileUserEdit extends React.Component{
         super(props);
         this.state = { 
             profileAddr:this.props.profileAddr,
-            isMine: Session.get('addr')==this.props.profileAddr
+            isMine: Session.get('addr')==this.props.profileAddr,
+            profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg,
+            type:"0"
         };
     }
 
     componentWillMount(){
-        this.setState({
-            profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg
-  
-        });
+        //Load existing profile if available
+
+        MixUtil.getProfileLocalDb(Session.get('addr'), true)
+        .then(profileObject =>{
+            if(profileObject) {
+                this.setState({
+                    name:profileObject.name,
+                    bio:profileObject.bio,
+                    type:String(profileObject.type),
+                    imgMip:profileObject.image,
+                    location:profileObject.location,
+                    loaded:true
+                });
+                console.log(profileObject.type);
+                if(profileObject.image){
+                    MixUtil.getImageFromMipmap(profileObject.image,250,250)
+                    .then(data => {
+                        if(data) {
+                            this.setState({
+                                image:data,
+                                profileImg:"data:image/jpeg;base64, "+ SessionUtil.arrayBufferToBase64(data)
+                            })
+                        }
+                    })
+                }
+            } else {
+                this.setState({
+                    loaded:true
+                })
+            }
+
+
+
+        })
+        
+        
+        
     };
 
     shouldComponentUpdate(lastState, nextState) {
@@ -55,19 +90,16 @@ class ProfileUserEdit extends React.Component{
             var reader = new FileReader();
             reader.onload = event => {
                 let byteArray = event.target.result;
-                SessionUtil.arrayBufferToBase64(byteArray)
-                .then(res => {
-
-                    console.log(res);
-                    this.setState({
-                        image: byteArray,
-                        base64img: res,
-                        profileImg: "data:image/jpeg;base64, " + res
-
-                    })
+                let res = SessionUtil.arrayBufferToBase64(byteArray)
+                
+                this.setState({
+                    image: byteArray,
+                    base64img: res,
+                    profileImg: "data:image/jpeg;base64, " + res,
+                    imgAltered:true
 
                 })
-                
+         
             };
             
             reader.readAsArrayBuffer(file);
@@ -79,53 +111,112 @@ class ProfileUserEdit extends React.Component{
 
     save () {
 
-        let content = new MixContent();
-        // Account profile
-        let profileMessage = new profileProto.AccountProfile();
-        profileMessage.setType(this.state.type);
-        profileMessage.setLocation(this.state.location);
-        content.addMixin(0x4bf3ce07, profileMessage.serializeBinary());
-        // Language
-        let languageMessage = new languageProto.LanguageMixin();
-        languageMessage.setLanguageTag('en-US');
-        content.addMixin(0x4e4e06c4, languageMessage.serializeBinary());
-        // Title
-        let titleMessage = new titleProto.TitleMixin();
-        titleMessage.setTitle(this.state.name);
-        content.addMixin(0x24da6114, titleMessage.serializeBinary());
-        // BodyText
-        let bodyTextMessage = new bodyTextProto.BodyTextMixin();
-        bodyTextMessage.setBodyText(this.state.bio);
-        content.addMixin(0x34a9a6ec, bodyTextMessage.serializeBinary());
-        // Image
-        console.log(this.state.image)
-        if (this.state.image) {
-            let notify =
-            $.notify({
-                icon: 'glyphicon glyphicon-warning-sign',
-                title: '',
-                message: 'Encoding images...',
-                target: '_blank',
-                allow_dismiss: false,
-              },{
-                animate: {
-                    enter: 'animated fadeInDown',
-                    exit: 'animated fadeOutUp'
-                },
-                type:'success',
-                showProgressbar: true,
-                placement: {
-                    from: "bottom",
-                    align: "center"
-                }
-              });
-            const image = new Image(this.state.image)
-              image.createMixin()
-              .then(imgMessage => {
+        Web3Util.getBalance(Session.get('addr'))
+        .then(res =>{
+
+            if(res<=0) {
+                $.notify({
+                    icon: 'glyphicon glyphicon-warning-sign',
+                    title: '',
+                    message: 'First fund your account with MIX in order to get started.',
+                    target: '_blank',
+                    allow_dismiss: false,
+                  },{
+                    animate: {
+                        enter: 'animated fadeInDown',
+                        exit: 'animated fadeOutUp'
+                    },
+                    type:'danger',
+                    showProgressbar: false,
+                    placement: {
+                        from: "bottom",
+                        align: "center"
+                    }
+                  });
+
+            } else {
+
+                let notify =
+                    $.notify({
+                        icon: 'glyphicon glyphicon-warning-sign',
+                        title: '',
+                        message: 'Encoding data...',
+                        target: '_blank',
+                        allow_dismiss: false,
+                    },{
+                        animate: {
+                            enter: 'animated fadeInDown',
+                            exit: 'animated fadeOutUp'
+                        },
+                        type:'success',
+                        showProgressbar: false,
+                        placement: {
+                            from: "bottom",
+                            align: "center"
+                        }
+                    });
+
+                let content = new MixContent();
+                // Account profile
+                let profileMessage = new profileProto.AccountProfile();
+                profileMessage.setType(this.state.type);
+                profileMessage.setLocation(this.state.location);
+                content.addMixin(0x4bf3ce07, profileMessage.serializeBinary());
+                // Language
+                let languageMessage = new languageProto.LanguageMixin();
+                languageMessage.setLanguageTag('en-US');
+                content.addMixin(0x4e4e06c4, languageMessage.serializeBinary());
+                // Title
+                let titleMessage = new titleProto.TitleMixin();
+                titleMessage.setTitle(this.state.name);
+                content.addMixin(0x24da6114, titleMessage.serializeBinary());
+                // BodyText
+                let bodyTextMessage = new bodyTextProto.BodyTextMixin();
+                bodyTextMessage.setBodyText(this.state.bio);
+                content.addMixin(0x34a9a6ec, bodyTextMessage.serializeBinary());
+                // Image
+                console.log(this.state.image)
+                if (this.state.image) {
+                    
+                    const image = new Image(this.state.image)
+                    image.createMixin()
+                    .then(imgMessage => {
+                        
+                        console.log('img mixin' ,image.imgMessage)
+                        content.addMixin(0x12745469, image.imgMessage);
+                        console.log(content);
+                        notify = 
+                        $.notify({
+                            icon: 'glyphicon glyphicon-warning-sign',
+                            title: '',
+                            message: 'Uploading to IPFS!',
+                            target: '_blank',
+                            allow_dismiss: false,
+                        },{
+                            animate: {
+                                enter: 'animated fadeInDown',
+                                exit: 'animated fadeOutUp'
+                            },
+                            type:'success',
+                            showProgressbar: false,
+                            placement: {
+                                from: "bottom",
+                                align: "center"
+                            }
+                        });
+                        console.log(content);
                 
-                console.log('img mixin' ,image.imgMessage)
-                content.addMixin(0x12745469, image.imgMessage);
-                console.log(content);
+                        content.save()
+                        .then(res=>{
+                            console.log(Session.get('addr'));
+                            MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
+                            this.route('home');
+                            
+                        });
+
+                    })
+                
+                } else {
                 notify = 
                 $.notify({
                     icon: 'glyphicon glyphicon-warning-sign',
@@ -139,55 +230,24 @@ class ProfileUserEdit extends React.Component{
                         exit: 'animated fadeOutUp'
                     },
                     type:'success',
-                    showProgressbar: true,
+                    showProgressbar: false,
                     placement: {
                         from: "bottom",
                         align: "center"
                     }
                 });
-                console.log(content);
-        
+                
                 content.save()
-                .then(res=>{
+                .then((res)=>{
+                    console.log(res);
                     console.log(Session.get('addr'));
                     MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
-                    this.route('home');
+                    this.route('/home');
                     
                 });
-
-              })
-          
-        } else {
-        notify = 
-        $.notify({
-            icon: 'glyphicon glyphicon-warning-sign',
-            title: '',
-            message: 'Uploading to IPFS!',
-            target: '_blank',
-            allow_dismiss: false,
-          },{
-            animate: {
-                enter: 'animated fadeInDown',
-                exit: 'animated fadeOutUp'
-            },
-            type:'success',
-            showProgressbar: true,
-            placement: {
-                from: "bottom",
-                align: "center"
+                }
             }
-          });
-        
-        content.save()
-        .then((res)=>{
-            console.log(res);
-            console.log(Session.get('addr'));
-            MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
-            this.route('home');
-            
-        });
-        }
-
+        })
     }
 
     handleTypeChange (e) {
@@ -205,7 +265,7 @@ class ProfileUserEdit extends React.Component{
 
     render() {
         let Render;
-        console.log(this.state.image)
+      
         Render = 
         <div style ={{margin:'auto', maxWidth:'800'}}>
         <div id = "edit"  className="w3-col m12 w3-row-padding">
@@ -221,12 +281,12 @@ class ProfileUserEdit extends React.Component{
     
                </div>
                <hr/>
-               <label htmlFor="name">Name:</label> <br/><input onChange={this.handleNameChange.bind(this)} className="form-control" id="name" placeholder="Name..." type="text"/> 
-               <label htmlFor="bio">Bio:</label> <br/><input onChange={this.handleBioChange.bind(this)} className="form-control" id="bio" placeholder="My bio..." type="text"/>
-               <label htmlFor="location">Location:</label> <br/><input onChange={this.handleLocationChange.bind(this)} className="form-control" id="location" placeholder="Location..." type="text"/> 
+               <label htmlFor="name">Name:</label> <br/><input onChange={this.handleNameChange.bind(this)} value={this.state.name} className="form-control" id="name" placeholder="Name..." type="text"/> 
+               <label htmlFor="bio">Bio:</label> <br/><input onChange={this.handleBioChange.bind(this)} value={this.state.bio} className="form-control" id="bio" placeholder="My bio..." type="text"/>
+               <label htmlFor="location">Location:</label> <br/><input onChange={this.handleLocationChange.bind(this)} value={this.state.location} className="form-control" id="location" placeholder="Location..." type="text"/> 
                
                <label htmlFor="typeChange">Profile Type: </label> <br/>
-                <select defaultValue = '' style={{width:'40%'}} onChange = {this.handleTypeChange.bind(this)} className="form-control" id="typeChange">
+                <select value ={this.state.type} style={{width:'40%'}} onChange = {this.handleTypeChange.bind(this)} className="form-control" id="typeChange">
                     <option value="0">Anon</option>
                     <option value="1">Person</option>
                     <option value="2">Project</option>

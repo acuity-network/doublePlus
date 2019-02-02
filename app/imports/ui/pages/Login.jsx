@@ -99,7 +99,7 @@ class Login extends React.Component{
                         </div>
                         <div style={{paddingBottom:'20px' }}>
                             <button onClick={this.handleSubmit.bind(this)} type="button" className="btn btn-light"><i className=""></i> &nbsp;Login</button> &nbsp; &nbsp;
-                            <a href ="#" onClick = {this.create.bind(this)} className="">Create Account</a>
+                            <a onClick = {this.create.bind(this)} className="">Create Account</a>
                         </div>
                         
                     </div>

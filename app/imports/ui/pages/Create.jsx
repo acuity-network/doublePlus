@@ -68,12 +68,12 @@ class Create extends React.Component{
             <div className="w3-card w3-round w3-white">
                 <div className="w3-container w3-padding">
                 <div style={{paddingBottom: "20px"}}>
-                    <h2 style={{paddingBottom: "20px"}} >Create Mix Account</h2>
+                    <h3 style={{paddingBottom: "20px"}} >Create Mix Account</h3>
             
                     <div  style={{paddingBottom: "20px"}}>
                         
-                        <button onClick= {this.createHandle.bind(this)} id="create" type="button" className="btn btn-light"><i className=""></i> &nbsp;Create</button>&nbsp;&nbsp;
-                        <a href="#" onClick = {this.loginHandle.bind(this)} >Login with existing account</a>
+                        <button onClick= {this.createHandle.bind(this)} id="create" type="button" className="btn btn-light"><i className=""></i> &nbsp;Create</button>&nbsp;&nbsp;&nbsp;
+                        <a onClick = {this.loginHandle.bind(this)} >Login with existing account</a>
                     </div>
                 </div>
             </div>

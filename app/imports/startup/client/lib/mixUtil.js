@@ -1,6 +1,5 @@
 
 const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
 
 const itemStoreRegistryAbi = require('../lib/jsonAbis/itemStoreRegistry.abi.json');
 const itemStoreRegistryAddr = '0x8928f846012b98aac5cd2f4ef4029097cd4110fc';
@@ -25,7 +24,7 @@ const itemDagAddr = '0xbd3af0bdcf4c8a6dfd8f6ff2129409632decfc7e';
 const itemDagOnlyOwnerAddr = '0xd6cc1712b46a599f87f023fad83bc06473bb2b8d';
 
 const blurbsAbi = require('../lib/jsonAbis/Blurbs.abi.json');
-const blurbsAddr = '0xe9dfe7da1310e73d515447695fe2a425ece9abde';
+const blurbsAddr = '0x67e27cd15b4df2e1bc85729e59e6e7964274b9af';
 
 import MixItem from '../classes/MixItem.js'
 const MixContent = require('../classes/MixContent.js')
@@ -46,7 +45,7 @@ module.exports = {
 
 
         try{
-          const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+          const web3 = global.web3;
           const itemStoreRegistry = new web3.eth.Contract(itemStoreRegistryAbi, itemStoreRegistryAddr);
 
           let itemStoreAddress = await itemStoreRegistry.methods.getItemStore(itemId).call();
@@ -109,7 +108,7 @@ module.exports = {
     },
 
     getTrustedAccounts:async (addr) => {
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
       
       let trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);
       
@@ -120,7 +119,7 @@ module.exports = {
     },
 
     isTrusting: async(myAddr, trustingAddr)=>{
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
       let trusted = [];
 
       trusted = await module.exports.getTrustedAccounts(myAddr);
@@ -128,7 +127,7 @@ module.exports = {
     },
     addTrustedAccount:async (myAddr, trustedAddr)=> {
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
 
         const trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);
         const addTrusted = trustedAccounts.methods.trustAccount(trustedAddr);
@@ -147,14 +146,15 @@ module.exports = {
               exit: 'animated fadeOutUp'
           },
           type:'info',
-          showProgressbar: true,
+          showProgressbar: false,
           placement: {
               from: "bottom",
               align: "center"
           }
         });
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr);
       
         let rawTx = {
@@ -167,7 +167,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx,notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx);
+        return hash;
 
       } catch(e) {
 
@@ -211,7 +212,7 @@ module.exports = {
 
     numberOfAccountsTrusting:async(addr) => {
 
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
 
       let trustedAccounts = new web3.eth.Contract(trustedAccountsAbi, trustedAccountAddr);     
       let count = await trustedAccounts.methods.getTrustedCountByAccount(addr).call();
@@ -239,7 +240,7 @@ module.exports = {
 
     accountHasProfile: async(addr) => {
 
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
       const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
       try {
         return await accountProfile.methods.hasProfile(addr).call();
@@ -250,7 +251,7 @@ module.exports = {
     },
 
     associateProfileToAccount: async(myAddr, mixAccountItemId) => {
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
       
       const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
       
@@ -259,26 +260,8 @@ module.exports = {
           const setProfile = accountProfile.methods.setProfile(mixAccountItemId);
           const encodedABI = setProfile.encodeABI();
 
-          const notify = $.notify({
-            icon: 'glyphicon glyphicon-warning-sign',
-            title: '',
-            message: 'Creating Transaction..',
-            target: '_blank',
-            allow_dismiss: false,
-          },{
-            animate: {
-                enter: 'animated fadeInDown',
-                exit: 'animated fadeOutUp'
-            },
-            type:'info',
-            showProgressbar: true,
-            placement: {
-                from: "bottom",
-                align: "center"
-            }
-          });
-
-          let GasPrice = await Web3Util.getGasPrice();
+          //let GasPrice = await Web3Util.getGasPrice();
+          let GasPrice = Session.get('gasPrice');
           let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
 
           let rawTx = {
@@ -291,7 +274,8 @@ module.exports = {
             gasPrice:GasPrice
           }; 
 
-          Web3Util.signAndSendRawTx(rawTx,notify);
+          let hash = await Web3Util.signAndSendRawTx(rawTx);
+          return hash;
     
         } catch (e) {
           console.log(e.message);
@@ -303,7 +287,7 @@ module.exports = {
     getProfile: async(addr) => {
       
       try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
         let profileId = await accountProfile.methods.getProfileByAccount(addr).call();
         return profileId;
@@ -318,7 +302,7 @@ module.exports = {
     createOrReviseMyProfile: async(ipfsHash, myAddr, notify = null) => {
       
       try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const accountProfile = new web3.eth.Contract(accountProfileAbi, accountProfileAddr);
        // accountProfile.getPastEvents("allEvents",(e,events)=>{console.log(events)})
         const myProfile = await module.exports.getProfile(myAddr);
@@ -342,11 +326,11 @@ module.exports = {
 
       try {
         
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         let flagsNonce = '0x01' + web3.utils.randomHex(30).substr(2);
         let itemId = await module.exports.getItemId(flagsNonce, myAddr);
 
-        await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce);
+        await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce,notify);
         await module.exports.associateProfileToAccount(myAddr, itemId);  
 
       } catch(e) {
@@ -358,7 +342,7 @@ module.exports = {
 
     getItemId: async(flagsNonce,myAddr) => {
       
-      const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+      const web3 = global.web3;
       const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
       let itemId = await itemStoreIpfsSha256.methods.getNewItemId(myAddr, flagsNonce).call({from:myAddr});
       return itemId;
@@ -366,10 +350,10 @@ module.exports = {
     },
 
     
-    createNewItem: async(myAddr, ipfsHash, flagsNonce, notify = null) => {
+    createNewItem: async(myAddr, ipfsHash, flagsNonce, notify = false) => {
       
       try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         
         const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
         let createItem;
@@ -378,13 +362,11 @@ module.exports = {
         const encodedABI = createItem.encodeABI();
 
         let gasEst = await createItem.estimateGas();
-        if(notify) {
-          notify.update('message', 'Creating new Mix Item!');
-          notify.update('progress', 60);
-        }
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr,'pending');
+        console.log('n1', Nonce)
   
         let rawTx = {
           nonce:Nonce,
@@ -396,7 +378,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx,notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
+        return hash;
 
       } catch (e) {
         throw e
@@ -407,7 +390,7 @@ module.exports = {
     createNewRevision: async(myAddr, mixItemId, revisionIpfsHash, notify=null) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
 
         let reviseItem = await itemStoreIpfsSha256.methods.createNewRevision(mixItemId, revisionIpfsHash);
@@ -415,10 +398,11 @@ module.exports = {
 
         if(notify) {
           notify.update('message', 'Revising Mix Item!');
-          notify.update('progress', 60);
+          // notify.update('progress', 60);
         }
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, "pending");
       
         let rawTx = {
@@ -431,7 +415,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx,notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
+        return hash;
 
       } catch (e) {
         throw e
@@ -442,7 +427,7 @@ module.exports = {
     updateLatestRevision: async(myAddr, itemId, revisionIpfsHash, notify=null) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const itemStoreIpfsSha256 = new web3.eth.Contract(itemStoreIpfsSha256Abi, itemStoreIpfsSha256Addr);
 
         let reviseItem = await itemStoreIpfsSha256.methods.updateLatestRevision(itemId, revisionIpfsHash);
@@ -450,10 +435,11 @@ module.exports = {
 
         if(notify) {
           notify.update('message', 'Revising Mix Item!');
-          notify.update('progress', 60);
+          // notify.update('progress', 60);
         }
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, "pending");
       
         let rawTx = {
@@ -466,7 +452,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx,notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
+        return hash;
 
       } catch (e) {
         throw e
@@ -477,15 +464,16 @@ module.exports = {
     addChildToParent: async(myAddr, parent, flagsNonce, onlyOwner = false) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const itemDagContractAddr =  onlyOwner ? itemDagOnlyOwnerAddr : itemDagAddr;
         const itemDag =  new web3.eth.Contract(itemDagAbi, itemDagContractAddr);
         let reviseItem = await itemDag.methods.addChild(parent, itemStoreIpfsSha256Addr, flagsNonce);
         const encodedABI = reviseItem.encodeABI();
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
-
+        console.log('n2', Nonce)
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -496,7 +484,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx);
+        let hash = await Web3Util.signAndSendRawTx(rawTx);
+        return hash;
 
       } catch (e) {
         throw e
@@ -515,6 +504,7 @@ module.exports = {
           await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce, true);
           await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
           await module.exports.initializeBlurb(myAddr, itemId, 0);
+          
 
           } catch (e) {
               throw e
@@ -532,11 +522,28 @@ module.exports = {
         await module.exports.addChildToParent(myAddr, parentPostId, flagsNonce, false)
         await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
         await module.exports.initializeBlurb(myAddr, itemId, 1);
+        
 
         } catch (e) {
             throw e
         }
 
+    },
+
+    getBlurbsByItemType: async(addr, blurbType) => {
+
+      try{
+        const web3 = global.web3;
+        const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
+
+        let blurbs = await blurbsFactory.methods.getBlurbsByType(addr, blurbType).call();
+        
+        return blurbs;
+
+      } catch(e) {
+        console.log(e);
+        return [];
+      }
     },
 
     getProfileLocalDb: async(addr, forceUpdate=false) => {
@@ -556,6 +563,7 @@ module.exports = {
             
             let profile = await _item.latestRevision().getProfile();
             profile.children = await module.exports.getChildren(profileId);
+            profile.post = (await module.exports.getBlurbsByItemType(addr, 0));
             profile.bio = await _item.latestRevision().getBodyText();
             profile.name = await _item.latestRevision().getTitle();
             profile._id = addr;
@@ -569,7 +577,7 @@ module.exports = {
 
             if(Meteor.isClient) {
               try{
-              profileDb.insert({_id:profile._id, profileItemId: profile.profileItemId, name:profile.name, bio:profile.bio, location:profile.location, type:profile.type, image:profile.image, children:profile.children});
+              profileDb.insert({_id:profile._id, profileItemId: profile.profileItemId, name:profile.name, bio:profile.bio, location:profile.location, type:profile.type, image:profile.image, children:profile.children, post:profile.post});
               } catch(e) {
                 
               }
@@ -589,7 +597,7 @@ module.exports = {
     getChildren: async(itemId) => {
 
       try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagOnlyOwnerAddr);
         let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
         return childrenArray;
@@ -603,7 +611,7 @@ module.exports = {
     getComments: async(itemId) => {
       
       try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagAddr);
         let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
         return childrenArray;
@@ -614,9 +622,9 @@ module.exports = {
 
     },
 
-    donateToItem: async(myAddr, itemId, notify = null, amount = 1) => {
+    donateToItem: async(myAddr, itemId, notify = null, amount = "1") => {
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let donateBlurb = await blurbsFactory.methods.donate(itemId);
@@ -624,13 +632,14 @@ module.exports = {
 
         if(notify) {
           notify.update('message', 'Sending 1 Mix!');
-          notify.update('progress', 60);
+          // notify.update('progress', 60);
         }
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
         //currently just 1 mix, will update in future.
-        let weiAmount = await web3.utils.toWei(web3.utils.toBN(amount),"ether");
+        let weiAmount = await web3.utils.toWei(amount,"ether");
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -642,7 +651,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx, notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
+        return hash;
 
       } catch (e) {
         throw e
@@ -654,15 +664,16 @@ module.exports = {
     initializeBlurb: async(myAddr, itemId, blurbType) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let addBlurb = await blurbsFactory.methods.addBlurb(itemId, blurbType);
         const encodedABI = addBlurb.encodeABI();
 
-        let GasPrice = await Web3Util.getGasPrice();
+        //let GasPrice = await Web3Util.getGasPrice();
+        let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
-   
+        console.log('n3', Nonce)
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -673,7 +684,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx);
+        let hash = await Web3Util.signAndSendRawTx(rawTx);
+        return hash;
 
       } catch (e) {
         console.log(e);
@@ -683,7 +695,7 @@ module.exports = {
 
     getTotalDonationsForItem: async(itemId) => {
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let donations = await blurbsFactory.methods.getBlurbTotalDonations(itemId).call();
@@ -698,10 +710,11 @@ module.exports = {
 
     getBlurbInfo: async(itemId) => {
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let blurbInfo = await blurbsFactory.methods.getBlurbInfo(itemId).call();
+        console.log(blurbInfo)
         return blurbInfo;
       } catch(e) {
         console.log(e);
@@ -714,18 +727,19 @@ module.exports = {
     withdrawDonationBalance: async(myAddr, notify = null) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let withdraw = await blurbsFactory.methods.withdraw();
         const encodedABI = withdraw.encodeABI();
 
         let GasPrice = await Web3Util.getGasPrice();
+        
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
 
         if(notify) {
           notify.update('message', 'Withdrawing Balance!');
-          notify.update('progress', 60);
+          // notify.update('progress', 60);
         }
 
         let rawTx = {
@@ -738,7 +752,8 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        Web3Util.signAndSendRawTx(rawTx, notify);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
+        return hash;
 
       } catch (e) {
         console.log(e);
@@ -749,11 +764,11 @@ module.exports = {
     donationBalance: async(myAddr) => {
 
       try{
-        const web3 = new Web3(new Web3.providers.HttpProvider(LocalStore.get('nodeURL')));
+        const web3 = global.web3;
         const blurbsFactory = new web3.eth.Contract(blurbsAbi, blurbsAddr);
 
         let donationBalance = await blurbsFactory.methods.currentBalance(myAddr).call();
-        return (web3.utils.fromWei(web3.utils.toBN(donationBalance),"ether"));
+        return (web3.utils.fromWei(String(donationBalance),"ether"));
       } catch(e) {
         console.log(e);
         return 0;
@@ -767,24 +782,22 @@ module.exports = {
         let returnFeedArray = [];
         let accountsTrusting = await module.exports.getTrustedAccounts(myAddr);
           for (let i = 0; i < accountsTrusting.length; i++) {
-            let _profile = await module.exports.getProfileLocalDb(accountsTrusting[i], true);
-            if(_profile) {
-              let reversedChildren = await _profile.children.reverse(); //reverse array to get newest first
-              let initItemArray = await reversedChildren.slice(0,5); //get the last 5 post per each account following
+            
+              let post = await module.exports.getBlurbsByItemType(accountsTrusting[i],0); //reverse array to get newest first
+              let initItemArray = await post.slice(Math.max(post.length - 3, 0)); //get the last 2 post per each account following
               await initItemArray.forEach( async _item =>{
                 if(_item){
                   await returnFeedArray.push(new MixItem(_item));
                 }
+              
               })
-            }
-        }
+        };
 
         let initalizedItems = await module.exports.initAllItems(returnFeedArray);
         await initalizedItems.sort((itemA, itemB) => {
           return (itemB.latestTimeStamp() - itemA.latestTimeStamp())
-          }
+        })
         
-        )
         return initalizedItems;
 
       } catch(e) {
@@ -818,8 +831,12 @@ module.exports = {
       let heightOut = Math.round(height / scale)
       //http://localhost:8081/ipfs/http://localhost:8081/ipfs/
       // return '<img src="' + Base58.encode(mipmapList[i].getIpfsHash()) + '" width="' + widthOut + '" height="' + heightOut + '">'
-      let data = await IpfsUtil.getItemFromIpfsHash(Base58.encode(mipmapList[i].getIpfsHash()))
-      return await SessionUtil.arrayBufferToBase64(data[0].content);
+      if(mipmapList[i]) {
+        let data = await IpfsUtil.getItemFromIpfsHash(Base58.encode(mipmapList[i].getIpfsHash()))
+        return data[0].content;
+      } else {
+        return null;
+      }
     }
 
 

@@ -91,7 +91,7 @@ class ProfilePost extends React.Component{
                     exit: 'animated fadeOutUp'
                 },
                 type:'info',
-                showProgressbar: true,
+                showProgressbar: false,
                 placement: {
                     from: "bottom",
                     align: "center"
@@ -118,7 +118,7 @@ class ProfilePost extends React.Component{
             content.save()
             .then((ipfsHash)=>{
                 notify.update('message', 'Item published to IPFS! Hash: ' + ipfsHash);
-                notify.update('progress', 50);
+                // notify.update('progress', 50);
                 console.log('ipfsHash: ',ipfsHash);
                 MixUtil.postNewBlurb(Session.get('addr'),ipfsHash,Session.get('profile'), notify)
                 .catch((e)=>{

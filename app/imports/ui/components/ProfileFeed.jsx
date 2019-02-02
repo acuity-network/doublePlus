@@ -16,20 +16,21 @@ class ProfileFeed extends React.Component{
                             Session.get('addr')==this.props.profileAddr,
                         profileObject:
                             this.props.profileObject,
-                        sections:
-                            1,
                         itemsPerSection:
                             10,
-                        profileChildren:
-                            this.props.profileObject.children,
+                        profilePost:
+                            this.props.profileObject.post.reverse(),
                         itemCount:
-                            10,
+                            this.props.profileObject.post.length < 10 ? this.props.profileObject.post.length: 10,
+                        totalItems:
+                            this.props.profileObject.post.length, 
                         done:
                             false
                     };
     }
 
     componentWillMount(){
+        console.log(this.state.totalItems, this.state.profilePost)
         
     };
 
@@ -43,29 +44,27 @@ class ProfileFeed extends React.Component{
 
     profileItems () {
         let _profileItems = [];
-        
-        
-        for (let i = this.state.profileChildren.length - 1; (i>(this.state.profileChildren.length-this.state.itemCount)); i--) {
-            if(i>=0) {
-                
-                const mixItem = new MixItem(this.state.profileChildren[i]);
+            console.log(this.state.itemCount);
+            for(let i = 0; i < this.state.itemCount; i++) {
+                try { 
+                const mixItem = new MixItem(this.state.profilePost[i]);
                  _profileItems.push(<ProfileFeedItem key = {i}  item = {mixItem} blurbType = {0}/>)
-                    
-            } else {  
-                break;
+                } catch(e) {
+                    console.log(e)
+                }
+
             }
-            
-        }
+
         return _profileItems;
 
     };
 
     loadMore () {
         this.setState({
-            itemCount: this.state.itemCount+this.state.itemsPerSection
+            itemCount: (this.state.itemCount + this.state.itemsPerSection > this.state.totalItems ? this.state.totalItems : (this.state.itemCount + this.state.itemsPerSection))
         })
 
-    }
+    };
     
     
     render() {

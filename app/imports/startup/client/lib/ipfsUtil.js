@@ -103,7 +103,7 @@ module.exports = {
         })
 
         if(isTimer) {
-            let ms = 13000;
+            let ms = 20000;
         
             let timeout = new Promise((resolve, reject) => {
                 let id = setTimeout(() => {

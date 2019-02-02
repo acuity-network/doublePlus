@@ -110,55 +110,113 @@ class ProfileUserEdit extends React.Component{
     };
 
     save () {
-        let notify =
-            $.notify({
-                icon: 'glyphicon glyphicon-warning-sign',
-                title: '',
-                message: 'Encoding data...',
-                target: '_blank',
-                allow_dismiss: false,
-              },{
-                animate: {
-                    enter: 'animated fadeInDown',
-                    exit: 'animated fadeOutUp'
-                },
-                type:'success',
-                showProgressbar: false,
-                placement: {
-                    from: "bottom",
-                    align: "center"
-                }
-              });
 
-        let content = new MixContent();
-        // Account profile
-        let profileMessage = new profileProto.AccountProfile();
-        profileMessage.setType(this.state.type);
-        profileMessage.setLocation(this.state.location);
-        content.addMixin(0x4bf3ce07, profileMessage.serializeBinary());
-        // Language
-        let languageMessage = new languageProto.LanguageMixin();
-        languageMessage.setLanguageTag('en-US');
-        content.addMixin(0x4e4e06c4, languageMessage.serializeBinary());
-        // Title
-        let titleMessage = new titleProto.TitleMixin();
-        titleMessage.setTitle(this.state.name);
-        content.addMixin(0x24da6114, titleMessage.serializeBinary());
-        // BodyText
-        let bodyTextMessage = new bodyTextProto.BodyTextMixin();
-        bodyTextMessage.setBodyText(this.state.bio);
-        content.addMixin(0x34a9a6ec, bodyTextMessage.serializeBinary());
-        // Image
-        console.log(this.state.image)
-        if (this.state.image) {
-            
-            const image = new Image(this.state.image)
-              image.createMixin()
-              .then(imgMessage => {
+        Web3Util.getBalance(Session.get('addr'))
+        .then(res =>{
+
+            if(res<=0) {
+                $.notify({
+                    icon: 'glyphicon glyphicon-warning-sign',
+                    title: '',
+                    message: 'First fund your account with MIX in order to get started.',
+                    target: '_blank',
+                    allow_dismiss: false,
+                  },{
+                    animate: {
+                        enter: 'animated fadeInDown',
+                        exit: 'animated fadeOutUp'
+                    },
+                    type:'danger',
+                    showProgressbar: false,
+                    placement: {
+                        from: "bottom",
+                        align: "center"
+                    }
+                  });
+
+            } else {
+
+                let notify =
+                    $.notify({
+                        icon: 'glyphicon glyphicon-warning-sign',
+                        title: '',
+                        message: 'Encoding data...',
+                        target: '_blank',
+                        allow_dismiss: false,
+                    },{
+                        animate: {
+                            enter: 'animated fadeInDown',
+                            exit: 'animated fadeOutUp'
+                        },
+                        type:'success',
+                        showProgressbar: false,
+                        placement: {
+                            from: "bottom",
+                            align: "center"
+                        }
+                    });
+
+                let content = new MixContent();
+                // Account profile
+                let profileMessage = new profileProto.AccountProfile();
+                profileMessage.setType(this.state.type);
+                profileMessage.setLocation(this.state.location);
+                content.addMixin(0x4bf3ce07, profileMessage.serializeBinary());
+                // Language
+                let languageMessage = new languageProto.LanguageMixin();
+                languageMessage.setLanguageTag('en-US');
+                content.addMixin(0x4e4e06c4, languageMessage.serializeBinary());
+                // Title
+                let titleMessage = new titleProto.TitleMixin();
+                titleMessage.setTitle(this.state.name);
+                content.addMixin(0x24da6114, titleMessage.serializeBinary());
+                // BodyText
+                let bodyTextMessage = new bodyTextProto.BodyTextMixin();
+                bodyTextMessage.setBodyText(this.state.bio);
+                content.addMixin(0x34a9a6ec, bodyTextMessage.serializeBinary());
+                // Image
+                console.log(this.state.image)
+                if (this.state.image) {
+                    
+                    const image = new Image(this.state.image)
+                    image.createMixin()
+                    .then(imgMessage => {
+                        
+                        console.log('img mixin' ,image.imgMessage)
+                        content.addMixin(0x12745469, image.imgMessage);
+                        console.log(content);
+                        notify = 
+                        $.notify({
+                            icon: 'glyphicon glyphicon-warning-sign',
+                            title: '',
+                            message: 'Uploading to IPFS!',
+                            target: '_blank',
+                            allow_dismiss: false,
+                        },{
+                            animate: {
+                                enter: 'animated fadeInDown',
+                                exit: 'animated fadeOutUp'
+                            },
+                            type:'success',
+                            showProgressbar: false,
+                            placement: {
+                                from: "bottom",
+                                align: "center"
+                            }
+                        });
+                        console.log(content);
                 
-                console.log('img mixin' ,image.imgMessage)
-                content.addMixin(0x12745469, image.imgMessage);
-                console.log(content);
+                        content.save()
+                        .then(res=>{
+                            console.log(Session.get('addr'));
+                            MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
+                            this.route('home');
+                            
+                        });
+
+                    })
+                
+                } else {
                 notify = 
                 $.notify({
                     icon: 'glyphicon glyphicon-warning-sign',
@@ -178,49 +236,18 @@ class ProfileUserEdit extends React.Component{
                         align: "center"
                     }
                 });
-                console.log(content);
-        
+                
                 content.save()
-                .then(res=>{
+                .then((res)=>{
+                    console.log(res);
                     console.log(Session.get('addr'));
                     MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
-                    this.route('home');
+                    this.route('/home');
                     
                 });
-
-              })
-          
-        } else {
-        notify = 
-        $.notify({
-            icon: 'glyphicon glyphicon-warning-sign',
-            title: '',
-            message: 'Uploading to IPFS!',
-            target: '_blank',
-            allow_dismiss: false,
-          },{
-            animate: {
-                enter: 'animated fadeInDown',
-                exit: 'animated fadeOutUp'
-            },
-            type:'success',
-            showProgressbar: false,
-            placement: {
-                from: "bottom",
-                align: "center"
+                }
             }
-          });
-        
-        content.save()
-        .then((res)=>{
-            console.log(res);
-            console.log(Session.get('addr'));
-            MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
-            this.route('home');
-            
-        });
-        }
-
+        })
     }
 
     handleTypeChange (e) {

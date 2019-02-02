@@ -260,25 +260,6 @@ module.exports = {
           const setProfile = accountProfile.methods.setProfile(mixAccountItemId);
           const encodedABI = setProfile.encodeABI();
 
-          const notify = $.notify({
-            icon: 'glyphicon glyphicon-warning-sign',
-            title: '',
-            message: 'Creating Transaction..',
-            target: '_blank',
-            allow_dismiss: false,
-          },{
-            animate: {
-                enter: 'animated fadeInDown',
-                exit: 'animated fadeOutUp'
-            },
-            type:'info',
-            showProgressbar: false,
-            placement: {
-                from: "bottom",
-                align: "center"
-            }
-          });
-
           //let GasPrice = await Web3Util.getGasPrice();
           let GasPrice = Session.get('gasPrice');
           let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
@@ -349,7 +330,7 @@ module.exports = {
         let flagsNonce = '0x01' + web3.utils.randomHex(30).substr(2);
         let itemId = await module.exports.getItemId(flagsNonce, myAddr);
 
-        await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce);
+        await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce,notify);
         await module.exports.associateProfileToAccount(myAddr, itemId);  
 
       } catch(e) {

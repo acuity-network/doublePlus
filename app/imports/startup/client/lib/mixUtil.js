@@ -167,7 +167,7 @@ module.exports = {
           gasPrice:GasPrice
         }; 
 
-        let hash = await Web3Util.signAndSendRawTx(rawTx);
+        let hash = await Web3Util.signAndSendRawTx(rawTx, notify);
         return hash;
 
       } catch(e) {

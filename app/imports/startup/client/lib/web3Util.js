@@ -108,24 +108,24 @@ module.exports = {
                 .on('receipt', function(receipt) { 
         
                     console.log('receipt',receipt);
-                    $.notify({
-                        icon: 'glyphicon glyphicon-success-sign',
-                        title: '',
-                        message: 'Transaction successfully included in block: ' + receipt.blockNumber,
-                        target: '_blank',
-                        allow_dismiss: false,
-                    },{
-                        animate: {
-                            enter: 'animated fadeInDown',
-                            exit: 'animated fadeOutUp'
-                        },
-                        type:'success',
-                        showProgressbar: false,
-                        placement: {
-                            from: "bottom",
-                            align: "center"
-                        }
-                    });
+                    // $.notify({
+                    //     icon: 'glyphicon glyphicon-success-sign',
+                    //     title: '',
+                    //     message: 'Transaction successfully included in block: ' + receipt.blockNumber,
+                    //     target: '_blank',
+                    //     allow_dismiss: false,
+                    // },{
+                    //     animate: {
+                    //         enter: 'animated fadeInDown',
+                    //         exit: 'animated fadeOutUp'
+                    //     },
+                    //     type:'success',
+                    //     showProgressbar: false,
+                    //     placement: {
+                    //         from: "bottom",
+                    //         align: "center"
+                    //     }
+                    // });
 
                     ////HANDLE UPDATES BASED ON TO CONTRACT ID
                     if(receipt.to == accountProfileAddr) {
@@ -183,7 +183,6 @@ module.exports = {
                 gas: 25000,
                 gasPrice: web3.utils.toBN(GasPrice)
             };
-            console.log('raxTx ' + rawTx);
             let ret = Web3Util.signAndSendRawTx(rawTx, notify);
         } catch (e) {
             console.error(e.message);

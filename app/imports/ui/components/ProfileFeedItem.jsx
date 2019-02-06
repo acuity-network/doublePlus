@@ -15,15 +15,40 @@ class ProfileFeedItem extends React.Component{
             replyCount:0,
             donations:0,
             replies:[],
-            isMine:false
+            isMine:false,
+            bodyText:'',
+            name:'',
+            bio:'',
+            location:'',
+            type:'',
+            owner:'',
+            itemId:''
 
         };
 
     };
 
+    clearState() {
+        //clear state
+        this.setState({
+            reply:false,
+            replyCount:0,
+            donations:0,
+            replies:[],
+            isMine:false,
+            bodyText:'',
+            name:'',
+            bio:'',
+            location:'',
+            type:'',
+            owner:'',
+            itemId:''
+        })
+
+    }
+
 
     componentWillMount(){
-
         //if not initalized then initalize
         if(this.state.item) {
             if(!this.state.item.item) {
@@ -53,6 +78,8 @@ class ProfileFeedItem extends React.Component{
     }
 
     intitalizeStateItems(_item) {
+
+        this.clearState();
 
         this.setState({
             profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg
@@ -167,13 +194,16 @@ class ProfileFeedItem extends React.Component{
 
     render() {
         let Render;
-        console.log(this.props.blurbType, this.state.blurbType);
         if(this.props.blurbType == this.state.blurbType) {
             Render = 
             <div className="w3-container w3-card w3-white w3-round w3-margin"><br/>
                 <img  src = {this.state.profileImg} alt="Avatar" className="w3-left w3-circle w3-margin-right" style={{width:'60px'}}/>
                 <span className="w3-right w3-opacity">{this.state.timeStamp}</span>
-                <h3>{this.state.name}</h3> <a onClick={this.route.bind(this,'/profile/'+this.state.owner)} > {this.state.owner}</a>
+                <h3>{this.state.name}</h3> 
+                {Session.get("isMobile") ?
+                    <a style ={{fontSize:"x-small"}} onClick={this.route.bind(this,'/profile/'+this.state.owner)} > {this.state.owner}</a> :
+                    <a onClick={this.route.bind(this,'/profile/'+this.state.owner)} > {this.state.owner}</a>
+                }
                 
                 <hr className="w3-clear"/>
                 <p style={{paddingBottom:"10px",fontSize:"20px"}}> &nbsp; {this.state.bodyText}</p>

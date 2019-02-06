@@ -15,13 +15,11 @@ export default class MixContent {
   async load(ipfsHash) {
     let encodedIpfsHash = multihashes.toB58String(multihashes.encode(Buffer.from(ipfsHash.substr(2), "hex"), 'sha2-256'))
     let response = await IpfsUtil.getItemFromIpfsHash(encodedIpfsHash,true);
-    console.log('res',response)
-    console.log(response[0].content);
+
     let itemPayload = new Uint8Array(Buffer.from(response[0].content, "binary"));
     let item = await brotli.decompressArray(itemPayload);
-    console.log(itemProto.Item.deserializeBinary(item));
+
     let mixins = itemProto.Item.deserializeBinary(item).getMixinList()
-    console.log('d'+item);
 
     for (let i = 0; i < mixins.length; i++) {
       await this.mixins.push({
@@ -45,7 +43,6 @@ export default class MixContent {
       itemMessage.addMixin(mixinMessage)
     }
 
-    console.log(Buffer.from(itemMessage.serializeBinary(),"binary"));
     let payload = await brotli.compressArray(new Uint8Array(Buffer.from(itemMessage.serializeBinary(),"binary")),11);
     var payloadBuffer = Buffer.from(payload)
     let hash = await IpfsUtil.addFile(payloadBuffer);

@@ -18,20 +18,33 @@ class CommentReplies extends React.Component{
             done: false,
             itemArray:[]
          };
+    };
+
+    clearState() {
+        this.setState({
+            itemArray:[],
+            loaded:false,
+            itemsPerSection:10,
+            itemCount:0,
+            totalItems:0
+
+        })
     }
+
+
 
     componentWillMount(){
         this.initalize(this.state.itemId);
     };
 
     initalize(itemId){
-        console.log(this.state.itemId)
+        this.clearState();
         MixUtil.getComments(itemId)
         .then((res)=>{
-            console.log(res)
+        
             this.setState({
                 itemId:itemId,
-                itemArray: res.reverse(),
+                itemArray: res,
                 totalItems: res.length,
                 loaded:true,
                 itemCount:(res.length < 10 ? res.length : 10)
@@ -41,10 +54,7 @@ class CommentReplies extends React.Component{
     };
 
     componentWillReceiveProps(nextProps){
-        console.log(nextProps.itemId, this.state.itemId)
-        // if(nextProps.itemId !== this.state.itemId) {
-            this.initalize(nextProps.itemId);
-        // };
+        this.initalize(nextProps.itemId);
 
     };
 
@@ -81,7 +91,6 @@ class CommentReplies extends React.Component{
 
     render() {
         let Render;
-        console.log(this.state.itemArray)
         if(this.state.loaded) {
         Render = 
         <div style ={{margin:'auto', maxWidth:'800px'}}>

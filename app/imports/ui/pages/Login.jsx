@@ -23,7 +23,6 @@ class Login extends React.Component{
     };
 
     handleLoginChange(e) {
-        console.log('here');
         this.setState({
             privateKey: e.target.value
         });

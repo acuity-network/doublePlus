@@ -17,7 +17,7 @@ class SidePanel extends React.Component{
     }
 
     componentWillMount(){
-        console.log('mounting')
+
         this.autoRun = Tracker.autorun(()=>{
             this.setState({
               isLogged : Session.get('loggedIn'),

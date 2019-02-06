@@ -77,6 +77,25 @@ class ProfilePost extends React.Component{
                 }
             });
 
+        }else if(!Session.get('profile')) {
+
+            $.notify({
+                icon: 'glyphicon glyphicon-warning-sign',
+                title: '',
+                message: 'Please wait for your MIX profile to be added to the blockchain.',
+                target: '_blank'
+            },{
+                animate: {
+                    enter: 'animated fadeInDown',
+                    exit: 'animated fadeOutUp'
+                },
+                type:'danger',
+                placement: {
+                    from: "bottom",
+                    align: "center"
+                }
+            });
+
         } else {
             let notify = 
             $.notify({
@@ -119,7 +138,7 @@ class ProfilePost extends React.Component{
             .then((ipfsHash)=>{
                 notify.update('message', 'Item published to IPFS! Hash: ' + ipfsHash);
                 // notify.update('progress', 50);
-                console.log('ipfsHash: ',ipfsHash);
+        
                 MixUtil.postNewBlurb(Session.get('addr'),ipfsHash,Session.get('profile'), notify)
                 .catch((e)=>{
                     $.notify({
@@ -163,7 +182,7 @@ class ProfilePost extends React.Component{
                 </div>
                 <button  onClick = {this.handlePostSubmit.bind(this)} style={{float: 'right'}} type="button" className="btn btn-info"><i className="fa fa-pencil"></i> &nbsp;Post</button> 
                 <span className="w3-right w3-opacity" style={{float: 'right'}}> {140 - this.state.charCount} &nbsp;&nbsp; </span>
-                <button  type="button" className="btn w3-theme"><i className="fa fa-image"></i> &nbsp;Attach Img</button> 
+                {/* <button  type="button" className="btn w3-theme"><i className="fa fa-image"></i> &nbsp;Attach Img</button>  */}
             </div>
         </div>
         return(Render);

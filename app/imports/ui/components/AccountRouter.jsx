@@ -33,7 +33,7 @@ class AccountRouter extends React.Component{
     }
 
     routeHandle () {
-        console.log(this.state.routeAddr)
+
         let addr = this.state.routeAddr;
 
         if(addr && Web3.utils.isAddress(addr)) {

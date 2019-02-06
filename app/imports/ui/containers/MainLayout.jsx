@@ -37,12 +37,9 @@ export default class MainLayout extends React.Component {
       });
     })
 
-
-
     if(!LocalStore.get('nodeURL')) {
       LocalStore.set('nodeURL', "https://rpc.doubleplus.io/");
     }
-    console.log(LocalStore.get('nodeURL'));
     if(!LocalStore.get('ipfsApiURL')) {
         LocalStore.set('ipfsApiURL', "localhost");
     }
@@ -75,6 +72,9 @@ export default class MainLayout extends React.Component {
     this.autoRun.stop();
   };
   
+  reload() {
+    document.location.reload(true);
+  }
   
   render() {
 
@@ -133,7 +133,8 @@ export default class MainLayout extends React.Component {
                   </div>
                   <p className = "w3-center">This may take up to 15 seconds the first time.  Currently browser IPFS isn't compatible with FireFox.</p>
                   <div className="modal-footer">
-                      {/* <button type="button"  className="btn btn-danger" data-dismiss="modal">Close</button> */}
+                      <span style={{float:"right"}}>Taking too long? Try refreshing.</span>
+                      <button type="button"  className="btn btn-light" onClick={this.reload.bind(this)}>Refresh</button>
                   </div>
               </div>
           </div>

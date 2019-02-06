@@ -63,16 +63,17 @@ class ProfileFeedItem extends React.Component{
     };
 
     componentWillReceiveProps(nextProps) {
-
-         //if not initalized then initalize
-         if(nextProps.item) {
-            if(!nextProps.item.item) {
-                nextProps.item.init()
-                .then(_item => {
-                    this.intitalizeStateItems(_item);
-                })
-            } else {
-                this.intitalizeStateItems(nextProps.item);
+        if (nextProps.item.itemId != this.state.item.itemId) {
+            //if not initalized then initalize
+            if(nextProps.item) {
+                if(!nextProps.item.item) {
+                    nextProps.item.init()
+                    .then(_item => {
+                        this.intitalizeStateItems(_item);
+                    })
+                } else {
+                    this.intitalizeStateItems(nextProps.item);
+                }
             }
         }
     }

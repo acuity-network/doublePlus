@@ -27,7 +27,6 @@ class ReplyBox extends React.Component{
     handleReplyChange(e) {
         let _postText = e.target.value;
         let _charCount = e.target.value.length;
-        console.log(_charCount);
         this.setState({
             postText: _postText,
             charCount : _charCount
@@ -113,7 +112,6 @@ class ReplyBox extends React.Component{
         //   let image = new Image(this.$root, window.fileNames[0])
         //   content.addMixin(0x12745469, await image.createMixin())
         // }
-        console.log(content);
         content.save()
         .then((ipfsHash)=>{
             notify.update('message', 'Item published to IPFS! Hash: ' + ipfsHash);

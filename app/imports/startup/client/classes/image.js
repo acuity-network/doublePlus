@@ -120,7 +120,7 @@ export default class Image {
           var scale = Math.pow(2, level);
           var width = Math.floor(rawImageData.width / scale);
           var height = Math.floor(rawImageData.height / scale);
-          console.log(level, width, height);
+       
           let imgData = await this.scaleImage(rawImageData, width, height);
           mipmaps.push(IpfsUtil.addFileReturnData(imgData));
           // imgInfuraPost.push(imgData);

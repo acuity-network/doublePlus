@@ -30,7 +30,7 @@ class ProfileFeed extends React.Component{
     }
 
     componentWillMount(){
-        console.log(this.state.totalItems, this.state.profilePost)
+
         
     };
 
@@ -44,7 +44,7 @@ class ProfileFeed extends React.Component{
 
     profileItems () {
         let _profileItems = [];
-            console.log(this.state.itemCount);
+    
             for(let i = 0; i < this.state.itemCount; i++) {
                 try { 
                 const mixItem = new MixItem(this.state.profilePost[i]);

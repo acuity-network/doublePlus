@@ -12,33 +12,18 @@ class Comments extends React.Component{
     }
 
     componentWillMount(){
+        this.initializeState(this.props.match.params.itemid)
+    };
 
+    componentWillReceiveProps(nextProps){
+        this.initializeState(nextProps.match.params.itemid)
+    };
+
+    initializeState(_itemId) {
         this.setState({
-            itemId: this.props.match.params.itemid
+            itemId: _itemId
         });
-      };
-
-      componentWillReceiveProps(nextProps){
-
-        // console.log(nextProps.match.params.itemid, this.props.match.params.itemid)
-        // if(nextProps.match.params.itemid !== this.props.match.params.itemid) {
-            this.setState({
-                itemId: nextProps.match.params.itemid
-            });
-        //     console.log(this.state.itemId);
-        // };
-
-      }
-
-    //  componentDidUpdate(prevProps, prevState) {
-    //      console.log(prevProps.match.params.itemid, this.props.match.params.itemid)
-    //     if(prevProps.match.params.itemid !== this.props.match.params.itemid) {
-    //         this.setState({
-    //             itemId: this.props.match.params.itemid
-    //         });
-    //         console.log(this.state.itemId);
-    //     };
-    //  }
+    };
 
     shouldComponentUpdate(lastState, nextState) {
         return true;

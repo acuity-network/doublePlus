@@ -6,8 +6,6 @@ class Transactions extends React.Component{
     constructor(props){
         super(props);
 
-        console.log(transactionDb.find());
-
         this.state ={style: {
                         paddingTop:this.props.paddingTop
                     } 

@@ -17,8 +17,7 @@ class Profile extends React.Component{
             isMine: Session.get('addr') == this.props.match.params.address,
             loaded:false
         };
-        console.log(Session.get('profile'))
-        console.log(this.props.match.params.address);
+
     }
 
     componentWillMount(){
@@ -28,7 +27,7 @@ class Profile extends React.Component{
             
             if(_profileObject) {
                 if(this.state.isMine) {
-                    Session.set('profileId', _profileObject.profileItemId)
+                    Session.set('profile', _profileObject.profileItemId)
                 }
     
                 this.setState({

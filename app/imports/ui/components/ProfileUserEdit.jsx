@@ -35,7 +35,6 @@ class ProfileUserEdit extends React.Component{
                     location:profileObject.location,
                     loaded:true
                 });
-                console.log(profileObject.type);
                 if(profileObject.image){
                     MixUtil.getImageFromMipmap(profileObject.image,250,250)
                     .then(data => {
@@ -175,16 +174,13 @@ class ProfileUserEdit extends React.Component{
                 bodyTextMessage.setBodyText(this.state.bio);
                 content.addMixin(0x34a9a6ec, bodyTextMessage.serializeBinary());
                 // Image
-                console.log(this.state.image)
                 if (this.state.image) {
                     
                     const image = new Image(this.state.image)
                     image.createMixin()
                     .then(imgMessage => {
                         
-                        console.log('img mixin' ,image.imgMessage)
                         content.addMixin(0x12745469, image.imgMessage);
-                        console.log(content);
                         notify = 
                         $.notify({
                             icon: 'glyphicon glyphicon-warning-sign',
@@ -204,11 +200,10 @@ class ProfileUserEdit extends React.Component{
                                 align: "center"
                             }
                         });
-                        console.log(content);
                 
                         content.save()
                         .then(res=>{
-                            console.log(Session.get('addr'));
+
                             MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
                             this.route('home');
                             
@@ -239,8 +234,7 @@ class ProfileUserEdit extends React.Component{
                 
                 content.save()
                 .then((res)=>{
-                    console.log(res);
-                    console.log(Session.get('addr'));
+                
                     MixUtil.createOrReviseMyProfile(res, Session.get('addr'), notify);
                     this.route('/home');
                     

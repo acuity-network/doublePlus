@@ -26,7 +26,6 @@ module.exports = {
 
             let profile = await MixUtil.getProfile(Session.get('addr'));
             Session.set('profile', profile);
-            console.log('myProfile', profile);
 
             return true;
         } catch(e) {

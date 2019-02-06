@@ -38,7 +38,6 @@ class Settings extends React.Component{
     };
 
     handleApiChange (e) {
-        console.log(e.target.value)
         this.setState({
             ipfsApiURL: e.target.value
         })
@@ -106,7 +105,6 @@ class Settings extends React.Component{
     }
 
     handleCheck (e) {
-        console.log(e.target.checked);
         if(e.target.checked) {
             this.setState({
                 browserIpfs: true
@@ -140,7 +138,7 @@ class Settings extends React.Component{
                                 </div> */}
 
                                 <div className="form-group">
-                                    {console.log(this.state.browserIpfs)}
+                
                                     <input  onChange={this.handleCheck.bind(this)} type="checkbox" id = "ipfsCheckBox" checked={this.state.browserIpfs}></input>
                                     <label htmlFor = "ipfsCheckBox">Use Browser IPFS?</label>
                                     <br/>

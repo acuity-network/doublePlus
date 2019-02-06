@@ -14,19 +14,34 @@ export default class MixContent {
 
   async load(ipfsHash) {
     let encodedIpfsHash = multihashes.toB58String(multihashes.encode(Buffer.from(ipfsHash.substr(2), "hex"), 'sha2-256'))
-    let response = await IpfsUtil.getItemFromIpfsHash(encodedIpfsHash,true);
-
-    let itemPayload = new Uint8Array(Buffer.from(response[0].content, "binary"));
-    let item = await brotli.decompressArray(itemPayload);
-
-    let mixins = itemProto.Item.deserializeBinary(item).getMixinList()
-
-    for (let i = 0; i < mixins.length; i++) {
-      await this.mixins.push({
-        mixinId: '0x' + ('00000000' + mixins[i].getMixinId().toString(16)).slice(-8),
-        payload: mixins[i].getPayload(),
-      })
     
+    try{
+      let response = await IpfsUtil.getItemFromIpfsHash(encodedIpfsHash,true);
+      let itemPayload = new Uint8Array(Buffer.from(response[0].content, "binary"));
+      let item = await brotli.decompressArray(itemPayload);
+  
+      let mixins = itemProto.Item.deserializeBinary(item).getMixinList()
+  
+      for (let i = 0; i < mixins.length; i++) {
+        await this.mixins.push({
+          mixinId: '0x' + ('00000000' + mixins[i].getMixinId().toString(16)).slice(-8),
+          payload: mixins[i].getPayload(),
+        })
+      }
+    } catch (e) {
+      //try once more
+      let response = await IpfsUtil.getItemFromIpfsHash(encodedIpfsHash,true);
+      let itemPayload = new Uint8Array(Buffer.from(response[0].content, "binary"));
+      let item = await brotli.decompressArray(itemPayload);
+  
+      let mixins = itemProto.Item.deserializeBinary(item).getMixinList()
+  
+      for (let i = 0; i < mixins.length; i++) {
+        await this.mixins.push({
+          mixinId: '0x' + ('00000000' + mixins[i].getMixinId().toString(16)).slice(-8),
+          payload: mixins[i].getPayload(),
+        })
+      }
     }
     
   }

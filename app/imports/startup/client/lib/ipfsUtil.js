@@ -102,7 +102,7 @@ module.exports = {
         })
 
         if(isTimer) {
-            let ms = 25000;
+            let ms = 12000;
             // let retryAfter = 5000;
             
             //timeoutAfter certain ms (cant find hash)

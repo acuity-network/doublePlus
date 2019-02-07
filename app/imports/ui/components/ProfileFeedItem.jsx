@@ -22,7 +22,8 @@ class ProfileFeedItem extends React.Component{
             location:'',
             type:'',
             owner:'',
-            itemId:''
+            itemId:'',
+            showReload:false
 
         };
 
@@ -42,7 +43,8 @@ class ProfileFeedItem extends React.Component{
             location:'',
             type:'',
             owner:'',
-            itemId:''
+            itemId:'',
+            showReload:false
         })
 
     }
@@ -81,6 +83,9 @@ class ProfileFeedItem extends React.Component{
     intitalizeStateItems(_item) {
 
         this.clearState();
+        this.setState({
+            item:_item
+        })
 
         this.setState({
             profileImg: "data:image/jpeg;base64, " + base64img.defaultProfileImg
@@ -136,16 +141,30 @@ class ProfileFeedItem extends React.Component{
             })
         });
         
-        _item.latestRevision().load()
+        this.loadBody();
+    };
+
+    loadBody () {
+        this.setState({
+            showReload:false
+        })
+
+        let ms = 7000
+        let timeOut = setTimeout(() => {
+            clearTimeout(timeOut);
+            this.setState({
+                showReload:true
+            })
+        }, ms)
+
+        this.state.item.latestRevision().load()
         .then(_revision => {
             this.setState({
                 bodyText: _revision.getBodyText(),
-                timeStamp: moment.unix(_revision.getTimestamp()).format('YYYY MM DD, h:mm a'),
-
+                timeStamp: moment.unix(_revision.getTimestamp()).format('YYYY MM DD, h:mm a')
             });
         })
-
-    };
+    }
         
 
     shouldComponentUpdate(lastState, nextState) {
@@ -207,7 +226,11 @@ class ProfileFeedItem extends React.Component{
                 }
                 
                 <hr className="w3-clear"/>
-                <p style={{paddingBottom:"10px",fontSize:"20px"}}> &nbsp; {this.state.bodyText}</p>
+                {(!this.state.bodyText && this.state.showReload) ?
+                    <p><a onClick={this.loadBody.bind(this)}>Click to reload item...</a></p>:
+                    <p style={{paddingBottom:"10px",fontSize:"20px"}}> &nbsp; {this.state.bodyText}</p>
+                }
+
                 {(!this.state.isMine && this.state.loggedIn) &&
                     <span style={{paddingRight:'10px'}}>
                         <button type="button" onClick={this.handleDonate.bind(this)} className="btn btn-success w3-margin-bottom"><i className="fa fa-money"></i> &nbsp;Send a Mix</button>

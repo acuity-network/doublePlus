@@ -53,6 +53,9 @@ export default class MainLayout extends React.Component {
       LocalStore.set('browserIpfs', true)
     }
 
+    Session.set('ipfsAPI','')
+    Session.set('IpfsCompanion', false);
+
     Session.set('isMobile', (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1));
   
     Web3Util.initWeb3();
@@ -79,7 +82,7 @@ export default class MainLayout extends React.Component {
   render() {
 
     if(this.state.ipfsInit) {
-    
+
 
     return (
       

@@ -71,7 +71,7 @@ class ProfileUserInfo extends React.Component{
                <hr/>
                <p><i className="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> {this.state.bio}</p>
                <p><i className="fa fa-home fa-fw w3-margin-right w3-text-theme"></i> {this.state.location}</p>
-               {/* <p><i className="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> June 9, 1990 </p> */}
+               
                { !this.state.isMine ? 
                <div>
                    { Session.get('loggedIn') ?

@@ -19,6 +19,7 @@ import SidePanel from '../components/SidePanel.jsx';
 import NavBar from '../components/NavBar.jsx';
 import Feed from '../pages/Feed.jsx';
 import Comments from '../pages/Comments.jsx';
+import Faucet from '../pages/Faucet.jsx'
 
 
 
@@ -105,6 +106,7 @@ export default class MainLayout extends React.Component {
                 <Route path = '/feed/:address' component={Feed} />
                 <Route path = '/profile/:address' component={Profile} />
                 <Route path = '/comments/:itemid' component={Comments} />
+                <Route path = '/faucet' component={Faucet} />
                 
                 <Route component={Home} />
               </Switch>

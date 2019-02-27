@@ -15,7 +15,12 @@
   "bugs": {
     "url": ""
   },
-  "homepage": "https://doubleplus.io",
+
+  "homepage": "https://github.com/mixblockchain/mix-hub",
+  "browser": {
+    "request": "xhr"
+  },
+
   "dependencies": {
     "@babel/runtime": "7.0.0-beta.55",
     "@ledgerhq/hw-app-eth": "^4.36.0",
@@ -39,6 +44,7 @@
     "react": "^16.3.0",
     "react-dom": "^16.3.0",
     "react-file-input": "^0.2.5",
+    "react-google-recaptcha": "^1.0.5",
     "react-infinite-scroll-component": "^4.2.0",
     "react-router-dom": "^4.0.0-beta.6",
     "request": "^2.88.0",

@@ -15,6 +15,7 @@ global.EthWallet = require('ethereumjs-wallet');
 global.EthTx = require('ethereumjs-tx');
 global.MixUtil = require('./lib/mixUtil.js');
 global.IpfsUtil = require('./lib/ipfsUtil.js');
+global.LedgerUtil = require('./lib/ledgerUtil.js')
 
 import MainLayout from '../../ui/containers/MainLayout.jsx';
 

@@ -1,34 +1,126 @@
 global.Buffer = global.Buffer || require("buffer").Buffer;
 const ipfsAPI = require('ipfs-api')
 let multihashes = require('multihashes')
+ //const IPFS = require('ipfs')
 
 
 module.exports = {
 
     initIPFS: async (useSecondaryScript = false)=>{
         Session.set('ipfsConnected',false);
+        console.log(window.ipfs)
 
-        if (LocalStore.get('browserIpfs') == null) {LocalStore.set('browserIpfs', true)}
+        if (LocalStore.get('browserIpfs') == null) {LocalStore.set('browserIpfs', false)}
+            console.log(window.ipfs);
+            // if(window.ipfs) {
+
+            //     global.ipfs = await window.ipfs.enable();
+            //     Session.set('IpfsCompanion', true);
+            //     Session.set('ipfsConnected',false);
+            //     Session.set('ipfsId',null);
+            //     Session.set('ipfsAPI','Ipfs Companion')
+            //     let hash = 'QmS8hKtny73KoTh8cL2xLoLHjMDjkG9WYF3AHAdd9PHkxo';
+            //     global.ipfs.get(hash).then(files =>{
+
+            //             console.log(files)
+            //         })
+            //         let files = await module.exports.getItemFromIpfsHash('Qmaisz6NMhDB51cCvNWa1GMS7LU1pAxdF4Ld6Ft9kZEP2a',false);
+            //         if(files && files.length > 0) {
+            //             $.notify({
+            //                 icon: 'glyphicon glyphicon-success-sign',
+            //                 title: '',
+            //                 message: 'IPFS daemon successfully started in browser! ',
+            //                 target: '_blank',
+            //                 allow_dismiss: false,
+            //             },{
+            //                 animate: {
+            //                     enter: 'animated fadeInDown',
+            //                     exit: 'animated fadeOutUp'
+            //                 },
+            //                 type:'success',
+            //                 showProgressbar: false,
+            //                 placement: {
+            //                     from: "bottom",
+            //                     align: "center"
+            //                 }
+            //             });
+
+            //             Session.set('ipfsConnected',true);
+            //         }
+            //         let id = await ipfs.id();
         
-        try{
+            //         Session.set('ipfsId', id.id);
+         
+
+            // } else 
             if(LocalStore.get('browserIpfs')) {
-                let scriptURL = useSecondaryScript ? "https://unpkg.com/ipfs/dist/index.min.js" : "https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js";
+                //let scriptURL = useSecondaryScript ? "https://unpkg.com/ipfs@0.34.2/dist/index.min.js" : "https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js";
+                let scriptURL = "https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js";
                 $.getScript(scriptURL, async ()=>{
 
-                    try{
-                    const repoPath = 'ipfs-mix'
+                 
+                    const repoPath = 'ipfs-repo'
+                    //global.ipfs = await window.ipfs.enable();
+
+                    global.ipfs =  new Ipfs({ 
+                          repo:  repoPath,
+                          config:{
+                            Addresses: {
+                                Swarm: [
+                                ],
+                                API: '',
+                                Gateway: ''
+                            },
+                            Discovery: {
+                                MDNS: {
+                                Enabled: false,
+                                Interval: 10
+                                },
+                                webRTCStar: {
+                                Enabled: true
+                                }
+                            },
+                            Bootstrap: [
+                                '/dns4/ams-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd',
+                                '/dns4/lon-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLMeWqB7YGVLJN3pNLQpmmEk35v6wYtsMGLzSr5QBU3',
+                                '/dns4/sfo-3.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM',
+                                '/dns4/sgp-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLSafTMBsPKadTEgaXctDQVcqN88CNLHXMkTNwMKPnu',
+                                '/dns4/nyc-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLueR4xBeUbY9WZ9xGUUxunbKWcrNFTDAadQJmocnWm',
+                                '/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64',
+                                '/dns4/node0.preload.ipfs.io/tcp/443/wss/ipfs/QmZMxNdpMkewiVZLMRxaNxUeZpDUb34pWjZ1kZvsd16Zic',
+                                '/dns4/node1.preload.ipfs.io/tcp/443/wss/ipfs/Qmbut9Ywz9YEDrz8ySBSgWyJk41Uvm2QJPhwDJzJyGFsD6'
+                            ]
+                        },
                     
-                    global.ipfs = new Ipfs({ repo: repoPath });
+                    });
 
                     
-                    // global.ipfs.bootstrap.add('/ip6/2400:6180:0:d0::151:6001/tcp/4001/ipfs/QmSoLSafTMBsPKadTEgaXctDQVcqN88CNLHXMkTNwMKPnu');
-                    // global.ipfs.bootstrap.add('/ip6/2604:a880:1:20::203:d001/tcp/4001/ipfs/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM');
-                    // global.ipfs.bootstrap.add('/ip6/2604:a880:800:10::4a:5001/tcp/4001/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64');
-                    // global.ipfs.bootstrap.add('/ip6/2a03:b0c0:0:1010::23:1001/tcp/4001/ipfs/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd');
+
+                    Session.set('ipfsAPI','JS-Ipfs')
+
 
                     global.ipfs.on('ready', async () => { 
+                    let peers
+                        peers = await window.ipfs.swarm.peers() // empty peers (still connecting)
+                        console.log(peers)
+                        console.log('myid', await global.ipfs.id())
+                        setTimeout( async() => {
+                            peers = await window.ipfs.swarm.peers() // several peers (connected now)
+                            console.log(peers)
+                            
+                            //const peerId = await window.ipfs.dht.findpeer('QmWLiP6qKSii1kfRuxXTev7C7Ck7XYbz8Rq92HZerui1cu')
+
+                            //console.log('peerId', peerId)
+                            
+                        }, 20000)
+                    
                         Session.set('ipfsConnected',false);
                         Session.set('ipfsId',null);
+                        let hash = 'QmS8hKtny73KoTh8cL2xLoLHjMDjkG9WYF3AHAdd9PHkxo';
+                        window.ipfs.get(hash).then(files =>{
+
+                            console.log(files)
+                        })
                         let files = await module.exports.getItemFromIpfsHash('Qmaisz6NMhDB51cCvNWa1GMS7LU1pAxdF4Ld6Ft9kZEP2a',false);
                         if(files && files.length > 0) {
                             $.notify({
@@ -58,9 +150,9 @@ module.exports = {
         
                         
                     })
-                    }catch(e) {
-                        module.exports.initIPFS(false);
-                    }
+                    // }catch(e) {
+                    //     module.exports.initIPFS(true);
+                    // }
                 
                 });
                 
@@ -68,6 +160,8 @@ module.exports = {
                 global.ipfs = ipfsAPI(LocalStore.get('ipfsApiURL'), '5001', {protocol: LocalStore.get('protocol')});
                 Session.set('ipfsConnected',false);
                 Session.set('ipfsId',null);
+
+                Session.set('ipfsAPI','Localhost')
 
                 let files = await module.exports.getItemFromIpfsHash('Qmaisz6NMhDB51cCvNWa1GMS7LU1pAxdF4Ld6Ft9kZEP2a', false);
                 if(files && files.length > 0) {
@@ -78,11 +172,11 @@ module.exports = {
                 Session.set('ipfsId', id.id);
           
         }
-        } catch(e) {
+        // } catch(e) {
             
-            console.log(e);
+        //     console.log(e);
 
-        }
+        // }
         
     },
 
@@ -94,15 +188,22 @@ module.exports = {
     },
 
     getItemFromIpfsHash: async(hash, isTimer) => {
-
+        console.log(hash)
+        console.log(global.ipfs)
+        isTimer = false
         const ipfs = global.ipfs;
         let promise = new Promise((resolve, reject) => {
-            ipfs.get(hash).then(files =>{resolve(files)});
+            ipfs.get(hash).then(files =>{
+
+                console.log(files)
+                resolve(files);
+
+            });
         
         })
 
         if(isTimer) {
-            let ms = 6500;
+            let ms = 20000;
             // let retryAfter = 5000;
             
             //timeoutAfter certain ms (cant find hash)
@@ -173,3 +274,4 @@ module.exports = {
 
 
 };
+

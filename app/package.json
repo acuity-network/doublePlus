@@ -1,28 +1,32 @@
 {
-  "name": "Mix-Hub",
-  "version": "1.0.1",
-  "description": "Mix-Hub",
+  "name": "DoublePlus",
+  "version": "0.0.2",
+  "description": "Fully decentralized social network.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/mix-blockchain/doubleplus"
   },
   "author": "Brian Heishman",
   "license": "Apache 2.0",
   "bugs": {
     "url": ""
   },
+
   "homepage": "https://github.com/mixblockchain/mix-hub",
   "browser": {
     "request": "xhr"
   },
+
   "dependencies": {
     "@babel/runtime": "7.0.0-beta.55",
+    "@ledgerhq/hw-app-eth": "^4.36.0",
     "base-58": "0.0.1",
     "buffer": "^5.2.1",
+    "bufferutil": "^4.0.1",
     "classnames": "^2.2.5",
     "clipboard": "^2.0.4",
     "core-js": "^2.5.7",
@@ -44,6 +48,7 @@
     "react-infinite-scroll-component": "^4.2.0",
     "react-router-dom": "^4.0.0-beta.6",
     "request": "^2.88.0",
+    "utf-8-validate": "^5.0.2",
     "web3": "1.0.0-beta.34"
   }
 }

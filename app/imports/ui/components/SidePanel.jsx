@@ -127,6 +127,9 @@ class SidePanel extends React.Component{
                             <a  onClick={this.route.bind(this, '/trusted',true)}>Following</a>
                         </li>
                         <li>
+                            <a  onClick={this.route.bind(this, '/faucet',true)}>Faucet</a>
+                        </li>
+                        <li>
                             <a  onClick={this.route.bind(this, '/settings',true)}>Settings</a>
                         </li>
                     </ul>

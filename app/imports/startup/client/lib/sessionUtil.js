@@ -1,4 +1,5 @@
 
+
 module.exports = {
     
     logOut: () => {
@@ -68,6 +69,74 @@ module.exports = {
             binary += String.fromCharCode( bytes[ i ] );
         }
         return window.btoa( binary );
+    },
+
+    requestMixFromFaucet: (_toAddr, _captchaKey) => { return new Promise(async function(resolve,reject) {
+
+            let data = "toAddr="+String(_toAddr)+"&captcha="+String(_captchaKey);
+
+            const xhr = new XMLHttpRequest();
+
+            xhr.addEventListener("readystatechange", function () {
+                if (this.readyState === 4) {
+
+                    console.log(this.status, this.responseText);
+                    let jsonResponse = JSON.parse(this.responseText);
+
+                    if (this.status !== 200) {
+                        
+                        $.notify({
+                            icon: 'glyphicon glyphicon-warning-sign',
+                            title: '',
+                            message: 'Error requesting MIX: '+jsonResponse.message,
+                            target: '_blank',
+                            allow_dismiss: false,
+                        },{
+                            animate: {
+                                enter: 'animated fadeInDown',
+                                exit: 'animated fadeOutUp'
+                            },
+                            type:'danger',
+                            showProgressbar: false,
+                            placement: {
+                                from: "bottom",
+                                align: "center"
+                            }
+                        });
+
+                    } else {
+
+                        $.notify({
+                            icon: 'glyphicon glyphicon-warning-sign',
+                            title: '',
+                            message: 'Tx created successfully! Tx Hash: '+jsonResponse.txHash,
+                            target: '_blank',
+                            allow_dismiss: false,
+                        },{
+                            animate: {
+                                enter: 'animated fadeInDown',
+                                exit: 'animated fadeOutUp'
+                            },
+                            type:'success',
+                            showProgressbar: false,
+                            placement: {
+                                from: "bottom",
+                                align: "center"
+                            }
+                        });
+
+                    }
+                    resolve(jsonResponse);
+                }
+            });
+
+            xhr.open("POST", "https://faucet.doubleplus.io/getMix");
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.setRequestHeader("cache-control", "no-cache");
+
+            xhr.send(data);
+  
+        });
     }
 
 

@@ -149,7 +149,7 @@ class ProfileFeedItem extends React.Component{
             showReload:false
         })
 
-        let ms = 7000
+        let ms = 8500
         let timeOut = setTimeout(() => {
             clearTimeout(timeOut);
             this.setState({

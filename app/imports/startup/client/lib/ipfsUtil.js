@@ -21,11 +21,7 @@ module.exports = {
                     global.ipfs = new Ipfs({ repo: repoPath });
 
                     
-                    // global.ipfs.bootstrap.add('/ip6/2400:6180:0:d0::151:6001/tcp/4001/ipfs/QmSoLSafTMBsPKadTEgaXctDQVcqN88CNLHXMkTNwMKPnu');
-                    // global.ipfs.bootstrap.add('/ip6/2604:a880:1:20::203:d001/tcp/4001/ipfs/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM');
-                    // global.ipfs.bootstrap.add('/ip6/2604:a880:800:10::4a:5001/tcp/4001/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64');
-                    // global.ipfs.bootstrap.add('/ip6/2a03:b0c0:0:1010::23:1001/tcp/4001/ipfs/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd');
-
+                
                     global.ipfs.on('ready', async () => { 
                         Session.set('ipfsConnected',false);
                         Session.set('ipfsId',null);
@@ -102,7 +98,7 @@ module.exports = {
         })
 
         if(isTimer) {
-            let ms = 6500;
+            let ms = 10000;
             // let retryAfter = 5000;
             
             //timeoutAfter certain ms (cant find hash)

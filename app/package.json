@@ -43,6 +43,7 @@
     "react-google-recaptcha": "^1.0.5",
     "react-infinite-scroll-component": "^4.2.0",
     "react-router-dom": "^4.0.0-beta.6",
+    "react-router-hash-link": "^1.2.1",
     "request": "^2.88.0",
     "web3": "1.0.0-beta.34"
   }

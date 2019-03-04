@@ -76,7 +76,7 @@ class Trusted extends React.Component{
                                             <label htmlFor="addr">Add Trusted Account</label>
                                             <input onChange={this.handleAddrChange.bind(this)} style={{width:"100%"}} className="form-control" id="addr" placeholder="0x43b32a..." type="text"/>
                                         </div>
-                                        <button onClick={this.handleSubmit.bind(this)} type="button" id="save" className="w3-button w3-theme">Add</button>
+                                        <button onClick={this.handleSubmit.bind(this)} type="button" id="save" className="btn btn-light">Add</button>
                                 </div>
 
 

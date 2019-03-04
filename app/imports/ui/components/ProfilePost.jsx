@@ -39,12 +39,12 @@ class ProfilePost extends React.Component{
     };
 
     handlePostSubmit(e) {
-        if(this.state.charCount>140) {
+        if(this.state.charCount>200) {
 
             $.notify({
                 icon: 'glyphicon glyphicon-warning-sign',
                 title: '',
-                message: 'Keep your post under 140 characters!',
+                message: 'Keep your post under 200 characters!',
                 target: '_blank'
             },{
                 animate: {
@@ -181,7 +181,7 @@ class ProfilePost extends React.Component{
                     <textarea value = {this.state.postText} style={{ width: '100%'}}  onChange={this.handlePostChange.bind(this)} className="form-control" id="post" placeholder="Feeling Uncensorable!" type="text"/>
                 </div>
                 <button  onClick = {this.handlePostSubmit.bind(this)} style={{float: 'right'}} type="button" className="btn btn-info"><i className="fa fa-pencil"></i> &nbsp;Post</button> 
-                <span className="w3-right w3-opacity" style={{float: 'right'}}> {140 - this.state.charCount} &nbsp;&nbsp; </span>
+                <span className="w3-right w3-opacity" style={{float: 'right'}}> {200 - this.state.charCount} &nbsp;&nbsp; </span>
                 {/* <button  type="button" className="btn w3-theme"><i className="fa fa-image"></i> &nbsp;Attach Img</button>  */}
             </div>
         </div>

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { withRouter } from 'react-router-dom';
+import { HashLink as Link } from 'react-router-hash-link';
 
 class NavBar extends React.Component{
 
@@ -50,10 +51,9 @@ class NavBar extends React.Component{
                     <li className="nav-item">
                         <a className="nav-link" onClick={this.route.bind(this,'/',false)} >Home</a>
                     </li>
-                    {/* <li className="nav-item">
-                        <a className="nav-link" href="#">About</a>
-                    </li> */}
-                    
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/home#about">About</Link>
+                    </li>
                     <li className="nav-item">
                         <a className="nav-link" target="_blank" href="https://graviex.net/markets/mixbtc">Get MIX</a>
                     </li>

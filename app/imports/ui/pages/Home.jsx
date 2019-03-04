@@ -4,6 +4,7 @@ import MixStats from '../components/MixStats.jsx'
 import IpfsStats from '../components/IpfsStats.jsx'
 import AccountRouter from '../components/AccountRouter.jsx'
 import base64img from '../../startup/client/lib/base64img.js'
+import HomeAbout from '../components/HomeAbout.jsx'
 
 class Home extends React.Component {
   
@@ -52,7 +53,7 @@ class Home extends React.Component {
       <div className="w3-row">
        
         <div className="w3-col m9 w3-row-padding" style={{paddingBottom:"20px"}}>
-        <AccountRouter/>
+            <AccountRouter/>
         
                 <div className="w3-card w3-round w3-white">
                     <div className="w3-center w3-container w3-padding">
@@ -79,7 +80,12 @@ class Home extends React.Component {
                     
                     </div>
                 </div>
+                <div id="about">
+                    <HomeAbout/>
+                </div>
+
             </div>
+       
 
         <MixStats/>
         <IpfsStats/>

@@ -43,7 +43,7 @@ class HomeAbout extends React.Component{
                         
                         <span className="w3-center" style={this.state.fontStyle}>
 
-                            <p> &nbsp; &nbsp;<span style={{fontWeight:"bold"}}> Post are cryptographically signed - </span>100% certainty the user in possion of the private key posted the message. </p>
+                            <p> &nbsp; &nbsp;<span style={{fontWeight:"bold"}}> Post are cryptographically signed - </span>100% certainty the user in possession of the private key posted the message. </p>
                             <p> &nbsp; &nbsp;<span style={{fontWeight:"bold"}}> Permissionless - </span> No user is barred from creating an account and posting. </p>
                             <p> &nbsp; &nbsp;<span style={{fontWeight:"bold"}}> Accessible across all boarders - </span> DoublePlus application is hosted through a peer to peer network (IPFS). </p>
                             <p> &nbsp; &nbsp;<span style={{fontWeight:"bold"}}> Censorship resistant post - </span>Post are pinned to the IPFS network and indexed on the MIX blockchain. Both of which are peer to peer decentralized networks. Meaning you are free to post your thoughts and opinions without the possibility of them being removed. </p>

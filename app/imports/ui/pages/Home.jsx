@@ -11,8 +11,9 @@ class Home extends React.Component {
   constructor(props){
     super(props);
 
-    this.state = { gif:
-        "data:image/gif;base64, "+ base64img.base64Gif
+    this.state = { 
+        gif: "data:image/gif;base64, "+ base64img.base64Gif,
+        dpImg:"data:image/png;base64, "+base64img.doublePlusImg
     };
   }
 
@@ -68,8 +69,8 @@ class Home extends React.Component {
                         <br /><br />&nbsp;&nbsp;&nbsp; For any questions, guides on getting started, or some MIX so you can start posting feel free to join the <a href= "https://discord.gg/vd7dknY" >Mix-Blockchain Discord channel</a>.
                     </h4>
                     <br/><br/><br/> */}
-                    <img style={{paddingTop:'30px'}} src={this.state.gif} />
-                    <br/><br/><br/>
+                    <img style={{width:"80%",paddingTop:'30px'}} src={this.state.dpImg} />
+                    <br/><br/><br/><br/><br/><br/>
                     {!this.state.loggedIn ? <div>
                     
                     <button onClick={this.route.bind(this,'/login')} style={{width:"60%"}} type="button" className="w3-button  btn-success btn-lg">Login</button>

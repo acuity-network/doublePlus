@@ -33,7 +33,7 @@ class HomeAbout extends React.Component{
                 <h2 style={{paddingBottom:"15px"}} className="w3-center">About DoublePlus</h2>
                     <span style={this.state.fontStyle}>
                         <p>&nbsp; &nbsp; &nbsp;DoublePlus is a fully decentralized social network platform that enables users to connect directly with each other
-                            without an intermediary in the way. This enables full freedom to communicate, share ideas and opinions in a that isn't
+                            without an intermediary in the way. This enables full freedom to communicate, share ideas and opinions in a way that isn't
                             possible with the current social networks. In comparison to other new and existing platforms, DoublePlus puts a large emphasis on 
                             decentralization, with no single fail point at any level.
                         </p>
@@ -65,6 +65,9 @@ class HomeAbout extends React.Component{
                             <p>
                             &nbsp; &nbsp; &nbsp; After your MIX account is funded you will be able to create a profile, create post, follow users, donate to post, and interact with users
                                 in a fully decentralized way.
+                            </p>
+                            <p>
+                                Check out my profile <Link style={{color:"blue"}} to="/profile/0xdbe58fffed107ad854a65c4eff1ea327ee0cbc5c">Here.</Link>
                             </p>
 
                         </span>

@@ -518,7 +518,6 @@ module.exports = {
         let flagsNonce = '0x01' + Web3.utils.randomHex(30).substr(2);
         let itemId = await module.exports.getItemId(flagsNonce, myAddr);
         
-        await module.exports.addChildToParent(myAddr, parentProfileId, flagsNonce, true);
         await module.exports.addChildToParent(myAddr, parentPostId, flagsNonce, false)
         await module.exports.createNewItem(myAddr,ipfsHash,flagsNonce, notify);
         await module.exports.initializeBlurb(myAddr, itemId, 1);

@@ -1,5 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
+import { HashLink as Link } from 'react-router-hash-link';
 
 class Create extends React.Component{
 
@@ -9,6 +10,9 @@ class Create extends React.Component{
     }
 
     componentWillMount(){
+
+        if(Session.get("loggedIn")) {this.route('/')}
+
         this.setState({
   
         });
@@ -61,6 +65,7 @@ class Create extends React.Component{
 
     render() {
         let Render;
+        
 
         Render = 
         <div style ={{margin:'auto', maxWidth:'1200px'}}>
@@ -91,8 +96,10 @@ class Create extends React.Component{
                 <p><strong>Save the following information to access your account.</strong></p>
                 <p><strong>Public Address: </strong>  {this.state.addr} <br/>  </p>
                 <p><strong>Private Key:  </strong> {this.state.priv} <br/>  </p>
+                <p><strong><u>You must save your private key in order to access your account in the future.</u></strong></p>
             </div>
             <div className="modal-footer">
+                <span style={{float:"left", marginLeft:"auto"}}> Need some MIX to get started?  Use the <Link style={{color:"blue"}} to="/faucet">MIX facuet.</Link></span>
                 <button type="button" onClick={this.hideModal.bind(this)} className="btn btn-light" data-dismiss="modal">Close</button>
             </div>
         </div>

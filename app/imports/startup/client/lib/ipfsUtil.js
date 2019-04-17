@@ -12,7 +12,8 @@ module.exports = {
         
         try{
             if(LocalStore.get('browserIpfs')) {
-                let scriptURL = useSecondaryScript ? "https://unpkg.com/ipfs/dist/index.min.js" : "https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js";
+                //let scriptURL = useSecondaryScript ? "https://cdn.jsdelivr.net/npm/ipfs/dist/index.js" : "https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js";
+                let scriptURL = "https://unpkg.com/ipfs@0.34.4/dist/index.min.js";
                 $.getScript(scriptURL, async ()=>{
 
                     try{

@@ -111,14 +111,15 @@ class ProfileFeedItem extends React.Component{
 
             })
         })
-
-        MixUtil.getBlurbInfo(_item.itemId)
-        .then(blurbInfo =>{
-            this.setState({
-                donations: web3.utils.fromWei(blurbInfo.donationsReceived,"ether"),
-                blurbType: blurbInfo.blurbType
-            })
-        })
+        if(this.props.blurbType >= 0) {
+            MixUtil.getBlurbInfo(_item.itemId)
+                .then(blurbInfo =>{
+                    this.setState({
+                        donations: web3.utils.fromWei(blurbInfo.donationsReceived,"ether"),
+                        blurbType: blurbInfo.blurbType
+                    })
+                })
+        }
 
         MixUtil.getProfileLocalDb(_item.owner())
         .then(_profile => {

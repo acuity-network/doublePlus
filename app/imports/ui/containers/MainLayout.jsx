@@ -20,6 +20,7 @@ import NavBar from '../components/NavBar.jsx';
 import Feed from '../pages/Feed.jsx';
 import Comments from '../pages/Comments.jsx';
 import Faucet from '../pages/Faucet.jsx'
+import MixFeed from '../pages/MixFeed.jsx';
 
 
 
@@ -41,9 +42,9 @@ export default class MainLayout extends React.Component {
     if(!LocalStore.get('nodeURL')) {
       LocalStore.set('nodeURL', "https://rpc.doubleplus.io/");
     }
-    if(!LocalStore.get('ipfsApiURL')) {
-        LocalStore.set('ipfsApiURL', "localhost");
-    }
+    // if(!LocalStore.get('ipfsApiURL')) {
+        LocalStore.set('ipfsApiURL', "https://ipfs.infura.io");
+    // }
     if(!LocalStore.get('ipfsGatewayURL')) {
         LocalStore.set('ipfsGatewayURL', "https://ipfs.infura.io/");
     }
@@ -107,6 +108,7 @@ export default class MainLayout extends React.Component {
                 <Route path = '/profile/:address' component={Profile} />
                 <Route path = '/comments/:itemid' component={Comments} />
                 <Route path = '/faucet' component={Faucet} />
+                <Route path = '/mixfeed/:itemid' component={MixFeed} />
                 
                 <Route component={Home} />
               </Switch>

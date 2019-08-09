@@ -114,18 +114,18 @@ class SidePanel extends React.Component{
                     </div>
                     
                     <ul style={{fontWeight:'bold'}} className="list-unstyled components">
-                        <li>
+                        {/* <li>
                             <a  onClick={this.route.bind(this, '/feed/'+Session.get('addr'),true)}>My Feed</a>
                         </li>
                         <li>
                             <a  onClick={this.route.bind(this, '/profile/'+Session.get('addr'),true)}>My Profile</a>
-                        </li>
+                        </li> */}
                         <li>
                             <a  onClick={this.route.bind(this, '/wallet',true)}>Wallet<span style={{float:'right', fontWeight:'lighter'}}>{Session.get('balance')} Mix</span></a>
                         </li>
-                        <li>
+                        {/* <li>
                             <a  onClick={this.route.bind(this, '/trusted',true)}>Following</a>
-                        </li>
+                        </li> */}
                         <li>
                             <a  onClick={this.route.bind(this, '/faucet',true)}>Faucet</a>
                         </li>
@@ -152,9 +152,9 @@ class SidePanel extends React.Component{
                     </div>
 
                     <ul style={{fontWeight:'bold'}} className="list-unstyled components">
-                        {/* <li>
-                            <a  onClick={this.route.bind(this, '/feed/'+Session.get('addr'),true)}>My Feed</a>
-                        </li> */}
+                        <li>
+                            <a  onClick={this.route.bind(this, '/faucet',true)}>Faucet</a>
+                        </li>
                         <li>
                             <a  onClick={this.route.bind(this, '/settings',true)}>Settings</a>
                         </li>

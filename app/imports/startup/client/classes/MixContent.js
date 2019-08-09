@@ -5,6 +5,7 @@ const IpfsUtil = require('../lib/ipfsUtil.js');
 import itemProto from '../lib/protobuf/item_pb.js';
 
 
+
 export default class MixContent {
 
   constructor() {
@@ -16,8 +17,14 @@ export default class MixContent {
     let encodedIpfsHash = multihashes.toB58String(multihashes.encode(Buffer.from(ipfsHash.substr(2), "hex"), 'sha2-256'))
     
     try{
-      let response = await IpfsUtil.getItemFromIpfsHash(encodedIpfsHash,true);
-      let itemPayload = new Uint8Array(Buffer.from(response[0].content, "binary"));
+      const ipfs = global.ipfs;
+      let response = await ipfs.cat(encodedIpfsHash);
+      let newr = response.toString('utf8');
+      console.log(newr);
+      console.log(encodedIpfsHash,Buffer.from(newr, "binary"));
+      //let response = await IpfsUtil.getItemFromIpfsHash(encodedIpfsHash,false);
+      let itemPayload = (Buffer.from(newr, "binary"));
+
       let item = await brotli.decompressArray(itemPayload);
   
       let mixins = itemProto.Item.deserializeBinary(item).getMixinList()
@@ -30,6 +37,7 @@ export default class MixContent {
       }
     } catch (e) {
       //try once more
+      console.log(e)
       let response = await IpfsUtil.getItemFromIpfsHash(encodedIpfsHash,true);
       let itemPayload = new Uint8Array(Buffer.from(response[0].content, "binary"));
       let item = await brotli.decompressArray(itemPayload);

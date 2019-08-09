@@ -84,23 +84,7 @@ class AccountRouter extends React.Component{
 
             })
         } else {
-            $.notify({
-                icon: 'glyphicon glyphicon-warning-sign',
-                title: '',
-                message: "Not a valid address format.",
-                target: '_blank'
-            },{
-                animate: {
-                    enter: 'animated fadeInDown',
-                    exit: 'animated fadeOutUp'
-                },
-                type:'danger',
-                placement: {
-                    from: "bottom",
-                    align: "center"
-                }
-            });
-
+            this.route('/mixfeed/' + addr);
         }
 
     };

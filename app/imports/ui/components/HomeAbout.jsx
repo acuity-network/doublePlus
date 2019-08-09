@@ -66,9 +66,9 @@ class HomeAbout extends React.Component{
                             &nbsp; &nbsp; &nbsp; After your MIX account is funded you will be able to create a profile, create post, follow users, donate to post, and interact with users
                                 in a fully decentralized way. <u>Keep in mind DoublePlus is still in active development and many features are still to come.</u>  Report any bugs or feedback to the DoublePlus channel on the <a style={{color:"blue"}} target="_blank" href="https://discord.gg/vd7dknY">MIX blockchain discord.</a>
                             </p>
-                            <p>
+                            {/* <p>
                                 Check out my profile <Link style={{color:"blue"}} to="/profile/0xdbe58fffed107ad854a65c4eff1ea327ee0cbc5c">Here.</Link>
-                            </p>
+                            </p> */}
 
                         </span>
                     

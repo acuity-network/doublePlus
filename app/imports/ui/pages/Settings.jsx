@@ -165,7 +165,7 @@ class Settings extends React.Component{
                 </div>
                 </div>
 
-                {Session.get('loggedIn')?<ProfileUserEdit/>:''}
+                {/* {Session.get('loggedIn')?<ProfileUserEdit/>:''} */}
                 </div>
             
        

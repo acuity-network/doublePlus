@@ -6,7 +6,8 @@ class Faucet extends React.Component{
 
     constructor(props){
         super(props);
-        this.state = {captchaKey:null };
+        this.state = {captchaKey:null,
+                      toAddr:''};
     }
 
     componentWillMount(){
@@ -15,20 +16,29 @@ class Faucet extends React.Component{
         });
     };
 
+    handleAddrChange (e) {
+        this.setState({
+            toAddr: e.target.value
+        });
+
+    };
+
     route (link) {
         this.props.history.push(link)
     };
 
     request () {
 
-        let toAddr = Session.get('addr');
+        let toAddr = this.state.toAddr;
 
-        if(!toAddr) {
+        let isAddr = Web3Util.isAddress(toAddr);
+        console.log(toAddr)
+        if(!toAddr || !isAddr) {
 
             $.notify({
                 icon: 'glyphicon glyphicon-warning-sign',
                 title: '',
-                message: 'Please log in to request funds.',
+                message: 'Not a valid MIX address.',
                 target: '_blank'
             },{
                 animate: {
@@ -110,9 +120,12 @@ class Faucet extends React.Component{
                         <div style={{paddingBottom: "20px"}}>
                             <h3 style={{paddingBottom: "20px"}} >MIX Faucet</h3>
                     
-                            <div  style={{paddingBottom: "20px"}}>
+                            <div  style={{paddingBottom: "10px"}}>
                                 <span>This is service to allow you to aquire a small amount of MIX to get your account started.  It can only be used once per account and IP. Please consider donating to keep the faucet funded.</span>
-                                
+                                <div className="form-group">
+                                        <label htmlFor="addr" style={{fontWeight: "bold"}}>Enter a MIX Address:</label>
+                                    <input onChange={this.handleAddrChange.bind(this)} style={{width:"80%"}} className="form-control" id="addr" placeholder="0x43b32a..." type="text"/>
+                                </div>
                             </div>
                             <div  style={{paddingBottom: "20px"}}>
                                 <button onClick= {this.request.bind(this)} id="request" type="button" className="btn btn-light"><i className=""></i> &nbsp;Request MIX</button>&nbsp;&nbsp;&nbsp;

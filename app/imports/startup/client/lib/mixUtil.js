@@ -19,9 +19,14 @@ const trustedAccountsAbi = require('../lib/jsonAbis/trustedAccounts.abi.json');
 const trustedAccountAddr = '0x11dc5cf838ae3850458f92474dc28d1e47f8e045';
 
 const itemDagAbi = require('../lib/jsonAbis/ItemDag.abi.json');
+const ItemDagOneParentAbi = require('../lib/jsonAbis/ItemDagOneParent.abi.json');
+
 const itemDagAddr = '0xbd3af0bdcf4c8a6dfd8f6ff2129409632decfc7e';
 
 const itemDagOnlyOwnerAddr = '0xd6cc1712b46a599f87f023fad83bc06473bb2b8d';
+
+const itemDagFeedAddr = '0xd6cc1712b46a599f87f023fad83bc06473bb2b8d';
+
 
 const blurbsAbi = require('../lib/jsonAbis/Blurbs.abi.json');
 const blurbsAddr = '0x67e27cd15b4df2e1bc85729e59e6e7964274b9af';
@@ -465,7 +470,7 @@ module.exports = {
 
       try{
         const web3 = global.web3;
-        const itemDagContractAddr =  onlyOwner ? itemDagOnlyOwnerAddr : itemDagAddr;
+        const itemDagContractAddr =  onlyOwner ? itemDagFeedAddr : itemDagAddr;
         const itemDag =  new web3.eth.Contract(itemDagAbi, itemDagContractAddr);
         let reviseItem = await itemDag.methods.addChild(parent, itemStoreIpfsSha256Addr, flagsNonce);
         const encodedABI = reviseItem.encodeABI();
@@ -597,7 +602,7 @@ module.exports = {
 
       try {
         const web3 = global.web3;
-        const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagOnlyOwnerAddr);
+        const itemDagFactory = new web3.eth.Contract(itemDagAbi, itemDagFeedAddr);
         let childrenArray = await itemDagFactory.methods.getAllChildIds(itemId).call();
         return childrenArray;
       } catch (e) {
@@ -617,6 +622,19 @@ module.exports = {
       } catch (e) {
         console.log(e)
         return [];
+      }
+
+    },
+
+    getAllFeedItems: async(feedItemId)=> {
+      try {
+        const web3 = global.web3;
+
+
+
+      } catch(e) {
+
+
       }
 
     },
@@ -672,7 +690,6 @@ module.exports = {
         //let GasPrice = await Web3Util.getGasPrice();
         let GasPrice = Session.get('gasPrice');
         let Nonce = await web3.eth.getTransactionCount(myAddr, 'pending');
-        console.log('n3', Nonce)
         let rawTx = {
           nonce:Nonce,
           chainId:76,
@@ -836,8 +853,26 @@ module.exports = {
       } else {
         return null;
       }
+    },
+
+    mixFeed: async(itemId) => {
+      let feedItems = []
+      let mixItem = new MixItem(itemId);
+      let _item = await mixItem.init();
+      await _item.latestRevision().load();
+      let revision = await _item.latestRevision();
+      console.log(revision.content)
+      if (!revision.content.getPrimaryMixinId() == '0xbcec8faa') {
+        throw new Error('Not a valid feed')
+      } else {
+        feedItems = await module.exports.getChildren(itemId);
+        feedItems = await module.exports.initAllItems(feedItems);
+        await feedItems.sort((itemA, itemB) => {
+          return (itemB.latestTimeStamp() - itemA.latestTimeStamp())
+        })
+        return feedItems;
+      }
+
     }
-
-
 
 }

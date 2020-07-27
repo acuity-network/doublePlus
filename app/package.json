@@ -32,7 +32,7 @@
     "google-protobuf": "^3.5.0",
     "history": "^3.0.0",
     "ipfs-api": "^25.0.0",
-    "jpeg-js": "^0.3.4",
+    "jpeg-js": "^0.4.1",
     "jquery": "^3.3.1",
     "meteor-node-stubs": "^0.4.1",
     "multihashes": "^0.4.12",
